@@ -16,6 +16,3 @@
 [submodule "third_party/glog"]
 	path = third_party/glog
 	url = https://github.com/google/glog
-[submodule "percona"]
-	path = percona
-	url = https://github.com/percona/percona-server
