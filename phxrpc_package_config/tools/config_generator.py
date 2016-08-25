@@ -12,6 +12,7 @@ class MyConfigParser( ConfigParser.ConfigParser ):
 class config_generator:
 	def __init__( self, args ):
 		self.m_args = args
+		os.system( 'mkdir %s/etc'% self.m_args.base_dir)
 
 	def generate_config( self ):
 		ret = self.generate_mysql_config()
