@@ -136,7 +136,7 @@ typedef struct Binlog_storage_observer {
 
   int (*before_recovery)(Binlog_storage_param *param,
 		  			 const char * server_uuid, 
-					 PSI_file_key & key_file_binlog_index,
+					 PSI_file_key * key_file_binlog_index,
 					 const char * log_bin_index );
 
 } Binlog_storage_observer;

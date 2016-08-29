@@ -23,7 +23,7 @@ ReplSemiSyncMaster repl_semisync;
 C_MODE_START
 
 int repl_semi_report_binlog_before_recovery(Binlog_storage_param *param, const char * server_uuid,
-                                            PSI_file_key & key_file_binlog_index, const char * log_bin_index) {
+                                            PSI_file_key * key_file_binlog_index, const char * log_bin_index) {
     return 0;
 }
 

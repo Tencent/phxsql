@@ -26,6 +26,6 @@ int repl_phx_report_binlog_to_binlogsvr(Binlog_storage_param *param, const char 
                                         const char *log_file_name, my_off_t log_pos);
 
 int repl_phx_report_binlog_before_recovery(Binlog_storage_param *param, const char * server_uuid,
-                                           PSI_file_key & key_file_binlog_index, const char * log_bin_index);
+                                           PSI_file_key * key_file_binlog_index, const char * log_bin_index);
 
 int GetFuncTime();

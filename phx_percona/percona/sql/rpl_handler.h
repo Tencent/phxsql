@@ -199,7 +199,9 @@ public:
 		  		  const char *log_file,
                   my_off_t log_pos);
 
-  int before_recovery(THD *thd, const char * server_uuid, PSI_file_key & key_file_binlog_index, const char * log_bin_index );
+  int before_recovery(THD *thd, const char * server_uuid, 
+		  			  PSI_file_key * key_file_binlog_index, 
+		  		      const char * log_bin_index );
 };
 
 #ifdef HAVE_REPLICATION

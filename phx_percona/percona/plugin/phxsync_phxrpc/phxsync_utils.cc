@@ -80,10 +80,10 @@ int repl_phx_read_binlog_buffer(const char * log_file_name, my_off_t begin_offse
 }
 
 int repl_phx_report_binlog_before_recovery(Binlog_storage_param *param, const char * server_uuid,
-                                           PSI_file_key & key_file_binlog_index, const char * log_bin_index) {
+                                           PSI_file_key * key_file_binlog_index, const char * log_bin_index) {
     BinlogGtidState * binlog_gtid_state = BinlogGtidState::instance();
     int truncate_binlog_ret = 0;
-    if ((truncate_binlog_ret = binlog_gtid_state->truncate_while_init(server_uuid, key_file_binlog_index, log_bin_index))) {
+    if ((truncate_binlog_ret = binlog_gtid_state->truncate_while_init(server_uuid, *key_file_binlog_index, log_bin_index))) {
         sql_print_information("truncate_binlog_ret %d", truncate_binlog_ret);
         unireg_abort(1);
     }

@@ -5171,7 +5171,7 @@ a file name for --log-bin-index option", opt_binlog_index_name);
 		}
 	}
 
-    int ret = RUN_HOOK(binlog_storage, before_recovery, (NULL, server_uuid, key_file_binlog_index, log_bin_index));
+    int ret = RUN_HOOK(binlog_storage, before_recovery, (NULL, server_uuid, &key_file_binlog_index, log_bin_index));
 	if ( ret )
 	{
    	  sql_print_information( "RUN_HOOK before_recovery ret %d", ret );

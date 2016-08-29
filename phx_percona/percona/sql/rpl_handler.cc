@@ -265,7 +265,10 @@ int Binlog_storage_delegate::after_flush(THD *thd,
   DBUG_RETURN(ret);
 }
 
-int Binlog_storage_delegate::before_recovery(THD * thd, const char * server_uuid, PSI_file_key & key_file_binlog_index, const char * log_bin_index )
+int Binlog_storage_delegate::before_recovery(THD * thd, 
+											 const char * server_uuid, 
+											 PSI_file_key * key_file_binlog_index, 
+											 const char * log_bin_index )
 {
   DBUG_ENTER("Binlog_storage_delegate::before_recovery");
   Binlog_storage_param param;
