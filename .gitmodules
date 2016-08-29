@@ -1,0 +1,18 @@
+[submodule "third_party/colib"]
+	path = third_party/colib
+	url = https://github.com/tencent-wechat/libco
+[submodule "third_party/phxrpc"]
+	path = third_party/phxrpc
+	url = https://github.com/tencent-wechat/phxrpc
+[submodule "third_party/phxpaxos"]
+	path = third_party/phxpaxos
+	url = https://github.com/tencent-wechat/phxpaxos
+[submodule "third_party/leveldb"]
+	path = third_party/leveldb
+	url = https://github.com/google/leveldb
+[submodule "third_party/protobuf"]
+	path = third_party/protobuf
+	url = https://github.com/google/protobuf
+[submodule "third_party/glog"]
+	path = third_party/glog
+	url = https://github.com/google/glog
