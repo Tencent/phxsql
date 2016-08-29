@@ -2,9 +2,13 @@
 
 **PhxSQL是由微信后台团队自主研发的一款服务高可用、数据强一致的分布式数据库服务。该服务基于Percona5.6搭建，目标在于解决[MySQL在容灾和数据一致性方面的不足](http://mp.weixin.qq.com/s?__biz=MzI4NDMyNTU2Mw==&mid=2247483726&idx=1&sn=a295d87b4f6d1394a17b33d7c71989e5&scene=0)，并大幅简化了MySQL容灾切换的运维操作。**
 
-作者：Junchao Chen (junechen@tencent.com), Haochuan Cui (lynncui@tencent.com), Duokai Huang (mariohuang@tencent.com), Ming Chen (mingchen@tencent.com) 和 Sifan Liu (stephenliu@tencent.com) 
+作者：Junchao Chen, Haochuan Cui, Duokai Huang, Ming Chen 和 Sifan Liu 
+
+联系我们：phxteam@tencent.com
 
 想了解更多，请扫描右侧二维码关注我们的公众号
+
+方案说明：[微信开源PhxSQL：高可用、强一致的MySQL集群](http://mp.weixin.qq.com/s?__biz=MzI4NDMyNTU2Mw==&mid=2247483783&idx=1&sn=a2d6e589f1f591ded7703eb74aefccbe&scene=0#wechat_redirect)
 
 # 总览
   - PhxSQL具有服务高可用、数据强一致、高性能、运维简单、和MySQL完全兼容的特点。
