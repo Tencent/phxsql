@@ -1,0 +1,41 @@
+# Copyright (c) 2016 Tencent.  See the AUTHORS file for names 
+# of contributors.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+# 
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the
+# Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+# Boston, MA  02110-1301, USA.
+# 
+
+allobject=librequestfilter_plugin.a libfreqfilter_plugin.a 
+
+REQUESTFILTER_PLUGIN_OBJ=requestfilter_plugin.o
+
+REQUESTFILTER_PLUGIN_LIB=requestfilter_plugin phxsqlproxy:phxsqlproxyconfig
+
+REQUESTFILTER_PLUGIN_SYS_LIB=
+
+REQUESTFILTER_PLUGIN_INCS=$(SRC_BASE_PATH)/phxsqlproxy/plugin/requestfilter 
+
+REQUESTFILTER_PLUGIN_EXTRA_CPPFLAGS=-pipe -fPIC -Wno-deprecated -D__STDC_FORMAT_MACROS
+
+FREQFILTER_PLUGIN_OBJ=freqfilter_plugin.o freqctrlconfig.o
+
+FREQFILTER_PLUGIN_LIB=freqfilter_plugin phxsqlproxy/plugin/monitor:idkey_monitor_plugin phxcomm/configparser:phxconfig phxsqlproxy:phxsqlproxyconfig :requestfilter_plugin
+
+FREQFILTER_PLUGIN_SYS_LIB=$(MYSQL_LIB_PATH)/libperconaserverclient.a -ldl -lrt -lz
+
+FREQFILTER_PLUGIN_INCS=$(SRC_BASE_PATH)/phxsqlproxy/plugin/requestfilter  $(MYSQL_INCLUDE_PATH) 
+
+FREQFILTER_PLUGIN_EXTRA_CPPFLAGS=-pipe -fPIC -Wno-deprecated -D__STDC_FORMAT_MACROS
+

@@ -1,0 +1,144 @@
+syntax = "proto2";
+
+package phxbinlogsvr;
+
+message BinLogBuffer
+{
+	required string oldgtid = 1;
+	required string newgtid = 2;
+	required bytes eventbuffer = 3;
+};
+
+message BinLogResp
+{
+	required int32 ret = 1;
+	optional bytes respbuffer = 2;
+};
+
+message MasterInfo
+{
+	required string ip = 1;
+	required uint32 expire_time = 2;
+	required uint32 version = 3;
+	optional uint32 update_time = 4;
+};
+
+message ExportIPInfo
+{
+	required string ip = 1;
+	required uint32 port= 2;
+};
+
+message HeartBeatInfo
+{
+	required uint32 flag = 1;
+};
+
+message ChangeMemberInfo
+{
+	required string ip = 1;
+}
+
+message MySqlUserModefiedInfo
+{
+	required string now_admin_username = 1;
+	required string now_admin_pwd = 2;
+
+	required string new_username = 3;
+	required string new_pwd = 4;
+}
+
+message MemberList
+{
+	repeated string ip_list = 1;
+	required uint32 port = 2;
+}
+
+
+enum Cmd
+{
+	send_binlog = 0;
+	get_lastsend_gtid_fromg_global = 2;
+	get_masterinfo_fromg_global = 4;
+	get_lastsend_gtid_from_local = 5;
+	get_masterinfo_fromg_lobal = 6;
+	set_export_ip = 7;
+	heart_beat = 8;
+	change_member = 9;
+	get_memberlist = 10;
+	set_mysql_admin_pwd = 11;
+	set_mysql_replica_pwd = 12;
+	get_member_list = 13;
+	init_binlogsvr_master = 14;
+	add_member = 15;
+	remove_member = 16;
+};
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MethodOptions {
+	optional int32 CmdID = 3000000; 
+	optional string OptString = 3000001;
+	optional string Usage = 3000002;
+}
+
+service phxbinlog{
+	rpc SendBinLog( google.protobuf.BytesValue ) returns( google.protobuf.Empty ) {
+	}
+	rpc GetMasterInfoFromGlobal( google.protobuf.Empty ) returns( google.protobuf.BytesValue ) {
+		option( CmdID ) = 1;
+		option( OptString ) = "h:p:";
+		option( Usage ) = "-h <host> -p <port>";
+	}
+	rpc GetMasterInfoFromLocal( google.protobuf.Empty ) returns( google.protobuf.BytesValue ) {
+		option( CmdID ) = 2;
+	}
+	rpc GetLastSendGtidFromGlobal( google.protobuf.BytesValue ) returns( google.protobuf.BytesValue ) {
+		option( CmdID ) = 3;
+		option( OptString ) = "h:p:u:";
+		option( Usage ) = "-h <host> -p <port> -u<gtid>";
+	}
+	rpc GetLastSendGtidFromLocal( google.protobuf.BytesValue ) returns( google.protobuf.BytesValue ) {
+		option( CmdID ) = 4;
+	}
+	rpc SetExportIP( google.protobuf.BytesValue ) returns( google.protobuf.Empty ) {
+		option( CmdID ) = 5;
+		option( OptString ) = "h:p:";
+		option( Usage ) = "-h <host> -p <port>";
+	}
+	rpc HeartBeat( google.protobuf.BytesValue ) returns( google.protobuf.Empty ) {
+		option( CmdID ) = 6;
+	}
+	rpc AddMember( google.protobuf.BytesValue ) returns( google.protobuf.Empty ) {
+		option( CmdID ) = 7;
+		option( OptString ) = "h:p:m:";
+		option( Usage ) = "-h <host> -p <port> -m <member ip>";
+	}
+	rpc RemoveMember( google.protobuf.BytesValue ) returns( google.protobuf.Empty ) {
+		option( CmdID ) = 8;
+		option( OptString ) = "h:p:m:";
+		option( Usage ) = "-h <host> -p <port> -m <member ip>";
+	}
+	rpc SetMySqlAdminInfo( google.protobuf.BytesValue ) returns( google.protobuf.Empty ) {
+		option( CmdID ) = 9;
+		option( OptString ) = "h:p:u:d:U:D:";
+		option( Usage ) = "-h <host> -p <port> -u <admin username> -d <admin pwd> -U <new admin username> -D <new admin pwd>";
+	}
+	rpc SetMySqlReplicaInfo( google.protobuf.BytesValue ) returns( google.protobuf.Empty ) {
+		option( CmdID ) = 10;
+		option( OptString ) = "h:p:u:d:U:D:";
+		option( Usage ) = "-h <host> -p <port> -u <admin username> -d <admin pwd> -U <new replica username> -D <new replica pwd>";
+	}
+	rpc GetMemberList( google.protobuf.Empty ) returns( google.protobuf.BytesValue ) {
+		option( CmdID ) = 11;
+		option( OptString ) = "h:p:";
+		option( Usage ) = "-h <host> -p <port>";
+	}
+	rpc InitBinlogSvrMaster( google.protobuf.BytesValue ) returns( google.protobuf.Empty ) {
+		option( CmdID ) = 12;
+		option( OptString ) = "h:p:";
+		option( Usage ) = "-h <ip1,ip2,ip3(ip1 is master, others are slaves)> -p <port>";
+	}
+}

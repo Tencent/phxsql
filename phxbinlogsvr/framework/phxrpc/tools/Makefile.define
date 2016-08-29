@@ -1,0 +1,34 @@
+# Copyright (c) 2016 Tencent.  See the AUTHORS file for names 
+# of contributors.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+# 
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the
+# Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+# Boston, MA  02110-1301, USA.
+# 
+
+allobject=phxbinlogsvr_tools_phxrpc 
+
+PHXBINLOGSVR_TOOLS_PHXRPC_OBJ=phxrpc_phxbinlog_tool.o phxbinlog_tool_impl.o phxbinlog_tool_main.o
+
+PHXBINLOGSVR_TOOLS_PHXRPC_LIB=phxbinlogsvr/framework/phxrpc/client:phxbinlogsvrclient_phxrpc
+
+PHXBINLOGSVR_TOOLS_PHXRPC_SYS_LIB=$(PHXRPC_LIB_PATH)/libphxrpc.a
+
+PHXBINLOGSVR_TOOLS_PHXRPC_INCS=$(SRC_BASE_PATH)/phxbinlogsvr/framework/phxrpc/tools  $(PHXRPC_INCLUDE_PATH)
+
+PHXBINLOGSVR_TOOLS_PHXRPC_EXTRA_CPPFLAGS=-Wall
+
+vpath %.proto $(SRC_BASE_PATH)/phxbinlogsvr/framework/proto
+phxrpc_phxbinlog_tool.cpp:phxbinlogsvr.proto
+	$(PHXRPC_INCLUDE_PATH)/codegen/phxrpc_pb2tool -f phxbinlogsvr.proto -I $(SRC_BASE_PATH)/phxbinlogsvr/framework/proto/ -I $(PROTOBUF_INCLUDE_PATH) -d .

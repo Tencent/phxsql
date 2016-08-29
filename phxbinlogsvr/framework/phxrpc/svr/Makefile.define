@@ -1,0 +1,36 @@
+# Copyright (c) 2016 Tencent.  See the AUTHORS file for names 
+# of contributors.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+# 
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the
+# Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+# Boston, MA  02110-1301, USA.
+# 
+
+allobject=phxbinlogsvr_phxrpc 
+
+PHXBINLOGSVR_PHXRPC_OBJ=phxrpc_phxbinlog_service.o phxrpc_phxbinlog_dispatcher.o phxbinlog_server_config.o phxbinlog_service_impl.o phxbinlog_server.o phxbinlog_main.o
+
+PHXBINLOGSVR_PHXRPC_LIB=phxbinlogsvr/framework/phxrpc/client:phxbinlogsvrclient_phxrpc phxbinlogsvr/framework/rpccomm:phxbinlogsvrlogic phxcomm/log/phxglog:phxglog
+
+PHXBINLOGSVR_PHXRPC_SYS_LIB=$(PHXRPC_LIB_PATH)/libphxrpc.a
+
+PHXBINLOGSVR_PHXRPC_INCS=$(SRC_BASE_PATH)/phxbinlogsvr/framework/phxrpc/svr  $(PHXRPC_INCLUDE_PATH)
+
+PHXBINLOGSVR_PHXRPC_EXTRA_CPPFLAGS=-Wall
+
+vpath %.proto $(SRC_BASE_PATH)/phxbinlogsvr/framework/proto
+phxrpc_phxbinlog_dispatcher.cpp:phxbinlogsvr.proto
+	$(PHXRPC_INCLUDE_PATH)/codegen/phxrpc_pb2service -f phxbinlogsvr.proto -I $(SRC_BASE_PATH)/phxbinlogsvr/framework/proto/ -I $(PROTOBUF_INCLUDE_PATH) -d .
+phxrpc_phxbinlog_service.cpp:phxbinlogsvr.proto
+	$(PHXRPC_INCLUDE_PATH)/codegen/phxrpc_pb2service -f phxbinlogsvr.proto -I $(SRC_BASE_PATH)/phxbinlogsvr/framework/proto/ -I $(PROTOBUF_INCLUDE_PATH) -d .

@@ -1,0 +1,41 @@
+# Copyright (c) 2016 Tencent.  See the AUTHORS file for names 
+# of contributors.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+# 
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the
+# Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+# Boston, MA  02110-1301, USA.
+# 
+
+allobject=libagentstatus.a libagentmonitorcomm.a 
+
+AGENTSTATUS_OBJ=master_monitor.o slave_monitor.o monitor_comm.o
+
+AGENTSTATUS_LIB=agentstatus phxbinlogsvr/config:phxbinlogconfig phxbinlogsvr/proto:phxbinlogproto phxbinlogsvr/core/mysql:mysqlcommand phxbinlogsvr/statistics:phxbinlogstat phxcomm/utils:phxutils
+
+AGENTSTATUS_SYS_LIB=
+
+AGENTSTATUS_INCS=$(SRC_BASE_PATH)/phxbinlogsvr/core/monitor/base 
+
+AGENTSTATUS_EXTRA_CPPFLAGS=-Wall -Werror
+
+AGENTMONITORCOMM_OBJ=agent_monitor_comm.o
+
+AGENTMONITORCOMM_LIB=agentmonitorcomm phxcomm/utils:phxutils phxcomm/log/phxlog:phxlog phxbinlogsvr/config:phxbinlogconfig phxbinlogsvr/proto:phxbinlogproto
+
+AGENTMONITORCOMM_SYS_LIB=
+
+AGENTMONITORCOMM_INCS=$(SRC_BASE_PATH)/phxbinlogsvr/core/monitor/base 
+
+AGENTMONITORCOMM_EXTRA_CPPFLAGS=-Wall -Werror
+

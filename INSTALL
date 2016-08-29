@@ -1,0 +1,54 @@
+Installation Instructions
+*************************
+
+Copyright (C) 2016 Tencent.
+
+PhxSql-Specific Installation Notes
+====================================
+
+*** NOTE FOR 64-BIT LINUX SYSTEMS
+
+The PhxSql library has to be built on 64-bit systems or you may
+experience some problems.
+
+Basic Installation
+==================
+
+Briefly, the shell commands `./autoinstall.sh; make;make install' should 
+configure and build this package. The following more-detailed instructions 
+are generic. 
+   The `autoinstall.sh' shell script attempts to guess correct values 
+for various system-dependent variables used during compilation. It 
+uses those values and Makefile.define in each directory which describes 
+the source files infomation to create a `Makefile' in each directory of 
+the package. 
+
+   The file `makefile.mk' is used to set options of the compilation 
+environment. You need modify it if you want to change the options including
+the paths of the third party libraries, like glog, leveldb, and protobuf.
+
+The simplest way to compile this package is:
+  1. Make sure the third party libraries, such as protobuf (3.0 or above) 
+  leveldb and glog, have been installed in the system. 
+  Please make sure the CXXFLAGS '-fPIC' has been added while compiling thrid 
+  party libraries.
+
+  2. `cd' to the directory containing the package's source code and type
+     `./autoinstall.sh' to configure the package for your system.
+
+  3. Type `make' to compile the package.
+
+  4. Type `make install' to install the programs to the destination directory.
+
+  5. You can remove the program binaries and object files from the source 
+  code directory by typing `make clean'.  
+
+Compilers and Options
+=====================
+
+Glibc 2.12 or above, as well as 64bit option and C++ 11 support in compiler,
+is required to build the library.
+
+If you want to include more options, modifying the makefile.mk file in 
+the source code directory is a good idea.
+

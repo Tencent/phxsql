@@ -1,0 +1,31 @@
+# Copyright (c) 2016 Tencent.  See the AUTHORS file for names 
+# of contributors.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+# 
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the
+# Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+# Boston, MA  02110-1301, USA.
+# 
+
+allobject=libphxbinlogproto.a 
+
+PHXBINLOGPROTO_OBJ=eventdata.pb.o masterinfo.pb.o paxosdata.pb.o
+
+PHXBINLOGPROTO_LIB=phxbinlogproto
+
+PHXBINLOGPROTO_SYS_LIB=$(PROTOBUF_LIB_PATH)/libprotobuf.a
+
+PHXBINLOGPROTO_INCS=$(SRC_BASE_PATH)/phxbinlogsvr/proto  $(PROTOBUF_INCLUDE_PATH)
+
+PHXBINLOGPROTO_EXTRA_CPPFLAGS=-Wall
+

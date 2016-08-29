@@ -1,0 +1,61 @@
+# Copyright (c) 2016 Tencent.  See the AUTHORS file for names 
+# of contributors.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+# 
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the
+# Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+# Boston, MA  02110-1301, USA.
+# 
+
+allobject=libpaxosagentbase.a libmasteragent.a libeventagent.a libpaxosagent.a 
+
+PAXOSAGENTBASE_OBJ=paxos_agent.o executer_base.o paxos_agent_manager.o
+
+PAXOSAGENTBASE_LIB=paxosagentbase phxbinlogsvr/core/storage:agentstorage phxbinlogsvr/proto:phxbinlogproto phxcomm/log/phxlog:phxlog
+
+PAXOSAGENTBASE_SYS_LIB=$(PHXPAXOS_LIB_PATH)/libphxpaxos.a $(PHXPAXOS_LIB_PATH)/libphxpaxos_plugin.a $(PHXPAXOS_LIB_PATH)/libphxpaxos.a $(PHXPAXOS_LIB_PATH)/libphxpaxos.a
+
+PAXOSAGENTBASE_INCS=$(SRC_BASE_PATH)/phxbinlogsvr/core/paxos  $(PHXPAXOS_PLUGIN_PATH) $(PHXPAXOS_INCLUDE_PATH)
+
+PAXOSAGENTBASE_EXTRA_CPPFLAGS=-Wall -Werror
+
+MASTERAGENT_OBJ=master_agent.o master_executer.o
+
+MASTERAGENT_LIB=masteragent :paxosagentbase phxbinlogsvr/core/handler:masterhandler
+
+MASTERAGENT_SYS_LIB=
+
+MASTERAGENT_INCS=$(SRC_BASE_PATH)/phxbinlogsvr/core/paxos  $(SRC_BASE_PATH)/phxbinlogsvr/core 
+
+MASTERAGENT_EXTRA_CPPFLAGS=-Wall -Werror
+
+EVENTAGENT_OBJ=event_agent.o event_executer.o
+
+EVENTAGENT_LIB=eventagent phxbinlogsvr/core/handler:eventhandler :masteragent :paxosagentbase
+
+EVENTAGENT_SYS_LIB=
+
+EVENTAGENT_INCS=$(SRC_BASE_PATH)/phxbinlogsvr/core/paxos  $(SRC_BASE_PATH)/phxbinlogsvr/core 
+
+EVENTAGENT_EXTRA_CPPFLAGS=-Wall -Werror
+
+PAXOSAGENT_OBJ=paxos_agent_manager.o
+
+PAXOSAGENT_LIB=paxosagent :masteragent :eventagent
+
+PAXOSAGENT_SYS_LIB=
+
+PAXOSAGENT_INCS=$(SRC_BASE_PATH)/phxbinlogsvr/core/paxos  $(SRC_BASE_PATH)/phxbinlogsvr/core 
+
+PAXOSAGENT_EXTRA_CPPFLAGS=-Wall -Werror
+

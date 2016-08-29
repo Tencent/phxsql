@@ -1,0 +1,29 @@
+syntax = "proto2";
+package phxbinlog;
+
+message EventData
+{
+	required string gtid = 1;
+	required bytes data = 2;
+	optional uint64 checksum = 3;
+	optional uint64 instance_id = 4;
+	optional bytes master_data = 5;
+	optional string event_data_file = 6;
+};
+
+message EventDataInfo
+{
+	required string gtid = 1;
+	required string file_name = 2;
+	required uint64 offset = 3;
+	optional uint64 checksum = 4;
+	optional uint64 instance_id = 5;
+};
+
+
+message EventDataInfoList
+{
+	repeated EventDataInfo info_list = 1;
+};
+
+
