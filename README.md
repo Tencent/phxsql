@@ -203,7 +203,7 @@ PhxSQL集群中对MySQL的管理使用两个账号管理员帐号和数据同步
  
 ### `phxbinlogsvr_tools_phxrpc -f GetMemberList -h <host> -p <port>`
 
-**功能：**集群的master机器ip和超时时间
+**功能：**集群的所有机器信息
 
 **参数：**
  
