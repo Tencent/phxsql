@@ -1,35 +1,36 @@
 <img align="right" src="http://mmbiz.qpic.cn/mmbiz/UqFrHRLeCAkOcYOjaX3oxIxWicXVJY0ODsbAyPybxk4DkPAaibgdm7trm1MNiatqJYRpF034J7PlfwCz33mbNUkew/640?wx_fmt=jpeg&wxfrom=5&wx_lazy=1" hspace="15" width="200px" style="float: right">
 
-[English Introduction](https://github.com/tencent-wechat/phxsql/blob/master/README.en.md)
+[简体中文README](https://github.com/tencent-wechat/phxsql/blob/master/README.zh_cn.md)
 
-**PhxSQL是由微信后台团队自主研发的一款服务高可用、数据强一致的分布式数据库服务。该服务基于Percona5.6搭建，目标在于解决[MySQL在容灾和数据一致性方面的不足](http://mp.weixin.qq.com/s?__biz=MzI4NDMyNTU2Mw==&mid=2247483726&idx=1&sn=a295d87b4f6d1394a17b33d7c71989e5&scene=0)，并大幅简化了MySQL容灾切换的运维操作。**
+**PhxSQL is a high-availability and strong-consistency MySQL cluster built on Paxos and Percona.**
 
-作者：Junchao Chen (junechen@tencent.com), Haochuan Cui (lynncui@tencent.com), Duokai Huang (mariohuang@tencent.com), Ming Chen (mingchen@tencent.com) 和 Sifan Liu (stephenliu@tencent.com) 
-
-想了解更多，请扫描右侧二维码关注我们的公众号
-
-# 总览
-  - PhxSQL具有服务高可用、数据强一致、高性能、运维简单、和MySQL完全兼容的特点。
-  - 服务高可用：PhxSQL集群内只要多数派节点存活就能正常提供服务；出于性能的考虑，集群会选举出一个Master节点负责写入操作；当Master失效，会自动重新选举新的Master。
-  - 数据强一致：PhxSQL采用多节点冗余部署，在多个节点之间采用paxos协议同步流水，保证了集群内各节点数据的强一致。
-  - 高性能：PhxSQL比MySQL SemiSync的写性能更好，得益于Paxos协议比SemiSync协议更加高效；
-  - 运维简单：PhxSQL集群内机器出现短时间故障，能自动恢复数据，无需复杂的运维操作；PhxSQL更提供一键更换（新增/删除）集群内的机器，简化运维的工作。
-  - MySQL完全兼容：PhxSQL是基于Percona的研发，完全兼容MySQL的操作命令。 可通过MySQL提供的mysqlclient/perconaserverclient直接操作PhxSQL。
-
-项目中包含PhxSQL源代码，源代码编译时所需要的一些第三方库，及可直接在Linux环境下运行的二进制包。其中代码使用到了微信团队自研的另外三个开源项目（phxpaxos,phxrpc,colib)。若需编译源代码，需额外下载，也可以在clone时通过--recurse-submodule获得代码。
-
-**phxpaxos项目地址：** [http://github.com/tencent-wechat/phxpaxos](http://github.com/tencent-wechat/phxpaxos "http://github.com/tencent-wechat/phxpaxos")
-
-**phxrpc项目地址：** [http://github.com/tencent-wechat/phxrpc](http://github.com/tencent-wechat/phxrpc "http://github.com/tencent-wechat/phxrpc")
-
-**colib项目地址：** [http://github.com/tencent-wechat/libco](http://github.com/tencent-wechat/libco "http://github.com/tencent-wechat/libco")
+#PhxSQL features:
+  - high resilience to nodes failure and network partition: the cluster works well when more than half of cluster nodes work and are interconnected.
+  - high availability by automatic failovers.
+  - guarantee of data consistency among cluster nodes: replacing loss-less semi-sync between MySQL master and MySQL slaves with Paxos, PhxSQL ensures zero-loss binlogs between master and slaves.
+  - easy deployment and easy maintenance: PhxSQL, powered by in-house implementation of Paxos, has only 4 components including MySQL and doesn't depend on zookeeper or etcd for anything. PhxSql supports automated cluster membership hot reconfiguration.
+  - complete compliance with MySQL and MySQL client.
 
 
-# PhxSQL编译
+This project includes 
+* Source codes
+* Third party submodules
+* Binaries in Ubuntu 64bit system.
+    
+It depends the other projects which are also published by tencent-wechat( phxpaxos, phxrpc, libco ).
+You can download or clone them with --recurse-submodule.
 
->如果是直接使用二进制包，请跳过这节。
+**phxpaxos：** [http://github.com/tencent-wechat/phxpaxos](http://github.com/tencent-wechat/phxpaxos "http://github.com/tencent-wechat/phxpaxos")
 
-### PhxSQL主要目录结构
+**phxrpc：** [http://github.com/tencent-wechat/phxrpc](http://github.com/tencent-wechat/phxrpc "http://github.com/tencent-wechat/phxrpc")
+
+**libco：** [http://github.com/tencent-wechat/libco](http://github.com/tencent-wechat/libco "http://github.com/tencent-wechat/libco")
+
+# The Compilation of PhxSQL
+
+>If you prefer using binaries directly, just skip this part.
+
+### Structure of PhxSQL Directories
 * PhxSQL
     * phxsqlproxy
     * phxbinlogsvr
@@ -48,225 +49,234 @@
     * tools
     * phxrpc_package_config
 
-### 主要目录介绍
+### The Introduction of Directories.
 
-| 目录名 |  |
+| Name | Introduction |
 | ------| ------ |
-| phxsqlproxy | phxsqlproxy模块，负责接入请求。 |
-| phxbinlogsvr | 负责MySQL binlog数据同步，master管理等。 |
-| percona | percona5.6.31-77.0的官方源代码 |
-| phx_percona/plugin/phxsync_phxrpc | percona用于跟phxbinlogsvr同步binlog的插件。|
-|phx_percona/plugin/semisync | 因兼容问题，修改了semisync的部分代码，目录内为修改过的文件。
-| third_party/glog | Google Glog 第三方库
-| third_party/leveldb | Google Leveldb 第三方库
-| third_party/protobuf | Google Protobuf 3.0+ 第三方库
-| third_party/phxpaxos| paxos协议库。用于phxbinlogsvr之间同步binlog
-| third_party/colib| 协程基础库。phxsqlproxy使用
-| third_party/phxrpc | rpc框架。phxbinlogsvr使用
+| phxsqlproxy | In charge of access and handle request |
+| phxbinlogsvr | In charge of binlog synchronization, mastership and membership management |
+| percona | Source code of percona5.6.31-77.0 |
+| phx_percona/plugin/phxsync_phxrpc | A plugin which is used for MySQL to post binlog to phxbinlogsvr |
+|phx_percona/plugin/semisync | We modified some plugin APIs in MySQL, This is a compatible version of semisync |
+| third_party/glog | Directory to store GLOG library
+| third_party/leveldb | Directory to store LevelDB library
+| third_party/protobuf | Directory to store Google Protobuf 3.0+ library
+| third_party/phxpaxos|  Directory to store PhxPaxos library
+| third_party/colib| Directory to store Libco library
+| third_party/phxrpc | Directory to store Phxrpc library
 
 
-### 事前准备
+### Preparation
 
-##### 安装第三方库
+##### The third party libs installation
 
-PhxSQL需要用到一些第三方库（glog, leveldb, protobuf, phxpaxos, colib, phxrpc）,下载后安装到PhxSQL的third_party目录下或者把安装目录链接到PhxSQL的third_party目录下。
+PhxSQL needs 6 third party libs(glog, leveldb, protobuf, phxpaxos, colib, phxrpc). Please install them in phxsql/third_party directory or just link to third_party.
 
-**需保证第三方库glog, protobuf在configure时带上-fPIC选项(configure CXXFLAGS=-fPIC)，并指定--prefix=当前目录绝对路径**。
-比如`configure CXXFLAGS=-fPIC --prefix=/home/root/phxsql/third_party/glog`.
+**NOTE: Please make sure -fPIC is added while executing configure in GLOG and Protobuf as well as specifying --prefix=/the/current/absolute/path.**
 
-**下载**  [percona-server-5.6.31-77.0.tar.gz](https://www.percona.com/downloads/Percona-Server-5.6/Percona-Server-5.6.31-77.0/source/tarball/percona-server-5.6.31-77.0.tar.gz)
+For example: `./configure CXXFLAGS=-fPIC --prefix=/home/root/phxsql/third_party/glog`.
 
-将`percona-server-5.6\_5.6.31-77.0`源代码放到PhxSQL目录下，更名或链接为percona**（请注意只能使用percona-server-5.6_5.6.31-77.0版本）**
+**Then download**  [percona-server-5.6.31-77.0.tar.gz](https://www.percona.com/downloads/Percona-Server-5.6/Percona-Server-5.6.31-77.0/source/tarball/percona-server-5.6.31-77.0.tar.gz)
 
-##### 生成安装环境
+Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as 'percona'
+**(NOTE: Only percona-server-5.6\_5.6.31-77.0 is available)**
 
-1. 在PhxSQL目录下执行`sh autoinstall.sh && make && make install`
-2. 若想打包二进制运行包（集群运行时所需要的所有文件和配置）`make package`
-3. `install`完成后，二进制会生成到`PhxSQL`目录下的`sbin`目录，运行所需要的相关文件和配置会安装到PhxSQL目录下的`install_package`目录。打包二进制运行包会把`install_package`进行tar格式的打包，并生成`phxsql.tar.gz`。若想更改`install`的安装目录，可在`sh autoinstall.sh` 后加入`-prefix=`路径
 
-# PhxSQL部署和运行
+##### The installation enviroment Preparation
+1. Execute `./autoinstall.sh && make && make install`
+2. Execute 'make package' to generate a tar.gz package so you can transfer to your online hosts.
 
-### 准备机器
+**(NOTE: We will put the binaries in install_package/sbin, configuration files in install_package/tools/etc_template, install scripts in install_package/tools. The 'make package' command will pack 'install_package' into 'phxsql-$version.tar.gz'. Please specify -prefix=/the/path/you/want/to/install while executing ./autoinstall.sh)**
 
->PhxSQL需要在2台或以上的机器集群上运行（建议集群内机器数目n>=3 且 n为奇数）
 
-### 初始化PhxSQL
+# The Deployment of PhxSQL
 
-1.  把`phxsql.tar.gz`传到集群内的所有机器,对集群内每台机器按以下步骤进行安装
-    1.  解压`phxsql.tar.gz`
-    2.  进入`phxsql/tools`, 并使用`python install.py --help`查看安装参数。(例子:`python2.7 install.py -i"your_inner_ip" -p 54321 -g 6000 -y 11111 -P 17000 -a 8001 -f/tmp/data/`）
-2.  任意找一台机器，`cd phxsql/sbin`, 执行
-    `./phxbinlogsvr_tools_phxrpc -f InitBinlogSvrMaster -h"ip1,ip2,ip3" -p 17000` (17000为phxbinlogsvr监听的端口）
-3.  看到master初始化完成的消息后，集群即可使用。
-4.  可通过`mysql -uroot -h"your_inner_ip" -P$phxsqlproxy_port`进入PhxSQL执行读写操作确认PhxSQL已正常运行
+### Host needs.
 
-### 简单测试
+>PhxSQL need to be run on more than 2 hosts. We suggest N >= 3 and N is an odd number(N means the number os hosts)
 
-1. 在PhxSQL目录下进入tools目录
-2. 执行`test_phxsql.sh port ip1 ip2 ip3`,  `port`为`phxsqlproxy_port`, `ip`为集群机器`ip`
+### The Initialization of PhxSQL
 
-### 配置文件说明
+1. Transfer phxsql.tar.gz to all of the hosts you want to install. Then do as the following step:
+    1. Execute `tar -xvf phxsq.tar.gz .`
+    2. Enter phxsql/tools, Execute `python install.py --help` to get the help of installation.
+    
+        (For example:`python2.7 install.py -i"your_inner_ip" -p 54321 -g 6000 -y 11111 -P 17000 -a 8001 -f/tmp/data/`)
 
-> PhxSQL一共有3个配置文件 
+2.  After executing 'install.py' on all the hosts, Execute './phxbinlogsvr_tools_phxrpc -f InitBinlogSvrMaster -h"ip1,ip2,ip3" -p 17000' in any one hosts. 17000 should be replaced into the port which phxbinlogsvr is listening.
+3.  The cluster is active while the message shows master initialization is finished.
+4.  You can execute some SQLs to check the status of cluster through `mysql -uroot -h"your_inner_ip" -P$phxsqlproxy_port` 
 
-###### 1. my.cnf： MySQL的配置,请根据你的业务需求进行修改（安装前请修改`tools/etc_template/my.cnf`，安装后请修改`etc/my.cnf`）
+### Simple tests.
+
+1. Enter phxsql/tools/.
+2. Execute `test_phxsql.sh phxsqlproxy_port ip1 ip2 ip3`
+
+### Description of Configuration Files
+
+> PhxSQL have 3 configuration files in total.
+
+###### 1. my.cnf： The configuration of MySQL. Please modify it accroding to your own needs.
+**NOTE:Modify `tools/etc_temlate/my.cnf` before installation, Modify `etc/my.cnf` after installation**
 
 ###### 2. phxbinlogsvr.conf 
 
 |Section name |Key name |comment|
 |------------ | ---------| ------|
-|AgentOption | AgentPort | Phxbinlogsvr监听MySQL访问的端口，用于MySQL和binlogsvr之间的通信|
-| | EventDataDir　|　Phxbinlogsvr数据存放目录|
-| | MaxFileSize　|Phxbinlogsvr每个数据文件的大小，数据文件过大会导致启动过慢，数据文件过小会导致文件数过多，单位为B|
-| | MasterLease | Phxbinlogsv的master租约时间，单位为s |
-| | CheckPointTime | Phxbinlogsvr会删除CheckPointTime时间前的数据，但如果被删数据中存在其他MySQL还没学到的，则不会删除该部分数据，单位为分钟 |
-| | MaxDeleteCheckPointFileNum　| Phxbinlogsvr删数据时，每次删除的最大文件数 |
-| | FollowIP | 机器为folloer机器，只负责拉取FollowIP机器上的数据，不参与集群的投票|
-| PaxosOption| PaxosLogPath| Phxbinlogsvr中paxos库的数据目录|
-| | PaxosPort|Phxbinlogsvr中paxos库的通信端口|
-| | PacketMode | Phxbinlogsvr在paxos协议中是否增大包的大小限制， 1为每个包的大小为100m，但超时限制变为1分钟，0 为每个包的大小为50m，超时限制2s起（动态变化）|
-| Server | IP | Phxbinlogsvr的监听ip |
-| | Port | Phxbinlogsvr的监听端口 |
-| |  LogFilePath | Phxbinlogsvr的日志目录 |
-| | LogLevel | Phxbinlogsvr的日志级别 |
+|AgentOption | AgentPort | Port for the connection of binlogsvr and MySQL |
+| | EventDataDir　|　Directory where to store the binlogsvr data |
+| | MaxFileSize　| File size per data of phxbinlogsvr, the unit is B |
+| | MasterLease | Lease length of master, the unit is second |
+| | CheckPointTime | The data before CheckPointTime will be deleted by phxbinlogsvr, but it will not be deleted if some other PhxSQL nodes have not learned yet, the unit is minute |
+| | MaxDeleteCheckPointFileNum　| The maximum number of files deleted each time by phxbinlogsvr |
+| | FollowIP | Enabled if it is a follower node and will learn binlog from this `FollowIP`, this node will not vote |
+| PaxosOption| PaxosLogPath| Directory where to store paxos data |
+| | PaxosPort| Port for paxos to connect each other |
+| | PacketMode | The maximum size of paxos log for PhxPaxos,1 means 100M, but the network timeout will be 1 minute, 0 means 50M and network timeout is 2s(changed in dynamic).| 
+| Server | IP | IP for phxbinlogsvr to listen |
+| | Port | Port for phxbinlogsvr to listen |
+| |  LogFilePath | Directory to store log |
+| | LogLevel | Log level of phxbinlogsvr |
 
 ###### 3. phxsqlproxy.conf 
 
 | Section name | Key name | comment |
 | ------| ------| ------|
-|Server | IP | phxsqlproxy的监听ip |
-| | Port | phxsqlproxy的监听端口 |
-| | QSLogFilePath  | phxsqlproxy的日志目录 |
-| | QSLogLevel | phxsqlproxy的日志级别 |
+|Server | IP | IP for phxsqlproxy to listen |
+| | Port | Port for phxsqlproxy to listen |
+| | LogFilePath  | Directory to store log |
+| | LogLevel | Log level of phxbinlogsvr |
+| | MasterEnableReadPort | Enable readonly-port in master node  |
 
-# PhxSQL使用
+# PhxSQL Usasge
 
->phxsqlproxy为PhxSQL的接入层，所有的请求均经过phxsqlproxy,再透传给MySQL。
+> phxsqlproxy is the acces layer os PhxSQL, all requests will be sent to phxsqlproxy and be redirected to MySQL.
 >
-### phxsqlproxy提供两个端口进行读写 
+### phxsqlproxy provides 2 different types of port for user. 
 
-##### 读写端口
+##### Master Port( also said Read-Write Port )
 
-该端口号为phxsqlproxy.conf配置中的端口号, 用户连接上proxyA的此端口，proxyA会自动把请求路由到Master机器，然后再对Master机器上的MySQL进行操作。
+It equals the port configured in `phxsqlproxy.conf`.
+Every requests will be sent to a master node to excute through this port.
 
-##### 只读端口
+##### Slave Port( also said Read-Only Port )
 
-该端口号为读写端口号+1, 用户连接上此端口时，会对本机的MySQL进行操作(但若本机为master，则phxsqlproxy会把请求转发到其他phxsqlproxy的只读端口）。
+It equals MasterPort + 1. You can also specify it by setting `SlavePort = xxxxx`. in `phxsqlproxy.conf`.  
+Every requests will be executed on the local MySQL. A master node will make a redirection to another slave nodes if  `MasterEnableReadPort = 0`(this will save the CPU/IO resource for write requests)
 
-### PhxSQL的使用
 
-1. 通过mysql命令连接上`phxsqlproxy`，然后执行命令`mysql -uroot -h$phxsqlproxyip -P$phxsqlproxyport -ppwd`
-2. 进行sql命令操作
+### SQL Command Execution
 
->phxsqlproxyip为集群内的任意一台phxsqlproxy的ip
->
->phxsqlproxyport为phxsqlproxy端口(读写/只读)
+1. Using `mysql -u$user -h$phxsqlproxyip -P$phxsqlproxyport -p$pwd` to connect phxsqlproxy
+2. Execute SQL command.
 
-# PhxSQL管理
+>`$phxsqlproxyip` can be any one IP of the clusters and `$phxsqlproxyport` can be one of `MasterPort` or `SlavePort`.
 
-PhxSQL提供一个工具`phxbinlogsvr_tools_phxrpc`来方便管理者对PhxSQL的运营管理。
+# PhxSQL Management
 
-PhxSQL集群中对MySQL的管理使用两个账号管理员帐号和数据同步账号。管理员账号默认账号密码为（"`root`"，""），数据同步账号默认账号密码为（"`replica`","`replica123`"）。账号密码的更改通过工具才执行（工具会直接操作MySQL数据，不需要人工进行MySQL操作）。
+PhxSQL provides a tool `phxbinlogsvr_tools_phxrpc` to help the mangerment of PhxSQL.
+
+PhxSQL cluster needs 1 MySQL admin accounts and 1 synchronization account. The default admin account is (`root`, `""` ),  the default synchronization account is ( `replica`, `replica123` ), They can be modified( and only be modifyed ) through `phxbinlogsvr_tools_phxrpc`. **DON'T DO THIS MANUALLY.**
+
+**Following is some commands you may used frequently.**
 
 ### `phxbinlogsvr_tools -f GetMasterInfoFromGlobal -h <host> -p <port>`
 
-**功能：**集群的master机器ip和超时时间
+**Function:**Get the current master info from quorum nodes( IP and timeout ).
 
-**参数：**
+**Arguments:**
  
-  - **Host:** 集群中的其中一台机器ip
-  - **Port:** phxbinlogsvr的监听port
+  - **Host:** Any one IP of clusters nodes
+  - **Port:** Port which phxbinlogsvr is listening. like `17000` 
  
 ### `phxbinlogsvr_tools -f SetMySqlAdminInfo -h <host> -p <port> -u <admin username> -d <admin pwd> -U <new admin username> -D <new admin pwd>`
 
-**功能：** 设置 PhxSQL管理员账号密码
+**Function:** Set the user and password of admin account.
 
-**参数：**
+**Arguments:**
 
-  - **Host:** 集群中的其中一台机器ip
-  - **Port:** phxbinlogsvr的监听port
-  - **Admin username:** 当前的管理员账号（默认为root）
-  - **Admin pwd:** 当前的管理员密码（默认为空）
-  - **New admin username:** 新的管理员账号
-  - **New admin pwd:** 新的管理员密码
+  - **Host:** Any one IP of clusters nodes
+  - **Port:** Port which phxbinlogsvr is listening. like `17000`
+  - **Admin username:** Current account user( default is `root` )
+  - **Admin pwd:** Current account password( default is `""` )
+  - **New admin username:** New user
+  - **New admin pwd:** New password
 
 ### `phxbinlogsvr_tools -f SetMySqlReplicaInfo -h <host> -p <port> -u <admin username> -d <admin pwd> -U <new replica username> -D <new replica pwd>`
 
-**功能：** 设置PhxSQL同步数据账号密码
+**Function:** Set the user and password of synchronization account.
 
 **参数：**
 
-  - **Host:** 集群中的其中一台机器ip
-  - **Port:** phxbinlogsvr的监听port
-  - **Admin username:** 当前的管理员账号（默认为root）
-  - **Admin pwd:** 当前的管理员密码（默认为空）
-  - **New replica username:** 新的同步数据账号
-  - **New replica pwd:** 新的同步数据密码
+  - **Host:** Any one IP of clusters nodes
+  - **Port:** Port which phxbinlogsvr is listening. like `17000`
+  - **Admin username:** Current account user( default is `root` )
+  - **Admin pwd:** Current account password( default is `""` )
+  - **New replica username:**  New user
+  - **New replica pwd:** New password
  
 ### `phxbinlogsvr_tools_phxrpc -f GetMemberList -h <host> -p <port>`
 
-**功能：**集群的所有机器信息
+**Function:** Membership of this cluster, all IPs and Ports included.
 
-**参数：**
+**Arguments:**
  
-  - **Host:** 集群中的其中一台机器ip
-  - **Port:** phxbinlogsvr的监听port
+  - **Host:** Any one IP of clusters nodes
+  - **Port:** Port which phxbinlogsvr is listening. like `17000`
 
-# phxbinlogsvr成员管理
+# Phxbinlogsvr Membership Managerment
 
-### 移除成员
-执行工具命令将机器A移除集群`phxbinlogsvr_tools_phxrpc -f RemoveMember -h<host> -p<port> -m <机器A的ip>`
+### Member Deletion
+Execute `phxbinlogsvr_tools_phxrpc -f RemoveMember -h<host> -p<port> -m <ip_of_nodeA>` to delete node A.
+Once it is succesfully executed, A will not learn binlog after a small period.
 
-执行成功后，机器A将会在一段时间后不在接收数据
+### Member Involvement
+1. Execute `phxbinlogsvr_tools -f AddMember -h<host> -p<port> -m <ip_of_nodeA>` to add node A into the membership.
+2. Install PhxSQL on A.
+3. A will begin to learn data after installation is finished.
+4. Copy a snapshot of MySQL from any other nodes to A.
+5. Kill phxbinlogsvr and access MySQL through the local port( or socket ). then execute `set super_read_only = 0; set read_only = 0`;
+6. Dump the snapshot into MySQL.
+7. A will begin to work after a while.
 
-### 添加成员
-1. 执行工具将机器A加入到集群`phxbinlogsvr_tools -f AddMember -h<host> -p<port> -m <机器A的ip>`
-2. 在新机器A上安装好PhxSQL
+# Phxbinlogsvr fault Handling.
 
-   >根据 "`初始化PhxSQL`" 步骤安装PhxSQL
-3. 执行成功后，机器A的phxbinlogsvr将会在一段时间后开始接收数据
-4. 从集群内任意一台机器的percona导出一份镜像数据
-5. kill掉机器A上的phxbinlogsvr, 并通过本地的MySQL端口进入MySQL，执行`set super_read_only = 0; set read_only = 0`;
-5. 将镜像数据导入到机器A上的percona，并kill掉机器A上的phxbinlogsvr
-6. 一段时间（~1分钟）后，机器A开始正常工作
+###### You can choose to reinstall PhxSQL if PhxSQL meets an unrecovery failure.
 
-# phxbinlogsvr故障处理
+`Phxbinlogsvr` will pull the checkpoint in another node to reboot during reinstallation. It will self-kill after pulling is over(to make sure the consistency). You can reboot `phxbinlogsvr` after a message like `"All sm load state ok, start to exit"` appears. 
 
-###### 当机器出现问题，PhxSQL无法正常启动时，可以选择在该机器上重装PhxSQL，重装过程可参考4.2
+###### `phxbinlogsvr` will stop working if a data problem arise in MySQL. We suggest you to check the status of MySQL. 
+###### You can observe logs with red `"err"` to check the abnormaly. 
 
-在重装过程中，`phxbinlogsvr`可能会拉取集群内其他机器`checkpoint`来启动，待`checkpoint`拉取结束后，`phxbinlogsvr`会自杀（为了确保数据安全），日志中会出现`"All sm load state ok, start to exit process"`，此时须重新启动`phxbinlogsvr`，启动后会正常运行。
+# Performance Testing
 
-###### 当MySQL数据出现问题时，phxbinlogsvr会停止工作，此时需要检查MySQL的binlog数据是否正常。
-###### 当出现问题时，可观察日志中带有err标志的红色字体的日志，来确认是否有异常。
-
-# 性能测试
-
-### 机型信息	
+### Hosts Infomation	
 CPU :	Intel(R) Xeon(R) CPU E5-2420 0 @ 1.90GHz * 24
 
-内存 : 32G
+Memory : 32G
 
-磁盘 : SSD Raid10 
+Disk : SSD Raid10 
 
 
-### 网络互Ping耗时
+### Ping Costs
 Master -> Slave : 3 ~ 4ms
 
 Client -> Master : 4ms
 
 
-### 压测工具和参数
+### Tools and Arguments
 sysbench  --oltp-tables-count=10 --oltp-table-size=1000000 --num-threads=500 --max-requests=100000 --report-interval=1 --max-time=200
 
-### 压测结果
+### Results
 
 
-| Client线程数                                         | 测试集群    |                    |             |     测试集合    |           |                 |               |
+| Client Threads                                         | Clusters    |                    |             |     Test sets   |           |                 |               |
 |------------------------------------------------------|-------------|------------------------|-------------|----------------------|-----------|---------------------|---------------|
-|                                                      |             | insert.lua (100%写)     |             | select.lua (0%写)     |           | OLTP.lua (20%写)     |               |
-|                                                      |             | QPS                | 耗时        | QPS              | 耗时      | QPS             | 耗时          |
+|                                                      |             | insert.lua (100% write)     |             | select.lua (0% write)     |           | OLTP.lua (20% write)     |               |
+|                                                      |             | QPS                | Costs        | QPS              | Costs      | QPS             | Costs          |
 | 200                                                  | PhxSQL      | 5076               | 39.34/56.93 | 46334            | 4.21/5.12 | 25657           | 140.16/186.39 |
-| 200                                                  | MySQL半同步 | 4055               | 49.27/66.64 | 47528            | 4.10/5.00 | 20391           | 176.39/226.76 |
+| 200                                                  | MySQL semi-sync | 4055               | 49.27/66.64 | 47528            | 4.10/5.00 | 20391           | 176.39/226.76 |
 | 500                                                  | PhxSQL      | 8260               | 60.41/83.14 | 105928           | 4.58/5.81 | 46543           | 192.93/242.85 |
-| 500                                                  | MySQL半同步 | 7072               | 70.60/91.72 | 121535           | 4.17/5.08 | 33229           | 270.38/345.84 |
-注：耗时分别为测试结果的平均耗时/95%分线耗时，单位ms
+| 500                                                  | MySQL semi-sync | 7072               | 70.60/91.72 | 121535           | 4.17/5.08 | 33229           | 270.38/345.84 |
+
+**NOTE:The 2 costs numbers means average and 95% percentile**
