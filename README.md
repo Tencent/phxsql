@@ -15,9 +15,9 @@ Authors: Junchao Chen (junechen@tencent.com), Haochuan Cui (lynncui@tencent.com)
 This project includes 
 * Source codes
 * Third party submodules
-* Binaries in Ubuntu 64bit system.
+* Pre-compiled binaries for Ubuntu 64bit system.
     
-It depends the other projects which are also published by tencent-wechat( phxpaxos, phxrpc, libco ).
+Projects on which this project depends are also published by tencent-wechat( phxpaxos, phxrpc, libco ).
 You can download or clone them with --recurse-submodule.
 
 **phxpaxos：** [http://github.com/tencent-wechat/phxpaxos](http://github.com/tencent-wechat/phxpaxos "http://github.com/tencent-wechat/phxpaxos")
@@ -26,9 +26,9 @@ You can download or clone them with --recurse-submodule.
 
 **libco：** [http://github.com/tencent-wechat/libco](http://github.com/tencent-wechat/libco "http://github.com/tencent-wechat/libco")
 
-# The Compilation of PhxSQL
+# Compilation of PhxSQL
 
->If you prefer using binaries directly, just skip this part.
+>If you prefer pre-compiled binaries, just skip this part.
 
 ### Structure of PhxSQL Directories
 * PhxSQL
@@ -49,26 +49,26 @@ You can download or clone them with --recurse-submodule.
     * tools
     * phxrpc_package_config
 
-### The Introduction of Directories.
+### Introduction of Directories.
 
 | Name | Introduction |
 | ------| ------ |
-| phxsqlproxy | In charge of access and handle request |
-| phxbinlogsvr | In charge of binlog synchronization, mastership and membership management |
+| phxsqlproxy | surrogate between MySQL client and PhxSql |
+| phxbinlogsvr | server for global binlog synchronization and storage, as well as management of mastership and membership |
 | percona | Source code of percona5.6.31-77.0 |
-| phx_percona/plugin/phxsync_phxrpc | A plugin which is used for MySQL to post binlog to phxbinlogsvr |
-|phx_percona/plugin/semisync | We modified some plugin APIs in MySQL, This is a compatible version of semisync |
-| third_party/glog | Directory to store GLOG library
-| third_party/leveldb | Directory to store LevelDB library
-| third_party/protobuf | Directory to store Google Protobuf 3.0+ library
-| third_party/phxpaxos|  Directory to store PhxPaxos library
-| third_party/colib| Directory to store Libco library
-| third_party/phxrpc | Directory to store Phxrpc library
+| phx_percona/plugin/phxsync_phxrpc | A plugin running in MySql that intercepts MySQL binlogs and forwards them to phxbinlogsvr |
+| phx_percona/plugin/semisync | A semisync compatible with our modified plugin APIs of MySQL |
+| third_party/glog | GLOG library
+| third_party/leveldb | LevelDB library
+| third_party/protobuf | Google Protobuf 3.0+ library
+| third_party/phxpaxos| PhxPaxos library
+| third_party/colib| Libco library
+| third_party/phxrpc | Phxrpc library
 
 
 ### Preparation
 
-##### The third party libs installation
+##### Installation of third party libs
 
 PhxSQL needs 6 third party libs(glog, leveldb, protobuf, phxpaxos, colib, phxrpc). Please install them in phxsql/third_party directory or just link to third_party.
 
@@ -82,34 +82,34 @@ Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as 'p
 **(NOTE: Only percona-server-5.6\_5.6.31-77.0 is available)**
 
 
-##### The installation enviroment Preparation
+##### Preparation of installation enviroment
 1. Execute `./autoinstall.sh && make && make install`
-2. Execute 'make package' to generate a tar.gz package so you can transfer to your online hosts.
+2. Execute 'make package' to generate a tar.gz package so you can transfer to your target hosts.
 
-**(NOTE: We will put the binaries in install_package/sbin, configuration files in install_package/tools/etc_template, install scripts in install_package/tools. The 'make package' command will pack 'install_package' into 'phxsql-$version.tar.gz'. Please specify -prefix=/the/path/you/want/to/install while executing ./autoinstall.sh)**
+**(NOTE: We put the binaries in install_package/sbin, configuration files in install_package/tools/etc_template, install scripts in install_package/tools. The 'make package' command will pack 'install_package' into 'phxsql-$version.tar.gz'. Please specify -prefix=/the/path/you/want/to/install while executing ./autoinstall.sh)**
 
 
-# The Deployment of PhxSQL
+# Deployment of PhxSQL
 
-### Host needs.
+### Host requirements.
 
->PhxSQL need to be run on more than 2 hosts. We suggest N >= 3 and N is an odd number(N means the number os hosts)
+>PhxSQL needs to run on more than 2 hosts. We suggest N >= 3 and N is an odd number, where N means the number of hosts.
 
-### The Initialization of PhxSQL
+### Initialization of PhxSQL
 
-1. Transfer phxsql.tar.gz to all of the hosts you want to install. Then do as the following step:
+1. Transfer phxsql.tar.gz to all of the hosts you want to install. Then do as the following steps:
     1. Execute `tar -xvf phxsq.tar.gz .`
     2. Enter phxsql/tools, Execute `python install.py --help` to get the help of installation.
     
         (For example:`python2.7 install.py -i"your_inner_ip" -p 54321 -g 6000 -y 11111 -P 17000 -a 8001 -f/tmp/data/`)
 
-2.  After executing 'install.py' on all the hosts, Execute './phxbinlogsvr_tools_phxrpc -f InitBinlogSvrMaster -h"ip1,ip2,ip3" -p 17000' in any one hosts. 17000 should be replaced into the port which phxbinlogsvr is listening.
-3.  The cluster is active while the message shows master initialization is finished.
+2.  After executing 'install.py' on all the hosts, Execute './phxbinlogsvr_tools_phxrpc -f InitBinlogSvrMaster -h"ip1,ip2,ip3" -p 17000' in any one hosts. 17000 should be replaced with the port on which phxbinlogsvr is listening.
+3.  The cluster is active while a message shows master initialization is finished.
 4.  You can execute some SQLs to check the status of cluster through `mysql -uroot -h"your_inner_ip" -P$phxsqlproxy_port` 
 
 ### Simple tests.
 
-1. Enter phxsql/tools/.
+1. Enter phxsql/tools/
 2. Execute `test_phxsql.sh phxsqlproxy_port ip1 ip2 ip3`
 
 ### Description of Configuration Files
@@ -150,33 +150,33 @@ Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as 'p
 
 # PhxSQL Usasge
 
-> phxsqlproxy is the acces layer os PhxSQL, all requests will be sent to phxsqlproxy and be redirected to MySQL.
+> phxsqlproxy is the surrogate of PhxSQL, all requests will be sent to phxsqlproxy and then be forwarded to MySQL.
 >
 ### phxsqlproxy provides 2 different types of port for user. 
 
-##### Master Port( also said Read-Write Port )
+##### Master Port( also called Read-Write Port )
 
-It equals the port configured in `phxsqlproxy.conf`.
-Every requests will be sent to a master node to excute through this port.
+It is the port configured in `phxsqlproxy.conf`.
+Every requests sent to this port will be forwarded to the master node to excute.
 
-##### Slave Port( also said Read-Only Port )
+##### Slave Port( also called Read-Only Port )
 
-It equals MasterPort + 1. You can also specify it by setting `SlavePort = xxxxx`. in `phxsqlproxy.conf`.  
-Every requests will be executed on the local MySQL. A master node will make a redirection to another slave nodes if  `MasterEnableReadPort = 0`(this will save the CPU/IO resource for write requests)
+It is (MasterPort + 1). You can also specify it by setting `SlavePort = xxxxx` in `phxsqlproxy.conf`.  
+Every requests will be executed on the local MySQL. A master node will make a redirection to another slave nodes if  `MasterEnableReadPort = 0` (this will save the CPU/IO resource for write requests)
 
 
 ### SQL Command Execution
 
-1. Using `mysql -u$user -h$phxsqlproxyip -P$phxsqlproxyport -p$pwd` to connect phxsqlproxy
+1. Using `mysql -u$user -h$phxsqlproxyip -P$phxsqlproxyport -p$pwd` to connect to phxsqlproxy
 2. Execute SQL command.
 
->`$phxsqlproxyip` can be any one IP of the clusters and `$phxsqlproxyport` can be one of `MasterPort` or `SlavePort`.
+>`$phxsqlproxyip` can be any one IP of hosts in a clusters and `$phxsqlproxyport` can be `MasterPort` or `SlavePort`.
 
 # PhxSQL Management
 
 PhxSQL provides a tool `phxbinlogsvr_tools_phxrpc` to help the mangerment of PhxSQL.
 
-PhxSQL cluster needs 1 MySQL admin accounts and 1 synchronization account. The default admin account is (`root`, `""` ),  the default synchronization account is ( `replica`, `replica123` ), They can be modified( and only be modifyed ) through `phxbinlogsvr_tools_phxrpc`. **DON'T DO THIS MANUALLY.**
+PhxSQL cluster needs 1 MySQL admin accounts and 1 synchronization account. The default admin account is (`root`, `""` ),  the default synchronization account is ( `replica`, `replica123` ), They can be modified( and only be modifyed ) via `phxbinlogsvr_tools_phxrpc`. **DON'T DO THIS MANUALLY.**
 
 **Following is some commands you may used frequently.**
 
@@ -206,7 +206,7 @@ PhxSQL cluster needs 1 MySQL admin accounts and 1 synchronization account. The d
 
 **Function:** Set the user and password of synchronization account.
 
-**参数：**
+**Arguments：**
 
   - **Host:** Any one IP of clusters nodes
   - **Port:** Port which phxbinlogsvr is listening. like `17000`
