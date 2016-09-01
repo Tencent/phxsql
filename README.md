@@ -1,8 +1,8 @@
-<img align="right" src="http://mmbiz.qpic.cn/mmbiz/UqFrHRLeCAkOcYOjaX3oxIxWicXVJY0ODsbAyPybxk4DkPAaibgdm7trm1MNiatqJYRpF034J7PlfwCz33mbNUkew/640?wx_fmt=jpeg&wxfrom=5&wx_lazy=1" hspace="15" width="200px" style="float: right">
-
 [简体中文README](https://github.com/tencent-wechat/phxsql/blob/master/README.zh_cn.md)
 
 **PhxSQL is a high-availability and strong-consistency MySQL cluster built on Paxos and Percona.**
+
+Authors: Junchao Chen (junechen@tencent.com), Haochuan Cui (lynncui@tencent.com), Duokai Huang (mariohuang@tencent.com), Ming Chen (mingchen@tencent.com) and Sifan Liu (stephenliu@tencent.com) 
 
 #PhxSQL features:
   - high resilience to nodes failure and network partition: the cluster works well when more than half of cluster nodes work and are interconnected.
