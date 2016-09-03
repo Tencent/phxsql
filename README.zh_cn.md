@@ -8,6 +8,8 @@
 
 想了解更多，请扫描右侧二维码关注我们的公众号
 
+方案说明：[微信开源PhxSQL：高可用、强一致的MySQL集群](http://mp.weixin.qq.com/s?__biz=MzI4NDMyNTU2Mw==&mid=2247483783&idx=1&sn=a2d6e589f1f591ded7703eb74aefccbe&scene=0#wechat_redirect)
+
 # 总览
   - PhxSQL具有服务高可用、数据强一致、高性能、运维简单、和MySQL完全兼容的特点。
   - 服务高可用：PhxSQL集群内只要多数派节点存活就能正常提供服务；出于性能的考虑，集群会选举出一个Master节点负责写入操作；当Master失效，会自动重新选举新的Master。
