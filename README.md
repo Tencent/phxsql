@@ -275,10 +275,10 @@ sysbench  --oltp-tables-count=10 --oltp-table-size=1000000 --num-threads=500 --m
 | Client Threads                                         | Clusters    |                    |             |     Test sets   |           |                 |               |
 |------------------------------------------------------|-------------|------------------------|-------------|----------------------|-----------|---------------------|---------------|
 |                                                      |             | insert.lua (100% write)     |             | select.lua (0% write)     |           | OLTP.lua (20% write)     |               |
-|                                                      |             | QPS                | Costs        | QPS              | Costs      | QPS             | Costs          |
+|                                                      |             | QPS                | Response time(MS)        | QPS              | Response time(MS)      | QPS             | Response time(MS)          |
 | 200                                                  | PhxSQL      | 5076               | 39.34/56.93 | 46334            | 4.21/5.12 | 25657           | 140.16/186.39 |
 | 200                                                  | MySQL semi-sync | 4055               | 49.27/66.64 | 47528            | 4.10/5.00 | 20391           | 176.39/226.76 |
 | 500                                                  | PhxSQL      | 8260               | 60.41/83.14 | 105928           | 4.58/5.81 | 46543           | 192.93/242.85 |
 | 500                                                  | MySQL semi-sync | 7072               | 70.60/91.72 | 121535           | 4.17/5.08 | 33229           | 270.38/345.84 |
 
-**NOTE:The 2 costs numbers means average and 95% percentile**
+**NOTE:The 2 Response times means average and 95% percentile**
