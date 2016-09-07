@@ -6,7 +6,7 @@
 
 联系我们：phxteam@tencent.com
 
-想了解更多，请扫描右侧二维码关注我们的公众号
+想了解更多, 以及更详细的编译手册，请进入[中文WIKI](https://github.com/tencent-wechat/phxsql/wiki)，和扫描右侧二维码关注我们的公众号
 
 方案说明：[微信开源PhxSQL：高可用、强一致的MySQL集群](http://mp.weixin.qq.com/s?__biz=MzI4NDMyNTU2Mw==&mid=2247483783&idx=1&sn=a2d6e589f1f591ded7703eb74aefccbe&scene=0#wechat_redirect)
 
