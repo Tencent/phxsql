@@ -1,6 +1,6 @@
 [简体中文README](https://github.com/tencent-wechat/phxsql/blob/master/README.zh_cn.md)
 
-**PhxSQL is a high-availability and strong-consistency MySQL cluster as strong as Zookeeper built on Paxos and Percona.**
+**PhxSQL is a high-availability and strong-consistency MySQL cluster as strong as Zookeeper and built on Paxos and Percona.**
 
 Authors: Junchao Chen, Haochuan Cui, Duokai Huang, Ming Chen and Sifan Liu 
 
