@@ -2,7 +2,7 @@
 import sys
 import os
 import binary_operator
-import director_operator
+import directory_operator
 
 class binary_installer:
 	def __init__( self, args ):
