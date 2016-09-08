@@ -3,7 +3,7 @@ import sys
 import os
 
 
-class director_operator:
+class directory_operator:
 	def __init__( self, args ):
 		self.m_args = args
 		os.system( 'mkdir %s/log'%self.m_args.data_dir )
