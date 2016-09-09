@@ -10,7 +10,7 @@
 
 方案说明：[微信开源PhxSQL：高可用、强一致的MySQL集群](http://mp.weixin.qq.com/s?__biz=MzI4NDMyNTU2Mw==&mid=2247483783&idx=1&sn=a2d6e589f1f591ded7703eb74aefccbe&scene=0#wechat_redirect)
 
-PhxSQL设计和实现哲学：[上](https://zhuanlan.zhihu.com/p/22345242)，[下](https://zhuanlan.zhihu.com/p/22361242)
+PhxSQL设计和实现哲学：[上篇](https://zhuanlan.zhihu.com/p/22345242)，[下篇](https://zhuanlan.zhihu.com/p/22361242)
 
 # 总览
   - PhxSQL具有服务高可用、数据强一致、高性能、运维简单、和MySQL完全兼容的特点。
