@@ -1,6 +1,6 @@
 [简体中文README](https://github.com/tencent-wechat/phxsql/blob/master/README.zh_cn.md)
 
-**PhxSQL is a high-availability and strong-consistency MySQL cluster as strong as Zookeeper and built on Paxos and Percona.**
+**PhxSQL is a high-availability and strong-consistency MySQL cluster built on Paxos and Percona.**
 
 Authors: Junchao Chen, Haochuan Cui, Duokai Huang, Ming Chen and Sifan Liu 
 
@@ -8,7 +8,7 @@ Contact us: phxteam@tencent.com
 
 #PhxSQL features:
   - high availability by automatic failovers: the cluster works well when more than half of cluster nodes work and are interconnected.
-  - guarantee of data consistency among cluster nodes: replacing loss-less semi-sync between MySQL master and MySQL slaves with Paxos, PhxSQL ensures zero-loss binlogs between master and slaves and supports linearizable consistency.
+  - guarantee of data consistency among cluster nodes: replacing loss-less semi-sync between MySQL master and MySQL slaves with Paxos, PhxSQL ensures zero-loss binlogs between master and slaves and supports linearizable consistency, which is as strong as that of Zookeeper.
   - complete compliance with MySQL for and MySQL client: PhxSQL supports up to serializable isolation level of transaction.
   - easy deployment and easy maintenance: PhxSQL, powered by in-house implementation of Paxos, has only 4 components including MySQL and doesn't depend on zookeeper or etcd for anything. PhxSql supports automated cluster membership hot reconfiguration.
   
