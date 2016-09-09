@@ -1,6 +1,6 @@
 <img align="right" src="http://mmbiz.qpic.cn/mmbiz/UqFrHRLeCAkOcYOjaX3oxIxWicXVJY0ODsbAyPybxk4DkPAaibgdm7trm1MNiatqJYRpF034J7PlfwCz33mbNUkew/640?wx_fmt=jpeg&wxfrom=5&wx_lazy=1" hspace="15" width="200px" style="float: right">
 
-**PhxSQL是由微信后台团队自主研发的一款服务高可用、数据强一致的分布式数据库服务。该服务基于Percona5.6搭建，目标在于解决[MySQL在容灾和数据一致性方面的不足](http://mp.weixin.qq.com/s?__biz=MzI4NDMyNTU2Mw==&mid=2247483726&idx=1&sn=a295d87b4f6d1394a17b33d7c71989e5&scene=0)，并大幅简化了MySQL容灾切换的运维操作。**
+**PhxSQL是由微信后台团队自主研发的一款数据强一致、服务高可用的分布式数据库服务。PhxSQL提供Zookeeper级别的强一致和高可用，完全兼容MySQL。**
 
 作者：Junchao Chen, Haochuan Cui, Duokai Huang, Ming Chen 和 Sifan Liu 
 
@@ -9,6 +9,8 @@
 想了解更多, 以及更详细的编译手册，请进入[中文WIKI](https://github.com/tencent-wechat/phxsql/wiki)，和扫描右侧二维码关注我们的公众号
 
 方案说明：[微信开源PhxSQL：高可用、强一致的MySQL集群](http://mp.weixin.qq.com/s?__biz=MzI4NDMyNTU2Mw==&mid=2247483783&idx=1&sn=a2d6e589f1f591ded7703eb74aefccbe&scene=0#wechat_redirect)
+
+PhxSQL设计和实现哲学：[上](https://zhuanlan.zhihu.com/p/22345242)，[下](https://zhuanlan.zhihu.com/p/22361242)
 
 # 总览
   - PhxSQL具有服务高可用、数据强一致、高性能、运维简单、和MySQL完全兼容的特点。
