@@ -144,6 +144,7 @@ PhxSQL需要用到一些第三方库（glog, leveldb, protobuf, phxpaxos, colib,
 | | Port | phxsqlproxy的监听端口 |
 | | QSLogFilePath  | phxsqlproxy的日志目录 |
 | | QSLogLevel | phxsqlproxy的日志级别 |
+| | MasterEnableReadPort | Enable readonly-port in master node |
 
 # PhxSQL使用
 
@@ -157,7 +158,7 @@ PhxSQL需要用到一些第三方库（glog, leveldb, protobuf, phxpaxos, colib,
 
 ##### 只读端口
 
-该端口号为读写端口号+1, 用户连接上此端口时，会对本机的MySQL进行操作(但若本机为master，则phxsqlproxy会把请求转发到其他phxsqlproxy的只读端口）。
+该端口号为读写端口号+1, 用户连接上此端口时，会对本机的MySQL进行操作(但若本机为master且phxsqlproxy.conf中设置了MasterEnableReadPort=0，则phxsqlproxy会把请求转发到其他phxsqlproxy的只读端口）。
 
 ### PhxSQL的使用
 
