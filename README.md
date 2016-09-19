@@ -6,6 +6,8 @@ Authors: Junchao Chen, Haochuan Cui, Duokai Huang, Ming Chen and Sifan Liu
 
 Contact us: phxteam@tencent.com
 
+PhxSQL [![Build Status](https://travis-ci.org/tencent-wechat/phxsql.png)](https://travis-ci.org/tencent-wechat/phxsql)
+
 #PhxSQL features:
   - high availability by automatic failovers: the cluster works well when more than half of cluster nodes work and are interconnected.
   - guarantee of data consistency among cluster nodes: replacing loss-less semi-sync between MySQL master and MySQL slaves with Paxos, PhxSQL ensures zero-loss binlogs between master and slaves and supports linearizable consistency, which is as strong as that of Zookeeper.
