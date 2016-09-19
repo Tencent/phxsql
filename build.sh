@@ -79,9 +79,13 @@ if [ ! -f phxpaxos/lib/libphxpaxos.a ]; then
 	tar zxvf v1.0.2.tar.gz
 	ln -s phxpaxos-1.0.2 phxpaxos
 
-	cd phxpaxos
-	rm third_party -rf 
-	ln -s ../../third_party third_party
+	cd phxpaxos/third_party
+	rm -rf glog gmock leveldb protobuf
+	ln -s ../../glog-0.3.3 glog
+	ln -s ../../protobuf-3.0.0/gmock gmock
+	ln -s ../../leveldb leveldb
+	ln -s ../../protobuf protobuf
+	cd ../
 
 	./autoinstall.sh
 
