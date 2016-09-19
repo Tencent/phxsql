@@ -161,7 +161,7 @@ PhxSQL需要用到一些第三方库（glog, leveldb, protobuf, phxpaxos, colib,
 
 ### PhxSQL的使用
 
-1. 通过mysql命令连接上`phxsqlproxy`，然后执行命令`mysql -uroot -h$phxsqlproxyip -P$phxsqlproxyport -ppwd`
+1. 通过执行命令`mysql -uroot -h$phxsqlproxyip -P$phxsqlproxyport -ppwd` 连接`phxsqlproxy`，
 2. 进行sql命令操作
 
 >phxsqlproxyip为集群内的任意一台phxsqlproxy的ip
