@@ -16,7 +16,6 @@
 
 #include "my_global.h"                          /* NO_EMBEDDED_ACCESS_CHECKS */
 
-#include <string>
 #include <vector>
 #include <algorithm>
 #include <functional>
@@ -124,7 +123,6 @@
 using std::min;
 using std::max;
 using std::vector;
-using std::string;
 
 #define mysqld_charset &my_charset_latin1
 
@@ -5080,33 +5078,6 @@ will be ignored as the --log-bin option is not defined.");
   }
 #endif
 
-  /* call ha_init_key_cache() on all key caches to init them */
-  process_key_caches(&ha_init_key_cache);
-
-  /* Allow storage engine to give real error messages */
-  if (ha_init_errors())
-    DBUG_RETURN(1);
-
-  if (opt_ignore_builtin_innodb)
-    sql_print_warning("ignore-builtin-innodb is ignored "
-                      "and will be removed in future releases.");
-
-  if (gtid_server_init())
-  {
-    sql_print_error("Failed to initialize GTID structures.");
-    unireg_abort(1);
-  }
-
-  if (plugin_init(&remaining_argc, remaining_argv,
-                  (opt_noacl ? PLUGIN_INIT_SKIP_PLUGIN_TABLE : 0) |
-                  (opt_help ? PLUGIN_INIT_SKIP_INITIALIZATION : 0)))
-  {
-    sql_print_error("Failed to initialize plugins.");
-    unireg_abort(1);
-  }
-  plugins_are_initialized= TRUE;  /* Don't separate from init function */
-  
-  //mark
   if (opt_bin_log)
   {
     /* Reports an error and aborts, if the --log-bin's path
@@ -5153,33 +5124,25 @@ a file name for --log-bin-index option", opt_binlog_index_name);
       my_free(opt_bin_logname);
       opt_bin_logname=my_strdup(buf, MYF(0));
     }
-
-	if (opt_bin_log)
-	{
-		log_bin_basename=
-			rpl_make_log_name(opt_bin_logname, pidfile_name,
-					opt_bin_logname ? "" : "-bin");
-		log_bin_index=
-			rpl_make_log_name(opt_binlog_index_name, log_bin_basename, ".index");
-		if (log_bin_basename == NULL || log_bin_index == NULL)
-		{
-			sql_print_error("Unable to create replication path names:"
-					" out of memory or path names too long"
-					" (path name exceeds " STRINGIFY_ARG(FN_REFLEN)
-					" or file name exceeds " STRINGIFY_ARG(FN_LEN) ").");
-			unireg_abort(1);
-		}
-	}
-
-    int ret = RUN_HOOK(binlog_storage, before_recovery, (NULL, server_uuid, &key_file_binlog_index, log_bin_index));
-	if ( ret )
-	{
-   	  sql_print_information( "RUN_HOOK before_recovery ret %d", ret );
-	  unireg_abort(1);
-	}
-
     if (mysql_bin_log.open_index_file(opt_binlog_index_name, ln, TRUE))
     {
+      unireg_abort(1);
+    }
+  }
+
+  if (opt_bin_log)
+  {
+    log_bin_basename=
+      rpl_make_log_name(opt_bin_logname, pidfile_name,
+                        opt_bin_logname ? "" : "-bin");
+    log_bin_index=
+      rpl_make_log_name(opt_binlog_index_name, log_bin_basename, ".index");
+    if (log_bin_basename == NULL || log_bin_index == NULL)
+    {
+      sql_print_error("Unable to create replication path names:"
+                      " out of memory or path names too long"
+                      " (path name exceeds " STRINGIFY_ARG(FN_REFLEN)
+                      " or file name exceeds " STRINGIFY_ARG(FN_LEN) ").");
       unireg_abort(1);
     }
   }
@@ -5205,6 +5168,31 @@ a file name for --log-bin-index option", opt_binlog_index_name);
     }
   }
 #endif /* !EMBEDDED_LIBRARY */
+
+  /* call ha_init_key_cache() on all key caches to init them */
+  process_key_caches(&ha_init_key_cache);
+
+  /* Allow storage engine to give real error messages */
+  if (ha_init_errors())
+    DBUG_RETURN(1);
+
+  if (opt_ignore_builtin_innodb)
+    sql_print_warning("ignore-builtin-innodb is ignored "
+                      "and will be removed in future releases.");
+  if (gtid_server_init())
+  {
+    sql_print_error("Failed to initialize GTID structures.");
+    unireg_abort(1);
+  }
+
+  if (plugin_init(&remaining_argc, remaining_argv,
+                  (opt_noacl ? PLUGIN_INIT_SKIP_PLUGIN_TABLE : 0) |
+                  (opt_help ? PLUGIN_INIT_SKIP_INITIALIZATION : 0)))
+  {
+    sql_print_error("Failed to initialize plugins.");
+    unireg_abort(1);
+  }
+  plugins_are_initialized= TRUE;  /* Don't separate from init function */
 
   /* we do want to exit if there are any other unknown options */
   if (remaining_argc > 1)
@@ -5888,7 +5876,6 @@ int mysqld_main(int argc, char **argv)
       if (ret)
         unireg_abort(1);
 
-	  //mark
       if (mysql_bin_log.init_gtid_sets(
             const_cast<Gtid_set *>(gtid_state->get_logged_gtids()),
             const_cast<Gtid_set *>(gtid_state->get_lost_gtids()),

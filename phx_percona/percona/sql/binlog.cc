@@ -6404,6 +6404,15 @@ int MYSQL_BIN_LOG::open_binlog(const char *opt_name)
   DBUG_ASSERT(total_ha_2pc > 1 || (1 == total_ha_2pc && opt_bin_log));
   DBUG_ASSERT(opt_name && opt_name[0]);
 
+  int ret = RUN_HOOK(binlog_storage, before_binlog_init, 
+		  (NULL, server_uuid, &key_file_binlog_index, log_bin_index));
+
+  if ( ret ) 
+  {
+	  sql_print_information( "RUN_HOOK before_binlog_init ret %d", ret );
+	  unireg_abort(1);
+  }
+
   if (!my_b_inited(&index_file))
   {
     /* There was a failure to open the index file, can't open the binlog */
