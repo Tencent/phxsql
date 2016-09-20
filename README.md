@@ -9,11 +9,10 @@
 
 ### phxsqlproxy 模块
 1. ConnectDest
-```
-int IORoutine::ConnectDest()
-```
+  ```
+  int IORoutine::ConnectDest()
+  ```
 2. GetDestEndpoint
-```
-int MasterIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port)
-```
-
+  ```
+  int MasterIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port)
+  ```
