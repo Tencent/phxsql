@@ -8,11 +8,11 @@
 - [ ] 厘清 phxbinlogsvr 选举 master 的过程
 
 ### phxsqlproxy 模块
-1. ConnectDest
+1. ConnectDest  
   ```
   int IORoutine::ConnectDest()
   ```
-2. GetDestEndpoint
+2. GetDestEndpoint  
   ```
   int MasterIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port)
   ```
