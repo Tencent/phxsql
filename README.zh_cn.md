@@ -1,14 +1,16 @@
 <img align="right" src="http://mmbiz.qpic.cn/mmbiz/UqFrHRLeCAkOcYOjaX3oxIxWicXVJY0ODsbAyPybxk4DkPAaibgdm7trm1MNiatqJYRpF034J7PlfwCz33mbNUkew/640?wx_fmt=jpeg&wxfrom=5&wx_lazy=1" hspace="15" width="200px" style="float: right">
 
-**PhxSQL是由微信后台团队自主研发的一款服务高可用、数据强一致的分布式数据库服务。该服务基于Percona5.6搭建，目标在于解决[MySQL在容灾和数据一致性方面的不足](http://mp.weixin.qq.com/s?__biz=MzI4NDMyNTU2Mw==&mid=2247483726&idx=1&sn=a295d87b4f6d1394a17b33d7c71989e5&scene=0)，并大幅简化了MySQL容灾切换的运维操作。**
+**PhxSQL是由微信后台团队自主研发的一款数据强一致、服务高可用的分布式数据库服务。PhxSQL提供Zookeeper级别的强一致和高可用，完全兼容MySQL。**
 
 作者：Junchao Chen, Haochuan Cui, Duokai Huang, Ming Chen 和 Sifan Liu 
 
 联系我们：phxteam@tencent.com
 
-想了解更多，请扫描右侧二维码关注我们的公众号
+想了解更多, 以及更详细的编译手册，请进入[中文WIKI](https://github.com/tencent-wechat/phxsql/wiki)，和扫描右侧二维码关注我们的公众号
 
 方案说明：[微信开源PhxSQL：高可用、强一致的MySQL集群](http://mp.weixin.qq.com/s?__biz=MzI4NDMyNTU2Mw==&mid=2247483783&idx=1&sn=a2d6e589f1f591ded7703eb74aefccbe&scene=0#wechat_redirect)
+
+PhxSQL设计和实现哲学：[上篇](https://zhuanlan.zhihu.com/p/22345242)，[下篇](https://zhuanlan.zhihu.com/p/22361242)
 
 # 总览
   - PhxSQL具有服务高可用、数据强一致、高性能、运维简单、和MySQL完全兼容的特点。
@@ -86,6 +88,8 @@ PhxSQL需要用到一些第三方库（glog, leveldb, protobuf, phxpaxos, colib,
 2. 若想打包二进制运行包（集群运行时所需要的所有文件和配置）`make package`
 3. `install`完成后，二进制会生成到`PhxSQL`目录下的`sbin`目录，运行所需要的相关文件和配置会安装到PhxSQL目录下的`install_package`目录。打包二进制运行包会把`install_package`进行tar格式的打包，并生成`phxsql.tar.gz`。若想更改`install`的安装目录，可在`sh autoinstall.sh` 后加入`-prefix=`路径
 
+> 详细的编译步骤请参阅WIKI [中文编译手册](https://github.com/tencent-wechat/phxsql/wiki/%E4%B8%AD%E6%96%87%E8%AF%A6%E7%BB%86%E7%BC%96%E8%AF%91%E6%89%8B%E5%86%8C)
+
 # PhxSQL部署和运行
 
 ### 准备机器
@@ -140,6 +144,7 @@ PhxSQL需要用到一些第三方库（glog, leveldb, protobuf, phxpaxos, colib,
 | | Port | phxsqlproxy的监听端口 |
 | | QSLogFilePath  | phxsqlproxy的日志目录 |
 | | QSLogLevel | phxsqlproxy的日志级别 |
+| | MasterEnableReadPort | Enable readonly-port in master node |
 
 # PhxSQL使用
 
@@ -153,11 +158,11 @@ PhxSQL需要用到一些第三方库（glog, leveldb, protobuf, phxpaxos, colib,
 
 ##### 只读端口
 
-该端口号为读写端口号+1, 用户连接上此端口时，会对本机的MySQL进行操作(但若本机为master，则phxsqlproxy会把请求转发到其他phxsqlproxy的只读端口）。
+该端口号为读写端口号+1, 用户连接上此端口时，会对本机的MySQL进行操作(但若本机为master且phxsqlproxy.conf中设置了MasterEnableReadPort=0，则phxsqlproxy会把请求转发到其他phxsqlproxy的只读端口）。
 
 ### PhxSQL的使用
 
-1. 通过mysql命令连接上`phxsqlproxy`，然后执行命令`mysql -uroot -h$phxsqlproxyip -P$phxsqlproxyport -ppwd`
+1. 通过执行命令`mysql -uroot -h$phxsqlproxyip -P$phxsqlproxyport -ppwd` 连接`phxsqlproxy`，
 2. 进行sql命令操作
 
 >phxsqlproxyip为集群内的任意一台phxsqlproxy的ip

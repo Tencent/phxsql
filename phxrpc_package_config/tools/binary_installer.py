@@ -2,7 +2,7 @@
 import sys
 import os
 import binary_operator
-import director_operator
+import directory_operator
 
 class binary_installer:
 	def __init__( self, args ):
@@ -27,7 +27,7 @@ class binary_installer:
 			print 'kill mysql failed'
 			return sys._getframe().f_lineno
 
-		do = director_operator.director_operator( self.m_args )
+		do = directory_operator.directory_operator( self.m_args )
 		if do.mkdir_for_mysql() != 0:
 			print 'mkdir for mysql failed'
 			return sys._getframe().f_lineno
@@ -42,7 +42,7 @@ class binary_installer:
 			print 'kill phxbinlogsvr failed'
 			return sys._getframe().f_lineno
 
-		do = director_operator.director_operator( self.m_args )
+		do = directory_operator.directory_operator( self.m_args )
 		if do.mkdir_for_phxbinlogsvr() != 0:
 			print 'mkdir for phxbinlogsvr failed'
 			return sys._getframe().f_lineno

@@ -33,10 +33,11 @@ CPPFLAGS+=-I$(SRC_BASE_PATH) -I$(PROTOBUF_INCLUDE_PATH)  -I$(LEVELDB_INCLUDE_PAT
 CPPFLAGS+=-I$(GLOG_INCLUDE_PATH) 
 CPPFLAGS+=-Wall -g -fPIC -m64 
 
-LDFLAGS+=-L$(PHXPAXOS_LIB_PATH) -L$(PHXSQL_LIB_PATH) -L$(PROTOBUF_LIB_PATH) -L$(LEVELDB_LIB_PATH) 
-LDFLAGS+=-L$(GLOG_LIB_PATH) -L$(GRPC_LIBE_PATH) -L$(OPEN_SSL_LIB_PATH) -L$(MYSQL_LIB_PATH)
-LDFLAGS+=-L$(COLIB_LIB_PATH) 
-LDFLAGS+=-static-libgcc -static-libstdc++
+LDFLAGS += -L$(PHXPAXOS_LIB_PATH) -L$(PHXSQL_LIB_PATH) -L$(PROTOBUF_LIB_PATH) -L$(LEVELDB_LIB_PATH) 
+LDFLAGS += -L$(GLOG_LIB_PATH) -L$(GRPC_LIBE_PATH) -L$(OPEN_SSL_LIB_PATH) -L$(MYSQL_LIB_PATH)
+LDFLAGS += -L$(COLIB_LIB_PATH) 
+LDFLAGS += -static-libgcc -static-libstdc++
+LDFLAGS += -Wl,--no-as-needed
 
 
 #=====================================================================================================
