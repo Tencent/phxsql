@@ -155,9 +155,9 @@ int IORoutine::ConnectDest() {
             LogError("requniqid %llu get mysql ip port failed", req_uniq_id_);
             return -__LINE__;
         }
-    } else {
-        dest_ip = "127.0.0.1";
-        dest_port = config_->GetMysqlPort();
+    } else {                                    // else 
+        dest_ip = "127.0.0.1";                  // assign local host ip address to dest_ip
+        dest_port = config_->GetMysqlPort();    // assign mysql port to dest_port
     }
 
     if (sqlsvr_fd_ != -1 && dest_ip == connect_dest_) {
@@ -190,8 +190,8 @@ int IORoutine::ConnectDest() {
         connect_port_ = dest_port;
     }
 
-    if (dest_port == config_->GetMysqlPort()) {
-        uint64_t cost = GetTimestampMS() - begin;
+    if (dest_port == config_->GetMysqlPort()) { 		// if dest_port is equal with mysql port
+        uint64_t cost = GetTimestampMS() - begin;		
         LogVerbose("%s:%d requniqid %llu connect [%s:%d] ret fd %d cost %llu", __func__, __LINE__, req_uniq_id_,
                    dest_ip.c_str(), dest_port, fd, cost);
         MonitorPluginEntry::GetDefault()->GetMonitorPlugin()->ConnectMysqlSvr(fd);
@@ -432,7 +432,7 @@ int IORoutine::run() {
                 break;
             }
 
-            uint64_t cost_in_epoll = GetTimestampMS() - begin;
+            uint64_t cost_in_epoll = GetTimestampMS() - begin;  // calculate cost time
             if (cost_in_epoll < 1000 && cost_in_epoll > 30) {
                 LogVerbose("%s:%d requniqid %llu epollcost2 %llu", __func__, __LINE__, req_uniq_id_, cost_in_epoll);
             }
@@ -608,27 +608,27 @@ int SlaveIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port) {
     std::string master_ip = "";
 
     uint64_t expired_time = 0;
-    ret = GetMasterCache()->GetMaster(master_ip, expired_time);
+    ret = GetMasterCache()->GetMaster(master_ip, expired_time); // obtain master ip
     if (ret != 0) {
         LogError("%s:%d requniqid %llu getmaster failed, ret %d", __func__, __LINE__, req_uniq_id_, ret);
         return -__LINE__;
     }
 
-    if (master_ip == std::string(GetWorkerConfig()->listen_ip_)) {
-        if (!config_->MasterEnableReadPort()) {
-            const std::vector<std::string> & ip_list = GetMembershipCache()->GetMembership();
-            for (size_t i = 0; i < ip_list.size(); ++i) {
-                if (ip_list[i] == std::string(GetWorkerConfig()->listen_ip_)) {
+    if (master_ip == std::string(GetWorkerConfig()->listen_ip_)) {      
+        if (!config_->MasterEnableReadPort()) {                                                 // if master read_only port(54322) is not enable 
+            const std::vector<std::string> & ip_list = GetMembershipCache()->GetMembership();   // obtain member ip list 
+            for (size_t i = 0; i < ip_list.size(); ++i) {                                       
+                if (ip_list[i] == std::string(GetWorkerConfig()->listen_ip_)) {                 // forward next ip after listen_ip_ in ip_list
                     dest_ip = ip_list[(i + 1) % ip_list.size()];
-                    dest_port = GetWorkerConfig()->port_;
+                    dest_port = GetWorkerConfig()->port_;                                       // assign read_only port to dest_port
                     break;
                 }
             }
-        } else
-            dest_port = config_->GetMysqlPort();
-    } else {
-        dest_ip = "127.0.0.1";
-        dest_port = config_->GetMysqlPort();
+        } else                                                                                  // if master read_only port is enable
+            dest_port = config_->GetMysqlPort();                                                // assign mysql port(11111) to dest_port
+    } else {                                                                                    // if master_ip is not equals with listen_ip_
+        dest_ip = "127.0.0.1";                                                                  // assign local host ip address to dest_ip
+        dest_port = config_->GetMysqlPort();                                                    // assign mysql port to dest_port
     }
     LogVerbose("%s:%d requniqid %llu ret ip [%s] port [%d]", __func__, __LINE__, req_uniq_id_, dest_ip.c_str(),
                dest_port);
