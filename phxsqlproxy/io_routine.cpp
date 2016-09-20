@@ -143,11 +143,14 @@ void IORoutine::ClearVariablesAndStatus() {
     db_name_ = "";
 }
 
+/**
+ * @function : connect to destination
+*/
 int IORoutine::ConnectDest() {
     std::string dest_ip = "";
     int dest_port = 0;
 
-    if (!config_->GetOnlyProxy()) {
+    if (!config_->GetOnlyProxy()) { // obtain only_proxy by GetOnlyProxy(), and its default value is 0
         if (GetDestEndpoint(dest_ip, dest_port) != 0) {
             LogError("requniqid %llu get mysql ip port failed", req_uniq_id_);
             return -__LINE__;
@@ -521,25 +524,30 @@ MasterIORoutine::MasterIORoutine(IORoutineMgr * routine_mgr, MasterCache * maste
 MasterIORoutine::~MasterIORoutine() {
 }
 
+/**
+ * @function : GetDestEndpoint
+ * @params : dest_ip            IP address of destination
+ * @params : dest_port          port number of destination
+*/
 int MasterIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port) {
     int ret = 0;
     dest_ip = "";
     std::string master_ip = "";
 
     uint64_t expired_time = 0;
-    ret = GetMasterCache()->GetMaster(master_ip, expired_time);
+    ret = GetMasterCache()->GetMaster(master_ip, expired_time);                 // get master ip
     if (ret != 0) {
         LogError("%s:%d requniqid %llu getmaster failed, ret %d", __func__, __LINE__, req_uniq_id_, ret);
         return -__LINE__;
     }
 
-    bool is_master = (master_ip == string(GetWorkerConfig()->listen_ip_));
-    if (is_master) {
-        dest_ip = "127.0.0.1";
-        dest_port = config_->GetMysqlPort();
-    } else {
-        dest_ip = master_ip;
-        dest_port = GetWorkerConfig()->port_;
+    bool is_master = (master_ip == string(GetWorkerConfig()->listen_ip_));      // compare master_ip with listen_ip_
+    if (is_master) {                                                            // if master_ip is same with listen_ip_
+        dest_ip = "127.0.0.1";                                                  
+        dest_port = config_->GetMysqlPort();                                    // assign 11111 to dest_port
+    } else {                                                                    // if not
+        dest_ip = master_ip;                                                    // assign master_ip to dest_ip
+        dest_port = GetWorkerConfig()->port_;                                   // assign 54321 to dest_port
     }
 
     LogVerbose("%s:%d requniqid %llu ret ip [%s] port [%d]", __func__, __LINE__, req_uniq_id_, dest_ip.c_str(),
