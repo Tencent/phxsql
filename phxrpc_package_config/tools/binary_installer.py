@@ -32,7 +32,7 @@ class binary_installer:
 			print 'mkdir for mysql failed'
 			return sys._getframe().f_lineno
 
-		cmd = 'cd %s/percona.src; ./scripts/mysql_install_db --defaults-file=%s/etc/my.cnf --user=mysql'%( self.m_args.base_dir, self.m_args.base_dir )
+		cmd = 'cd %spercona.src; ./scripts/mysql_install_db --defaults-file=%setc/my.cnf --user=mysql'%( self.m_args.base_dir, self.m_args.base_dir )
 		print cmd
 		return os.system( cmd )
 
