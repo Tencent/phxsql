@@ -3,6 +3,7 @@ import sys
 import os
 import binary_operator
 import directory_operator
+from phxsql_utils import *
 
 class binary_installer:
 	def __init__( self, args ):
@@ -32,7 +33,8 @@ class binary_installer:
 			print 'mkdir for mysql failed'
 			return sys._getframe().f_lineno
 
-		cmd = 'cd %spercona.src; ./scripts/mysql_install_db --defaults-file=%setc/my.cnf --user=mysql'%( self.m_args.base_dir, self.m_args.base_dir )
+		cmd = 'cd %s; ./scripts/mysql_install_db --defaults-file=%s --user=mysql'% \
+				( format_path('%s/percona.src'%self.m_args.base_dir), format_path('%s/etc/my.cnf'%self.m_args.base_dir) )
 		print cmd
 		return os.system( cmd )
 

@@ -3,6 +3,7 @@ import sys
 import os
 import time
 import name_config
+from phxsql_utils import *
 
 class binary_operator:
 	def __init__( self, args ):
@@ -70,24 +71,26 @@ class binary_operator:
 		return 0
 
 	def start_mysql( self ):
-		cmd = 'nohup sh %s/bin/mysqld_safe --defaults-file=%s/etc/my.cnf --super_read_only --plugin-load=%s &'%(self.m_args.base_dir, self.m_args.base_dir, name_config.phxsync_plugin )
+		cmd = 'nohup sh %s --defaults-file=%s --super_read_only --plugin-load=%s &' \
+				%( format_path('%s/bin/mysqld_safe'%self.m_args.base_dir), format_path('%s/etc/my.cnf'%self.m_args.base_dir), name_config.phxsync_plugin )
 		return os.system(cmd)
 
 
 	def start_phxbinlogsvr( self ):
-		cmd = 'nohup %s/sbin/%s &'%(self.m_args.base_dir, name_config.phxbinlogsvr)
+		cmd = 'nohup %s &'%( format_path('%s/sbin/%s'%(self.m_args.base_dir, name_config.phxbinlogsvr) ) )
 		return os.system(cmd)
 
 
 	def start_phxsqlproxy( self ):
-		cmd = '%s/sbin/%s %s/etc/phxsqlproxy.conf daemon'%(self.m_args.base_dir, name_config.phxsqlproxy, self.m_args.base_dir)
+		cmd = '%s %s daemon'%( format_path('%s/sbin/%s'%(self.m_args.base_dir, name_config.phxsqlproxy)), \
+			format_path('%s/etc/phxsqlproxy.conf'%self.m_args.base_dir) )
 		return os.system(cmd)
 
 	def restart_mysql( self ):
 		self.kill_mysql()
 		time.sleep(1)
 		if self.m_args.new_process != "":
-			cmd = 'cp %s %s/sbin/'%( self.m_args.new_process, self.m_args.base_dir )
+			cmd = 'cp %s %s'%( format_path(self.m_args.new_process), format_path( '%s/sbin/'%self.m_args.base_dir ) )
 			os.system( cmd )
 		return self.start_mysql()
 
@@ -95,7 +98,7 @@ class binary_operator:
 		self.kill_phxsqlproxy()
 		time.sleep(1)
 		if self.m_args.new_process != "":
-			cmd = 'cp %s %s/sbin/'%( self.m_args.new_process, self.m_args.base_dir )
+			cmd = 'cp %s %s'%( format_path(self.m_args.new_process), format_path( '%s/sbin/'%self.m_args.base_dir ) )
 			os.system( cmd )
 		return self.start_phxsqlproxy()
 
@@ -103,7 +106,7 @@ class binary_operator:
 		self.kill_phxbinlogsvr()
 		time.sleep(1)
 		if self.m_args.new_process != "":
-			cmd = 'cp %s %s/sbin/'%( self.m_args.new_process, self.m_args.base_dir )
+			cmd = 'cp %s %s'%( format_path(self.m_args.new_process), format_path( '%s/sbin/'%self.m_args.base_dir ) )
 			os.system( cmd )
 		return self.start_phxbinlogsvr()
 
