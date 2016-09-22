@@ -35,6 +35,12 @@ MasterCache::MasterCache(PHXSqlProxyConfig * config) :
 MasterCache::~MasterCache() {
 }
 
+/**
+ * @function : IsMasterValid
+ * @&master_ip : master ip 
+ * @expired_time : expire time
+ * @brief : whether master is vaild
+*/
 bool MasterCache::IsMasterValid(const std::string & master_ip, uint64_t expired_time) {
     if (master_ip == "") {
         return false;
@@ -46,6 +52,12 @@ bool MasterCache::IsMasterValid(const std::string & master_ip, uint64_t expired_
     return false;
 }
 
+/**
+ * @function : GetMaster
+ * @&master_ip : master ip 
+ * @expired_time : expire time
+ * @brief : get master ip
+*/
 int MasterCache::GetMaster(std::string & master_ip, uint64_t & expired_time) {
     if (string(config_->GetSpecifiedMasterIP()) != "") {
         master_ip = config_->GetSpecifiedMasterIP();
@@ -65,6 +77,11 @@ int MasterCache::GetMaster(std::string & master_ip, uint64_t & expired_time) {
     return -__LINE__;
 }
 
+/**
+ * @function : UpdateGroupStatus
+ * @param : &group_status master status 
+ * @brief : get master info
+*/
 int MasterCache::UpdateGroupStatus(MasterStatus_t & group_status) {
     if (string(config_->GetSpecifiedMasterIP()) != "") {
         return 0;

@@ -69,6 +69,12 @@ int TickFunc(void* args) {
     return 0;
 }
 
+/**
+ * @function : StartWorker
+ * @param : config
+ * @param : worker_config
+ * @brief : start work
+*/
 template<class T>
 int StartWorker(PHXSqlProxyConfig * config, WorkerConfig_t * worker_config) {
     const char * listen_ip = worker_config->listen_ip_;
@@ -134,6 +140,13 @@ int StartWorker(PHXSqlProxyConfig * config, WorkerConfig_t * worker_config) {
     return 0;
 }
 
+/**
+ * @function : phxsqlproxymain
+ * @param : argc
+ * @param : argv
+ * @param : config
+ * @brief : main function of phxsqlproxy
+*/
 int phxsqlproxymain(int argc, char *argv[], PHXSqlProxyConfig * config) {
     if (argc < 2) {
         printf("Usage %s <config>\n", argv[0]);

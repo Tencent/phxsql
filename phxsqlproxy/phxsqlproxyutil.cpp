@@ -108,6 +108,10 @@ bool IsAuthFinishPkg(const char * buf, int len) {
     return buf[4] == 0x0;
 }
 
+/**
+ * @function : GetTimestampMS 
+ * @brief : calculate millisecond
+*/
 uint64_t GetTimestampMS() {
     uint64_t u = 0;
     struct timeval now;

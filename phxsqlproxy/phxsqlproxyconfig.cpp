@@ -30,6 +30,10 @@ PHXSqlProxyConfig::PHXSqlProxyConfig(const char * filename) {
 PHXSqlProxyConfig::~PHXSqlProxyConfig() {
 }
 
+/**
+ * @function : ReadConfig
+ * @brief : read config
+*/
 void PHXSqlProxyConfig::ReadConfig() {
     svr_port_ = GetInteger("Server", "Port", 0);
     svr_ip_ = Get("Server", "IP", "");
@@ -78,6 +82,11 @@ WorkerConfig_t * PHXSqlProxyConfig::GetSlaveWorkerConfig() {
     return &slave_worker_config_;
 }
 
+/**
+ * @function : ReadMasterWorkerConfig
+ * @param : worker_config
+ * @brief : read master config
+*/
 void PHXSqlProxyConfig::ReadMasterWorkerConfig(WorkerConfig_t * worker_config) {
     worker_config->listen_ip_ = svr_ip_.c_str();
     worker_config->port_ = svr_port_;
@@ -87,6 +96,11 @@ void PHXSqlProxyConfig::ReadMasterWorkerConfig(WorkerConfig_t * worker_config) {
     worker_config->is_master_port_ = true;
 }
 
+/**
+ * @function : ReadSlaveWorkerConfig
+ * @param : worker_config
+ * @brief : read slave config
+*/
 void PHXSqlProxyConfig::ReadSlaveWorkerConfig(WorkerConfig_t * worker_config) {
     worker_config->listen_ip_ = svr_ip_.c_str();
     worker_config->port_ = GetInteger("Server", "SlavePort", 0);

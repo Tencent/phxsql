@@ -35,6 +35,11 @@ MembershipCache::MembershipCache() {
 MembershipCache::~MembershipCache() {
 }
 
+/**
+ * @function : UpdateGroupStatus
+ * @param : &group_status member status 
+ * @brief : get member status
+*/
 int MembershipCache::UpdateGroupStatus(std::vector<std::string> & group_status) {
     std::shared_ptr<PhxBinlogClient> client = PhxBinlogClientPlatformInfo::GetDefault()->GetClientFactory()
             ->CreateClient();
@@ -58,6 +63,10 @@ int MembershipCache::UpdateGroupStatus(std::vector<std::string> & group_status) 
     return ret;
 }
 
+/**
+ * @function : GetMembership
+ * @brief : get member list
+*/
 const std::vector<std::string> & MembershipCache::GetMembership() {
     return GetGroupStatus();
 }

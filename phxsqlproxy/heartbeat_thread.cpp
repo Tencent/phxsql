@@ -39,7 +39,7 @@ void HeartBeatThread::run() {
             phxsql::LogWarning("%s:%d heartbeat ret %d", __func__, __LINE__, ret);
             count = 1;
         }
-        poll(0, 0, 1000);
+        poll(0, 0, 1000); //1000ms
     }
 }
 

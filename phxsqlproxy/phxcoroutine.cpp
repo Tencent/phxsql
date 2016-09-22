@@ -90,7 +90,7 @@ int Coroutine::RoutineConnectWithTimeout(int fd, const struct sockaddr *address,
     }
 
     if (pf.revents & POLLOUT)  //connect succ
-            {
+    {
         errno = 0;
         return 0;
     }

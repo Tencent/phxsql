@@ -56,8 +56,9 @@ void AcceptThread::run() {
     co_init_curr_thread_env();
     co_enable_hook_sys();
 
+    // obtain a random number
     static std::default_random_engine random_engine(time (NULL));
-    static std::uniform_int_distribution<unsigned> random_range(0, worker_threads_.size() - 1);
+    static std::uniform_int_distribution<unsigned> random_range(0, worker_threads_.size() - 1); // the range of random number is [0, size-1]
 
     for (;;) {
         struct sockaddr_in addr;  //maybe sockaddr_un;
@@ -76,7 +77,7 @@ void AcceptThread::run() {
         MonitorPluginEntry::GetDefault()->GetMonitorPlugin()->AcceptSuccess();
         SetNonBlock(fd);
 
-        int rand_idx = random_range(random_engine);
+        int rand_idx = random_range(random_engine);                                          // random index
         if (worker_threads_[rand_idx]->AssignFD(fd) > 0) {
             MonitorPluginEntry::GetDefault()->GetMonitorPlugin()->ResumeRoutine();
         } else {
