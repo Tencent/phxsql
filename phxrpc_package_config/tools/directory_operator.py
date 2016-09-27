@@ -24,7 +24,7 @@ class directory_operator:
 		os.system( 'mkdir %s'%(format_path( '%s/tmp'%mysql_data_dir)) )
 		os.system( 'mkdir %s'%(format_path( '%s/binlog'%mysql_data_dir)) )
 		os.system( 'mkdir %s'%(format_path( '%s/innodb'%mysql_data_dir)) )
-		os.system( 'chown user:mysql -R %s'%mysql_data_dir )
+		os.system( 'chown mysql:mysql -R %s'%mysql_data_dir )
 
 		return 0
 
