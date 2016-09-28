@@ -24,11 +24,13 @@ class MySqlStringHelper {
     static std::string GetSvrIDString(const uint32_t &svr_id);
 
     static std::string GetCreateUserStr(const std::string &username);
+    static std::string GetChangePwdStr(const std::string &username, const std::string &pwd);
     static std::string GetGrantReplicaUserStr(const std::string &username, const std::string &pwd);
     static std::string GetGrantAdminUserStr(const std::string &root_username, const std::string &root_pwd,
                                             const std::string &svr_ip);
     static std::string GetRevokeAdminUserStr(const std::string &admin_username, const std::string &admin_pwd,
                                              const std::string &svr_ip);
+	static std::string GetFlushPrivilegeStr();
     static std::string GetShowUserStr(const std::string &username);
     static std::string GetShowGrantString(const std::string &username, const std::string &ip);
 };
