@@ -94,10 +94,11 @@ int MySqlManager::Query(const string& query_string, const string &ip) {
     mysql_option.ip = ip;
     mysql_option.port = option_->GetMySqlConfig()->GetMySQLPort();
     mysql_option.username = GetAdminUserName();
+    mysql_option.pwd = GetAdminPwd();
     if (mysql_option.username == "") {
         mysql_option.username = "root";
+		mysql_option.pwd = "";
     }
-    mysql_option.pwd = GetAdminPwd();
     LogVerbose("%s username %s pwd %s query %s", __func__, mysql_option.username.c_str(), mysql_option.pwd.c_str(),
                query_string.c_str());
 
@@ -110,10 +111,11 @@ int MySqlManager::Query(const string &query_string, vector<vector<string> > *res
     mysql_option.ip = ip;
     mysql_option.port = option_->GetMySqlConfig()->GetMySQLPort();
     mysql_option.username = GetAdminUserName();
+    mysql_option.pwd = GetAdminPwd();
     if (mysql_option.username == "") {
         mysql_option.username = "root";
+		mysql_option.pwd = "";
     }
-    mysql_option.pwd = GetAdminPwd();
     LogVerbose("%s username %s pwd %s query %s", __func__, mysql_option.username.c_str(), mysql_option.pwd.c_str(),
                query_string.c_str());
 
@@ -129,6 +131,7 @@ int MySqlManager::GetValue(const std::string &value_type, const std::string &val
     mysql_option.pwd = GetAdminPwd();
     if (mysql_option.username == "") {
         mysql_option.username = "root";
+		mysql_option.pwd = "";
     }
     LogVerbose("%s username %s pwd %s", __func__, mysql_option.username.c_str(), mysql_option.pwd.c_str());
 
@@ -310,11 +313,7 @@ int MySqlManager::CreateAdmin(const string &admin_username, const string &admin_
         }
         LogVerbose("%s grant %s user %s done", __func__, grant_string.c_str(), admin_username.c_str());
     }
-	int ret = ChangePwd(admin_username, admin_pwd);
-	if (ret) {
-		return ret;
-	}
-	return Query(MySqlStringHelper::GetFlushPrivilegeStr());
+	return OK;
 }
 
 int MySqlManager::CreateReplica(const string &admin_username, const string &replica_username,
@@ -334,11 +333,7 @@ int MySqlManager::CreateReplica(const string &admin_username, const string &repl
         }
         LogVerbose("%s grant %s user %s done", __func__, grant_string.c_str(), replica_username.c_str());
     }
-	int ret = ChangePwd(replica_username, replica_pwd);
-	if (ret) {
-		return ret;
-	}
-	return Query(MySqlStringHelper::GetFlushPrivilegeStr());
+	return OK;
 }
 
 int MySqlManager::CreateMySqlAdminInfo(const string &now_admin_username, const string &now_admin_pwd,
@@ -378,7 +373,7 @@ int MySqlManager::CheckAdminPermission(const std::vector<std::string> &member_li
         int ret = CheckUserGrantExist(username, pwd, MySqlStringHelper::GetShowGrantString(username, member),
                                       " WITH GRANT OPTION");
         if (ret == MYSQL_USER_NOT_EXIST) {
-            ColorLogWarning("%s new user %s do not have grant add one", __func__, username.c_str());
+            ColorLogWarning("%s new user %s, member %s do not have grant add one", __func__, username.c_str(), member.c_str());
 
             string grant_string = MySqlStringHelper::GetGrantAdminUserStr(username, pwd, member);
             ret = Query(grant_string);
@@ -419,4 +414,3 @@ int MySqlManager::RemoveMemberAdminPermission(const std::string &member_ip) {
 }
 
 }
-
