@@ -32,6 +32,11 @@ string Utils::GetIP(const uint32_t &svrid) {
     return tmp;
 }
 
+/**
+ * @ function : GetSrvID
+ * @ params : const string &ip	ip address
+ * @ brief : 根据 IP 地址计算 svrid
+*/
 uint32_t Utils::GetSvrID(const string &ip) {
     uint32_t svrid = 0;
     uint32_t tmp[4] = { 0 };
