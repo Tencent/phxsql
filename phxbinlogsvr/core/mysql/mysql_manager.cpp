@@ -206,7 +206,7 @@ int MySqlManager::ChangePwd(const string &username, const string &pwd) {
 int MySqlManager::CreateUser(const string &username,const string &pwd) {
     int ret = CheckUserExist(username);
     if (ret == MYSQL_USER_NOT_EXIST) {
-        ret = Query(MySqlStringHelper::GetCreateUserStr(username));
+        ret = Query(MySqlStringHelper::GetCreateUserStr(username, pwd));
     }
     return ret;
 }
