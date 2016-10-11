@@ -10,6 +10,7 @@
 
 #include <string>
 #include <inttypes.h>
+#include <time.h>
 #include "master_cache.h"
 
 #include "phxbinlogsvr/client/phxbinlog_client_platform_info.h"
@@ -39,11 +40,10 @@ bool MasterCache::IsMasterValid(const std::string & master_ip, uint64_t expired_
     if (master_ip == "") {
         return false;
     }
-    uint64_t timestamp = GetTimestampMS();
-    if (timestamp / 1000 < expired_time) {
-        return true;
+    if (expired_time < (uint32_t)time(NULL)) {
+        return false;
     }
-    return false;
+    return true;
 }
 
 int MasterCache::GetMaster(std::string & master_ip, uint64_t & expired_time) {
