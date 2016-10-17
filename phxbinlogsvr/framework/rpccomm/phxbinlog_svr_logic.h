@@ -46,6 +46,7 @@ class PhxBinlogSvrLogic {
     int GetMemberList(std::string *resp_buffer);
 
     int InitBinlogSvrMaster(const std::string &req_buffer);
+
  private:
     int RealGetMasterInfo(phxbinlogsvr::MasterInfo *masterinfo);
     int RealSendBinLog(const phxbinlogsvr::BinLogBuffer req);
@@ -67,6 +68,7 @@ class PhxBinlogSvrLogic {
 
  private:
     int GetIPList(std::vector<std::string> *iplist);
+	uint32_t GetCurrentTime();
 
  private:
     phxbinlog::Option *option_;

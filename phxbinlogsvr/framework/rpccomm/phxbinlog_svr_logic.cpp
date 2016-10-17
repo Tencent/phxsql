@@ -41,6 +41,10 @@ PhxBinlogSvrLogic::PhxBinlogSvrLogic(Option *option, PhxBinLogAgent *binlogagent
     binlogagent_ = binlogagent;
 }
 
+uint32_t PhxBinlogSvrLogic::GetCurrentTime() {
+	return time(NULL);
+}
+
 int PhxBinlogSvrLogic::GetIPList(vector<string> *iplist) {
     vector < string > memberlist;
     int ret = binlogagent_->GetMemberList(&memberlist);
@@ -82,14 +86,13 @@ int PhxBinlogSvrLogic::SetExportIP(const string &req_buff) {
 int PhxBinlogSvrLogic::GetMasterInfoFromGlobal(string *resp_buffer) {
     phxbinlogsvr::MasterInfo master_info;
     int ret = RealGetMasterInfo(&master_info);
-    LogVerbose("%s get master info ret %d", __func__, ret);
-
     if (ret == 0) {
         if (!master_info.SerializeToString(resp_buffer)) {
             return phxbinlog::BUFFER_FAIL;
         }
     }
-    LogVerbose("%s get master info ret %d, ip %s", __func__, ret, master_info.ip().c_str());
+    LogVerbose("%s get master info ret %d, ip %s expired time %u", 
+			__func__, ret, master_info.ip().c_str(), master_info.expire_time() );
     return ret;
 }
 
@@ -100,7 +103,7 @@ int PhxBinlogSvrLogic::GetLastSendGTIDFromGlobal(const string &uuid, string *res
 int PhxBinlogSvrLogic::GetMasterInfoFromLocal(string *resp_buffer) {
     phxbinlogsvr::MasterInfo masterinfo;
     int ret = RealGetLocalMasterInfo(&masterinfo);
-    LogVerbose("%s get master info from local ret %d", __func__, ret);
+    //LogVerbose("%s get master info from local ret %d", __func__, ret);
     if (ret == 0) {
         if (!masterinfo.SerializeToString(resp_buffer)) {
             return phxbinlog::BUFFER_FAIL;
@@ -252,6 +255,7 @@ int PhxBinlogSvrLogic::RealGetLocalMasterInfo(phxbinlogsvr::MasterInfo *masterin
     int ret = binlogagent_->GetMaster(&ip, &update_time, &expire_time, &version);
     if (ret == 0) {
         masterinfo->set_ip(ip);
+        masterinfo->set_current_time(GetCurrentTime());
         masterinfo->set_update_time(update_time);
         masterinfo->set_expire_time(expire_time);
         masterinfo->set_version(version);
@@ -302,4 +306,3 @@ int PhxBinlogSvrLogic::RealInitBinLogSvrMaster() {
 }
 
 }
-

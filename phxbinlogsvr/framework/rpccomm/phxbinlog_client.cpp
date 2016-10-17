@@ -98,7 +98,6 @@ int PhxBinlogClient::GetMaster(string *ip, uint32_t *expire_time) {
             ColorLogError("%s:%d decode fail", __func__, __LINE__);
             return phxbinlog::BUFFER_FAIL;
         }
-        LogVerbose("%s get ip %s expire time %u version %u", __func__, ip->c_str(), *expire_time, t_version);
     }
     return ret;
 }
@@ -128,7 +127,7 @@ int PhxBinlogClient::GetGlobalMaster(const vector<string> &iplist, const uint32_
         for (size_t i = 0; i < resp_bufferlist.size(); ++i) {
             if (resp_bufferlist[i].second) {
                 ret = resp_bufferlist[i].second;
-                ColorLogError("%s fail, ip %s ret %d", __func__, iplist[i].c_str(), ret);
+				continue;
             } else {
                 uint32_t t_version = 0;
                 string t_ip;
@@ -150,12 +149,19 @@ int PhxBinlogClient::GetGlobalMaster(const vector<string> &iplist, const uint32_
             }
         }
         if ((ok_num << 1) >= iplist.size()) {
+				ColorLogInfo("%s resp num %u get ip %s version %u expiretime %u", 
+				__func__, ok_num, ip->c_str(), *version,
+                 *expire_time);
             return phxbinlog::OK;
         }
-    }
+	}
 
-    ColorLogInfo("%s resp num %u get ip %s version %u expiretime %u", __func__, ok_num, ip->c_str(), *version,
-                 *expire_time);
+	for (size_t i = 0; i < resp_bufferlist.size(); ++i) {
+		if (resp_bufferlist[i].second) {
+			ret = resp_bufferlist[i].second;
+			ColorLogError("%s get master fail, ip %s ret %d",__func__, iplist[i].c_str(), ret );
+		}
+	}
 
     return ret;
 }
@@ -314,14 +320,17 @@ bool PhxBinlogClient::DecodeMasterInfo(const string &decode_buffer, string *ip, 
         return false;
     }
 
-    LogVerbose("%s master ip %s, update time %u expire time %u", __func__, master_info.ip().c_str(),
-               master_info.update_time(), master_info.expire_time());
-
     *ip = master_info.ip();
     if (master_info.update_time() == 0) {
         *expire_time = master_info.expire_time();
     } else {
-        uint32_t delta_time = master_info.expire_time() - master_info.update_time();
+        uint32_t delta_time = 0;
+		if( master_info.current_time() ) {
+			delta_time = master_info.expire_time() - master_info.current_time();
+		}
+		else {
+			delta_time = master_info.expire_time() - time (NULL);
+		}
         *expire_time = time(NULL) + delta_time;
     }
     *version = master_info.version();

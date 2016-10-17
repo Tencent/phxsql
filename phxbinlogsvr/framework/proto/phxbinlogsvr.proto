@@ -21,6 +21,7 @@ message MasterInfo
 	required uint32 expire_time = 2;
 	required uint32 version = 3;
 	optional uint32 update_time = 4;
+	optional uint32 current_time = 5;
 };
 
 message ExportIPInfo
