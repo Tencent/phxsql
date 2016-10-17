@@ -15,6 +15,7 @@
 
 #include "phxbinlogsvr/client/phxbinlog_client_platform_info.h"
 #include "phxcomm/phx_log.h"
+#include "phxcomm/lock_manager.h"
 #include "phxsqlproxyconfig.h"
 #include "monitor_plugin.h"
 #include "phxsqlproxyutil.h"
@@ -29,8 +30,6 @@ namespace phxsqlproxy {
 
 MasterCache::MasterCache(PHXSqlProxyConfig * config) :
         config_(config) {
-    group_status_.expired_time_ = 0;
-    group_status_.master_ip_ = "";
 }
 
 MasterCache::~MasterCache() {
@@ -53,6 +52,8 @@ int MasterCache::GetMaster(std::string & master_ip, uint64_t & expired_time) {
         return 0;
     }
 
+    phxsql::RWLockManager lock(&mutex_, phxsql::RWLockManager::READ);
+
     if (IsMasterValid(GetGroupStatus().master_ip_, GetGroupStatus().expired_time_)) {
         master_ip = GetGroupStatus().master_ip_;
         expired_time = GetGroupStatus().expired_time_;
@@ -70,16 +71,11 @@ int MasterCache::UpdateGroupStatus(MasterStatus_t & group_status) {
         return 0;
     }
 
-    if (IsMasterValid(GetGroupStatus().master_ip_, GetGroupStatus().expired_time_ - 10)) {
-        return 0;
-    }
-
     string master_in_binlogsvr = "";
     uint32_t expired_time_in_binlogsvr = 0;
     std::shared_ptr<PhxBinlogClient> client = PhxBinlogClientPlatformInfo::GetDefault()->GetClientFactory()
             ->CreateClient();
     int ret = client->GetMaster(&master_in_binlogsvr, &expired_time_in_binlogsvr);
-    //getmaster here, the network will cause co yiled. so it is nonblock.
     if (ret != 0) {
         MonitorPluginEntry::GetDefault()->GetMonitorPlugin()->GetMasterInBinLogFail();
         phxsql::LogError("%s:%d GetMaster failed ret %d", __func__, __LINE__, ret);
@@ -87,6 +83,7 @@ int MasterCache::UpdateGroupStatus(MasterStatus_t & group_status) {
     }
 
     if (IsMasterValid(master_in_binlogsvr, (uint64_t) expired_time_in_binlogsvr)) {
+        phxsql::RWLockManager lock(&mutex_, phxsql::RWLockManager::WRITE);
         group_status.expired_time_ = expired_time_in_binlogsvr;
         group_status.master_ip_ = master_in_binlogsvr;
         return 0;

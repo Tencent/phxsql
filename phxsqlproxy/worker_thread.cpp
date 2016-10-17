@@ -23,20 +23,16 @@ WorkerThread::WorkerThread(PHXSqlProxyConfig * config, WorkerConfig_t * worker_c
         worker_config_(worker_config),
         connection_dispatcher_(NULL),
         monitor_routine_(NULL),
-        io_routine_mgr_(NULL),
-        membership_cache_(NULL),
-        master_cache_(NULL) {
+        io_routine_mgr_(NULL) {
 }
 
 WorkerThread::~WorkerThread() {
     delete connection_dispatcher_, connection_dispatcher_ = NULL;
-    delete master_cache_, master_cache_ = NULL;
     delete io_routine_mgr_, io_routine_mgr_ = NULL;
     delete monitor_routine_, monitor_routine_ = NULL;
     for (size_t i = 0; i < io_routines_.size(); ++i) {
         delete io_routines_[i], io_routines_[i] = NULL;
     }
-    delete membership_cache_, membership_cache_ = NULL;
 }
 static int TickFunc(void* arg) {
 //	phoenix::LogErr("%s:%d Tick", __func__, __LINE__);
@@ -47,8 +43,6 @@ void WorkerThread::run() {
     co_init_curr_thread_env();
     co_enable_hook_sys();
     monitor_routine_->start();
-    membership_cache_->start();
-    master_cache_->start();
     for (size_t i = 0; i < io_routines_.size(); ++i) {
         io_routines_[i]->start();
     }

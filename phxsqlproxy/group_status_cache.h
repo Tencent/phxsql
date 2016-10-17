@@ -10,31 +10,30 @@
 
 #pragma once 
 
-#include "co_routine.h"
-#include "phxcoroutine.h"
+#include "phxthread.h"
 
 #include "phxcomm/phx_log.h"
+#include "phxcomm/lock_manager.h"
+
+#include <poll.h>
+#include <pthread.h>
 
 #include <atomic> 
 
 namespace phxsqlproxy {
 
 template<class T>
-class GroupStatusCache : public Coroutine {
+class GroupStatusCache : public PhxThread {
  public:
     GroupStatusCache() {
+        pthread_rwlock_init(&mutex_, NULL);
     }
 
     virtual ~GroupStatusCache() {
+        pthread_rwlock_destroy(&mutex_);
     }
 
-    virtual const T & GetGroupStatus() {
-        return group_status_;
-    }
-
- private:
-    int run() {
-        co_enable_hook_sys();
+    void run() {
         while (true) {
             int ret = UpdateGroupStatus(group_status_);
 
@@ -43,16 +42,24 @@ class GroupStatusCache : public Coroutine {
             }
             phxsql::LogVerbose("UpdateGroupStatus ret %d", ret);
 
-            int sleep_ms = (ret == 0 ? 10000 : 100);
+            int sleep_ms = (ret == 0 ? 300 : 100);
             poll(0, 0, sleep_ms);
         }
-        return 0;
     }
 
+ protected:
+    const T & GetGroupStatus() {
+        return group_status_;
+    }
+
+ private:
     virtual int UpdateGroupStatus(T & group_status) = 0;
 
- protected:
+ private:
     T group_status_;
+
+ protected:
+    pthread_rwlock_t mutex_;
 };
 
 }

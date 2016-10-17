@@ -257,16 +257,7 @@ int IORoutine::FakeClientIPInAuthBuf(char * buf, size_t buf_len) {
     memcpy(&ip, reserverd_begin, sizeof(uint32_t));
     if (ip) {
         if (inet_ntop(AF_INET, reserverd_begin, ip_buf, INET6_ADDRSTRLEN) != NULL) {
-            const std::vector<std::string> & ip_list = GetMembershipCache()->GetMembership();
-            bool found = false;
-            for (auto itr : ip_list) {
-                if (itr == client_ip_) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
+            if (!GetMembershipCache()->IsInMembership(client_ip_)) {
                 LogError("requniqid %llu receive fake ip package from [%s], fake ip [%s]", req_uniq_id_,
                          client_ip_.c_str(), ip_buf);
                 return -__LINE__;
@@ -602,16 +593,15 @@ int SlaveIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port) {
 
     if (master_ip == std::string(GetWorkerConfig()->listen_ip_)) {
         if (!config_->MasterEnableReadPort()) {
-            const std::vector<std::string> & ip_list = GetMembershipCache()->GetMembership();
-            for (size_t i = 0; i < ip_list.size(); ++i) {
-                if (ip_list[i] == std::string(GetWorkerConfig()->listen_ip_)) {
-                    dest_ip = ip_list[(i + 1) % ip_list.size()];
-                    dest_port = GetWorkerConfig()->port_;
-                    break;
-                }
+            int ret = GetMembershipCache()->GetMemberExcept(GetWorkerConfig()->listen_ip_, dest_ip);
+            if (ret != 0) {
+                return -__LINE__;
             }
-        } else
+            dest_port = GetWorkerConfig()->port_;
+        } else {
+            dest_ip = "127.0.0.1";
             dest_port = config_->GetMysqlPort();
+        }
     } else {
         dest_ip = "127.0.0.1";
         dest_port = config_->GetMysqlPort();

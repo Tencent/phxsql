@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "co_routine.h"
-#include "phxcoroutine.h"
 #include "group_status_cache.h"
 
 #include <memory>
@@ -26,7 +24,8 @@ class MembershipCache : public GroupStatusCache<std::vector<std::string> > {
 
     virtual ~MembershipCache();
 
-    const std::vector<std::string> & GetMembership();
+    bool IsInMembership(const std::string & ip);
+    int GetMemberExcept(const std::string & ip, std::string & result);
 
  private:
     int UpdateGroupStatus(std::vector<std::string> & group_status);

@@ -38,16 +38,14 @@ class WorkerThread : public PhxThread {
     int AssignFD(int fd);
 
     template<class T>
-    void InitRoutines() {
+    void InitRoutines(MembershipCache * membership_cache, MasterCache * master_cache) {
         io_routine_mgr_ = new IORoutineMgr(config_, worker_config_);
 
         connection_dispatcher_ = new ConnectionDispatcher(io_routine_mgr_);
-        membership_cache_ = new MembershipCache();
-        master_cache_ = new MasterCache(config_);
 
         int routine_count = worker_config_->io_routine_count_;
         for (int i = 0; i < routine_count; ++i) {
-            T * io_routine = new T(io_routine_mgr_, master_cache_, membership_cache_);
+            T * io_routine = new T(io_routine_mgr_, master_cache, membership_cache);
             io_routines_.push_back(io_routine);
         }
 
@@ -67,9 +65,6 @@ class WorkerThread : public PhxThread {
 
     IORoutineMgr * io_routine_mgr_;
     std::vector<IORoutine *> io_routines_;
-
-    MembershipCache * membership_cache_;
-    MasterCache * master_cache_;
 
 };
 

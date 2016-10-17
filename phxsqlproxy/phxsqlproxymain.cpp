@@ -33,6 +33,7 @@
 #include "worker_thread.h"
 #include "monitor_routine.h"
 #include "master_cache.h"
+#include "membership_cache.h"
 #include "io_routine.h"
 #include "phxcoroutine.h"
 #include "phxsqlproxyconfig.h"
@@ -117,10 +118,16 @@ int StartWorker(PHXSqlProxyConfig * config, WorkerConfig_t * worker_config) {
             heartbeat_thread->start();
         }
 
+        MembershipCache * membership_cache = new MembershipCache();
+        membership_cache->start();
+
+        MasterCache * master_cache = new MasterCache(config);
+        master_cache->start();
+
         vector<WorkerThread *> worker_threads;
         for (int j = 0; j < worker_thread_count; ++j) {
             WorkerThread * worker_thread = new WorkerThread(config, worker_config);
-            worker_thread->InitRoutines<T>();
+            worker_thread->InitRoutines<T>(membership_cache, master_cache);
             worker_threads.push_back(worker_thread);
             worker_thread->start();
         }

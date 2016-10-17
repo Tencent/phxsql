@@ -21,8 +21,8 @@ class PHXSqlProxyConfig;
 
 //master cache
 typedef struct tagMasterStatus {
-    std::string master_ip_;
-    uint64_t expired_time_;
+    std::string master_ip_ = "";
+    uint64_t expired_time_ = 0;
 } MasterStatus_t;
 
 class MasterCache : public GroupStatusCache<MasterStatus_t> {

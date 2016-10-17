@@ -15,6 +15,7 @@
 
 #include "phxbinlogsvr/client/phxbinlog_client_platform_info.h"
 #include "phxcomm/phx_log.h"
+#include "phxcomm/lock_manager.h"
 
 #include <memory>
 #include <vector>
@@ -48,18 +49,35 @@ int MembershipCache::UpdateGroupStatus(std::vector<std::string> & group_status) 
     }
 
     if (ret == 0) {
-        group_status.clear();
-        for (auto itr : membership) {
-            group_status.push_back(itr);
-        }
+        phxsql::RWLockManager lock(&mutex_, phxsql::RWLockManager::WRITE);
+        group_status = std::move(membership);
         phxsql::LogVerbose("%s:%d get membership ret size %zu", __func__, __LINE__, group_status.size());
     }
 
     return ret;
 }
 
-const std::vector<std::string> & MembershipCache::GetMembership() {
-    return GetGroupStatus();
+bool MembershipCache::IsInMembership(const std::string & ip) {
+    phxsql::RWLockManager lock(&mutex_, phxsql::RWLockManager::READ);
+    const std::vector<std::string> & ip_list = GetGroupStatus();
+    for (auto itr : ip_list) {
+        if (itr == ip) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int MembershipCache::GetMemberExcept(const std::string & ip, std::string & result) {
+    phxsql::RWLockManager lock(&mutex_, phxsql::RWLockManager::READ);
+    const std::vector<std::string> & ip_list = GetGroupStatus();
+    for (size_t i = 0; i < ip_list.size(); ++i) {
+        if (ip_list[i] == ip) {
+            result = ip_list[(i + 1) % ip_list.size()];
+            return 0;
+        }
+    }
+    return -1;
 }
 
 }
