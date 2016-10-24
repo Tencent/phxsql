@@ -49,6 +49,8 @@ void PHXBinlogSvrBaseConfig::ReadPaxosConfig() {
 
 void PHXBinlogSvrBaseConfig::ReadAgentConfig() {
     ColorLogInfo("%s read agent config", __func__);
+
+    engine_ip_ = Get("Server", "IP", "");
     binlogsvr_port_ = GetInteger("Server", "Port", 17000);
     specified_master_ip_ = Get("Server", "SpecifiedMasterIP", "");
 
@@ -58,7 +60,9 @@ void PHXBinlogSvrBaseConfig::ReadAgentConfig() {
 
     package_name_ = Get("Server", "PackageName", "phxbinlogsvr");
 
-    engine_ip_ = GetInnerIP();
+	if(engine_ip_.empty() || engine_ip_[0]=='\0' || engine_ip_[0] == '$' )
+		engine_ip_ = GetInnerIP();
+
     engine_port_ = GetInteger("AgentOption", "AgentPort", 6000);
     event_data_base_path_ = Get("AgentOption", "EventDataDir", "");
     event_data_db_path_ = event_data_base_path_ + "/event_lb/";
@@ -209,4 +213,12 @@ string PHXBinlogSvrBaseConfig::GetFollowIP() const {
 }
 
 }
+
+
+//gzrd_Lib_CPP_Version_ID--start
+#ifndef GZRD_SVN_ATTR
+#define GZRD_SVN_ATTR "0"
+#endif
+static char gzrd_Lib_CPP_Version_ID[] __attribute__((used))="$HeadURL$ $Id$ " GZRD_SVN_ATTR "__file__";
+// gzrd_Lib_CPP_Version_ID--end
 
