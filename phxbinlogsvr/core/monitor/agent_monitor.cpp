@@ -56,9 +56,9 @@ AgentMonitor::~AgentMonitor() {
 
 int AgentMonitor::Process() {
     LogVerbose("monitor running");
+	uint32_t last_check = 0;
     while (1) {
         bool check_master = false;
-        uint32_t last_check = 0;
         {
             struct timeval now;
             gettimeofday(&now, NULL);
@@ -380,4 +380,3 @@ void AgentMonitor::CheckCheckPointFiles() {
 }
 
 }
-

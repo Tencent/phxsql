@@ -1,4 +1,5 @@
 /*
+/*
 	Tencent is pleased to support the open source community by making PhxSQL available.
 	Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
 	Licensed under the GNU General Public License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
@@ -240,7 +241,8 @@ int PhxBinlogSvrLogic::RealGetLastSendGTID(const string &uuid, string *gtid) {
                        gtid->c_str(), uuid.c_str(), ip.c_str(), local_ip.c_str());
         }
     } else {
-        ret = client->GetGlobalLastSendGtid(iplist, port, uuid, gtid);
+		std::shared_ptr<PhxBinlogClient> master_client = client_factor->CreateClient(ip, port);
+        ret = master_client->GetLastSendGtid(uuid, gtid);
         LogVerbose("%s ret = %d get global gtid %s from uuid %s", __func__, ret, gtid->c_str(), uuid.c_str());
     }
 
@@ -306,3 +308,4 @@ int PhxBinlogSvrLogic::RealInitBinLogSvrMaster() {
 }
 
 }
+
