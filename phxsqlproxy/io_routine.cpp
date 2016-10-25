@@ -545,7 +545,7 @@ bool MasterIORoutine::CanExecute(const char * buf, int size) {
 
     bool can_execute = false;
     if (connect_dest_ == "127.0.0.1") {
-        if (master_ip == PhxBaseConfig::GetInnerIP()) {
+        if (master_ip == GetWorkerConfig()->listen_ip_) {
             can_execute = true;
         }
     } else {
