@@ -46,7 +46,7 @@ class binary_operator:
 		return self.comm_kill_binary( 'mysqld' )
 
 	def kill_phxbinlogsvr( self ):
-		return self.comm_kill_binary( 'phxbinlogsvf' )
+		return self.comm_kill_binary( 'phxbinlogsvr' )
 
 	def kill_phxsqlproxy( self ):
 		return self.comm_kill_binary( 'phxsqlproxy' )

@@ -48,6 +48,8 @@ class config_generator:
 		cp.set( 'mysqld', 'innodb_data_home_dir', format_path('%s/percona.workspace/innodb'%self.m_args.data_dir) )
 		cp.set( 'mysqld', 'innodb_log_group_home_dir', format_path('%s/percona.workspace/innodb'%self.m_args.data_dir) )
 		cp.set( 'mysqld', 'innodb_undo_directory', format_path('%s/percona.workspace/innodb'%self.m_args.data_dir) )
+		cp.set( 'client', 'port', self.m_args.mysql_port )
+		cp.set( 'client', 'socket', format_path('%s/percona.workspace/tmp/percona.sock'%self.m_args.data_dir) )
 		cp.write( open( format_path('%s/etc/my.cnf'%self.m_args.base_dir), 'w' ) )
 		os.system( 'chmod 644 %s'%format_path( '%s/etc/my.cnf'%self.m_args.base_dir ) )
 		return 0
