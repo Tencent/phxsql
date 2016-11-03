@@ -28,10 +28,13 @@ class binary_installer:
 			print 'kill mysql failed'
 			return sys._getframe().f_lineno
 
-		do = directory_operator.directory_operator( self.m_args )
-		if do.mkdir_for_mysql() != 0:
-			print 'mkdir for mysql failed'
-			return sys._getframe().f_lineno
+		print "skip data", self.m_args.skip_data
+
+		if self.m_args.skip_data == 0:
+			do = directory_operator.directory_operator( self.m_args )
+			if do.mkdir_for_mysql() != 0:
+				print 'mkdir for mysql failed'
+				return sys._getframe().f_lineno
 
 		cmd = 'cd %s; ./scripts/mysql_install_db --defaults-file=%s --user=mysql'% \
 				( format_path('%s/percona.src'%self.m_args.base_dir), format_path('%s/etc/my.cnf'%self.m_args.base_dir) )
@@ -44,10 +47,11 @@ class binary_installer:
 			print 'kill phxbinlogsvr failed'
 			return sys._getframe().f_lineno
 
-		do = directory_operator.directory_operator( self.m_args )
-		if do.mkdir_for_phxbinlogsvr() != 0:
-			print 'mkdir for phxbinlogsvr failed'
-			return sys._getframe().f_lineno
+		if self.m_args.skip_data == 0:
+			do = directory_operator.directory_operator( self.m_args )
+			if do.mkdir_for_phxbinlogsvr() != 0:
+				print 'mkdir for phxbinlogsvr failed'
+				return sys._getframe().f_lineno
 
 		return 0
 	

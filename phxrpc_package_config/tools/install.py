@@ -42,6 +42,7 @@ def ParseArguments():
 	parser.add_argument( '-y', '--mysql_port', help="mysql port for phxsqlproxy to connect", type=int, default=13306)
 	parser.add_argument( '-P', '--phxbinlogsvr_port', help="phxbinlogsvr port", type=int, default=17000)
 	parser.add_argument( '-a', '--paxos_port', help="port for paxos protocol to communicate", type=int, default=8001)
+	parser.add_argument( '-s', '--skip_data', help="do not delete datas in data_dir", type=int, default=1)
 	parser.add_argument( '-f', '--data_dir', help="where phxbinlogsvr and paxos log been stored", type=str, default="/data/phxsql/" )
 	parser.add_argument( '-b', '--base_dir', help="where phxsql located, no need to specify it", type=str, default="" )
 	parser.add_argument( '-n', '--inner_ip', help="host inner ip,we will figure it out on system config, no need to specify it", type=str, default="" )
