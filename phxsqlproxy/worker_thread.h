@@ -18,8 +18,7 @@
 #include "phxsqlproxyconfig.h"
 #include "connection_dispatcher.h"
 #include "io_routine.h"
-#include "master_cache.h"
-#include "membership_cache.h"
+#include "group_status_cache.h"
 #include "monitor_routine.h"
 
 namespace phxsqlproxy {
@@ -38,14 +37,14 @@ class WorkerThread : public PhxThread {
     int AssignFD(int fd);
 
     template<class T>
-    void InitRoutines(MembershipCache * membership_cache, MasterCache * master_cache) {
+    void InitRoutines(GroupStatusCache * group_status_cache) {
         io_routine_mgr_ = new IORoutineMgr(config_, worker_config_);
 
         connection_dispatcher_ = new ConnectionDispatcher(io_routine_mgr_);
 
         int routine_count = worker_config_->io_routine_count_;
         for (int i = 0; i < routine_count; ++i) {
-            T * io_routine = new T(io_routine_mgr_, master_cache, membership_cache);
+            T * io_routine = new T(io_routine_mgr_, group_status_cache);
             io_routines_.push_back(io_routine);
         }
 

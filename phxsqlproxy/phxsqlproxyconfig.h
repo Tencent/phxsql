@@ -47,6 +47,8 @@ class PHXSqlProxyConfig : public phxsql::PhxBaseConfig {
 
     int MasterEnableReadPort();
 
+    int TryBestIfBinlogsvrDead();
+
     const char * GetFreqCtrlConfigPath();
 
     int GetSvrLogLevel();
@@ -85,6 +87,8 @@ class PHXSqlProxyConfig : public phxsql::PhxBaseConfig {
     int is_only_proxy_;
 
     int is_master_enable_read_port_;
+
+    int is_enable_try_best_;
 
     std::string freqctrl_config_;
 

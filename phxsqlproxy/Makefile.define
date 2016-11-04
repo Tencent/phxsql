@@ -39,7 +39,7 @@ PHXSQLPROXY_PHXRPC_INCS=$(SRC_BASE_PATH)/phxsqlproxy
 
 PHXSQLPROXY_PHXRPC_EXTRA_CPPFLAGS=-pipe -fPIC -Wno-deprecated -D__STDC_FORMAT_MACROS -O2
 
-PHXSQLPROXYLIB_PHXRPC_OBJ=phxsqlproxymain.o phxsqlproxyconfig.o phxsqlproxyutil.o phxcoroutine.o phxthread.o master_cache.o accept_thread.o io_routine.o monitor_routine.o worker_thread.o connection_dispatcher.o heartbeat_thread.o membership_cache.o
+PHXSQLPROXYLIB_PHXRPC_OBJ=phxsqlproxymain.o phxsqlproxyconfig.o phxsqlproxyutil.o phxcoroutine.o phxthread.o group_status_cache.o accept_thread.o io_routine.o monitor_routine.o worker_thread.o connection_dispatcher.o heartbeat_thread.o
 
 PHXSQLPROXYLIB_PHXRPC_LIB=phxsqlproxylib_phxrpc phxbinlogsvr/config:phxbinlogconfig phxsqlproxy/plugin/monitor:monitor_plugin phxsqlproxy/plugin/requestfilter:freqfilter_plugin phxcomm/log/phxlog:phxlog phxcomm/configparser:phxconfig
 
@@ -49,7 +49,7 @@ PHXSQLPROXYLIB_PHXRPC_INCS=$(SRC_BASE_PATH)/phxsqlproxy  $(COLIB_INCLUDE_PATH) $
 
 PHXSQLPROXYLIB_PHXRPC_EXTRA_CPPFLAGS=-pipe -fPIC -Wno-deprecated -D__STDC_FORMAT_MACROS -ldl -O2
 
-PHXSQLPROXYLIB_PHXRPC_SK_OBJ=phxsqlproxymain.o phxsqlproxyconfig.o phxsqlproxyutil.o phxcoroutine.o phxthread.o master_cache.o accept_thread.o io_routine.o monitor_routine.o worker_thread.o connection_dispatcher.o heartbeat_thread.o membership_cache.o
+PHXSQLPROXYLIB_PHXRPC_SK_OBJ=phxsqlproxymain.o phxsqlproxyconfig.o phxsqlproxyutil.o phxcoroutine.o phxthread.o group_status_cache.o accept_thread.o io_routine.o monitor_routine.o worker_thread.o connection_dispatcher.o heartbeat_thread.o
 
 PHXSQLPROXYLIB_PHXRPC_SK_LIB=phxsqlproxylib_phxrpc_sk phxbinlogsvr/config:phxbinlogconfig phxsqlproxy/plugin/monitor:monitor_plugin phxsqlproxy/plugin/requestfilter:freqfilter_plugin phxcomm/log/phxlog:phxlog phxcomm/configparser:phxconfig
 
