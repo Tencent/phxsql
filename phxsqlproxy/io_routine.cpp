@@ -30,8 +30,7 @@
 #include "phxcomm/base_config.h"
 #include "phxcomm/phx_log.h"
 #include "phxsqlproxyutil.h"
-#include "master_cache.h"
-#include "membership_cache.h"
+#include "group_status_cache.h"
 #include "monitor_plugin.h"
 #include "requestfilter_plugin.h"
 #include "phxsqlproxyconfig.h"
@@ -91,10 +90,9 @@ WorkerConfig_t * IORoutineMgr::GetWorkerConfig() {
 //IORoutineMgr end
 
 //IORoutine begin
-IORoutine::IORoutine(IORoutineMgr * routine_mgr, MasterCache * master_cache, MembershipCache * membership_cache) :
+IORoutine::IORoutine(IORoutineMgr * routine_mgr, GroupStatusCache * group_status_cache) :
         io_routine_mgr_(routine_mgr),
-        master_cache_(master_cache),
-        membership_cache_(membership_cache),
+        group_status_cache_(group_status_cache),
         client_fd_(-1),
         sqlsvr_fd_(-1) {
     config_ = routine_mgr->GetConfig();
@@ -105,12 +103,8 @@ IORoutine::~IORoutine() {
     ClearAll();
 }
 
-MasterCache * IORoutine::GetMasterCache() {
-    return master_cache_;
-}
-
-MembershipCache * IORoutine::GetMembershipCache() {
-    return membership_cache_;
+GroupStatusCache * IORoutine::GetGroupStatusCache() {
+    return group_status_cache_;
 }
 
 void IORoutine::ReleaseFD(int & fd) {
@@ -257,7 +251,7 @@ int IORoutine::FakeClientIPInAuthBuf(char * buf, size_t buf_len) {
     memcpy(&ip, reserverd_begin, sizeof(uint32_t));
     if (ip) {
         if (inet_ntop(AF_INET, reserverd_begin, ip_buf, INET6_ADDRSTRLEN) != NULL) {
-            if (!GetMembershipCache()->IsInMembership(client_ip_)) {
+            if (!GetGroupStatusCache()->IsMember(client_ip_)) {
                 LogError("requniqid %llu receive fake ip package from [%s], fake ip [%s]", req_uniq_id_,
                          client_ip_.c_str(), ip_buf);
                 return -__LINE__;
@@ -384,12 +378,12 @@ int IORoutine::run() {
             continue;
         }
 
+        int byte_size_tot = 0;
         while (true) {
             //first connect to master mysql to finish auth
             if (sqlsvr_fd_ == -1) {
                 int fd = ConnectDest();
                 if (fd <= 0) {
-                    ClearAll();
                     break;
                 }
                 sqlsvr_fd_ = fd;
@@ -416,7 +410,6 @@ int IORoutine::run() {
             if (return_fd_count < 0) {
                 LogError("requniqid %llu poll fd client_fd_ %d sqlsvr_fd_ %d failed,ret %d", req_uniq_id_, client_fd_,
                          sqlsvr_fd_, return_fd_count);
-                ClearAll();
                 break;
             }
 
@@ -427,22 +420,33 @@ int IORoutine::run() {
 
             int byte_size = TransMsgDirect(client_fd_, sqlsvr_fd_, pf, 2);
             if (byte_size < 0) {
-                ClearAll();
                 break;
             }
+            byte_size_tot += byte_size;
 
             ByteFromMysqlClient(byte_size);
             int byte_size2 = TransMsgDirect(sqlsvr_fd_, client_fd_, pf, 2);
             if (byte_size2 < 0) {
-                ClearAll();
                 break;
             }
+            byte_size_tot += byte_size2;
 
             ByteFromConnectDestSvr(byte_size2);
             if (byte_size || byte_size2) {
                 TimeCostMonitor(GetTimestampMS() - begin);
             }
         }
+
+        if (byte_size_tot == 0) {
+            // MasterEnableReadPort=0
+            if (connect_port_ == GetWorkerConfig()->port_ && !GetWorkerConfig()->is_master_port_) {
+                LogVerbose("%s:%d requniqid %llu mark %s failure", __func__, __LINE__, req_uniq_id_,
+                           connect_dest_.c_str());
+                GetGroupStatusCache()->MarkFailure(connect_dest_);
+            }
+        }
+
+        ClearAll();
     }
     return 0;
 }
@@ -498,9 +502,8 @@ bool IORoutine::CanExecute(const char * buf, int size) {
 
 //IORoutine end
 
-MasterIORoutine::MasterIORoutine(IORoutineMgr * routine_mgr, MasterCache * master_cache,
-                                 MembershipCache * membership_cache) :
-        IORoutine(routine_mgr, master_cache, membership_cache) {
+MasterIORoutine::MasterIORoutine(IORoutineMgr * routine_mgr, GroupStatusCache * group_status_cache) :
+        IORoutine(routine_mgr, group_status_cache) {
 }
 
 MasterIORoutine::~MasterIORoutine() {
@@ -511,14 +514,13 @@ int MasterIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port) {
     dest_ip = "";
     std::string master_ip = "";
 
-    uint64_t expired_time = 0;
-    ret = GetMasterCache()->GetMaster(master_ip, expired_time);
+    ret = GetGroupStatusCache()->GetMaster(master_ip);
     if (ret != 0) {
         LogError("%s:%d requniqid %llu getmaster failed, ret %d", __func__, __LINE__, req_uniq_id_, ret);
         return -__LINE__;
     }
 
-    bool is_master = (master_ip == string(GetWorkerConfig()->listen_ip_));
+    bool is_master = (master_ip == GetWorkerConfig()->listen_ip_);
     if (is_master) {
         dest_ip = "127.0.0.1";
         dest_port = config_->GetMysqlPort();
@@ -536,8 +538,7 @@ int MasterIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port) {
 
 bool MasterIORoutine::CanExecute(const char * buf, int size) {
     string master_ip;
-    uint64_t expired_time = 0;
-    int ret = GetMasterCache()->GetMaster(master_ip, expired_time);
+    int ret = GetGroupStatusCache()->GetMaster(master_ip);
     if (ret != 0) {
         LogError("%s:%d requniqid %llu getmaster failed, ret %d", __func__, __LINE__, req_uniq_id_, ret);
         return false;
@@ -556,8 +557,8 @@ bool MasterIORoutine::CanExecute(const char * buf, int size) {
     }
 
     if (can_execute && connect_port_ == config_->GetMysqlPort()) {
-        can_execute = RequestFilterPluginEntry::GetDefault()->GetRequestFilterPlugin()->CanExecute(true, db_name_, buf,
-                                                                                                   size);
+        can_execute = RequestFilterPluginEntry::GetDefault()->GetRequestFilterPlugin()
+                    ->CanExecute(true, db_name_, buf, size);
     }
 
     if (can_execute == false) {
@@ -571,9 +572,8 @@ WorkerConfig_t * MasterIORoutine::GetWorkerConfig() {
     return config_->GetMasterWorkerConfig();
 }
 
-SlaveIORoutine::SlaveIORoutine(IORoutineMgr * routine_mgr, MasterCache * master_cache,
-                               MembershipCache * membership_cache) :
-        IORoutine(routine_mgr, master_cache, membership_cache) {
+SlaveIORoutine::SlaveIORoutine(IORoutineMgr * routine_mgr, GroupStatusCache * group_status_cache) :
+        IORoutine(routine_mgr, group_status_cache) {
 }
 
 SlaveIORoutine::~SlaveIORoutine() {
@@ -584,17 +584,18 @@ int SlaveIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port) {
     dest_ip = "";
     std::string master_ip = "";
 
-    uint64_t expired_time = 0;
-    ret = GetMasterCache()->GetMaster(master_ip, expired_time);
+    ret = GetGroupStatusCache()->GetMaster(master_ip);
     if (ret != 0) {
         LogError("%s:%d requniqid %llu getmaster failed, ret %d", __func__, __LINE__, req_uniq_id_, ret);
         return -__LINE__;
     }
 
-    if (master_ip == std::string(GetWorkerConfig()->listen_ip_)) {
+    if (master_ip == GetWorkerConfig()->listen_ip_) {
         if (!config_->MasterEnableReadPort()) {
-            int ret = GetMembershipCache()->GetMemberExcept(GetWorkerConfig()->listen_ip_, dest_ip);
+            int ret = GetGroupStatusCache()->GetSlave(master_ip, dest_ip);
             if (ret != 0) {
+                LogError("%s:%d requniqid %llu getslave failed, master %s", __func__, __LINE__,
+                            req_uniq_id_, master_ip.c_str());
                 return -__LINE__;
             }
             dest_port = GetWorkerConfig()->port_;
@@ -613,8 +614,7 @@ int SlaveIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port) {
 
 bool SlaveIORoutine::CanExecute(const char * buf, int size) {
     string master_ip;
-    uint64_t expired_time = 0;
-    int ret = GetMasterCache()->GetMaster(master_ip, expired_time);
+    int ret = GetGroupStatusCache()->GetMaster(master_ip);
     if (ret != 0) {
         LogError("%s:%d requniqid %llu getmaster failed, ret %d", __func__, __LINE__, req_uniq_id_, ret);
         return false;
@@ -622,15 +622,16 @@ bool SlaveIORoutine::CanExecute(const char * buf, int size) {
 
     if (!config_->MasterEnableReadPort()) {
         if (master_ip == connect_dest_) {
-            //if I connected to a master now, just stop query
+            LogError("%s:%d requniqid %llu connected to master %s, stop query", __func__, __LINE__,
+                        req_uniq_id_, master_ip.c_str());
             return false;
         }
     }
 
     bool can_execute = true;
     if (connect_port_ == config_->GetMysqlPort()) {
-        can_execute = RequestFilterPluginEntry::GetDefault()->GetRequestFilterPlugin()->CanExecute(false, db_name_, buf,
-                                                                                                   size);
+        can_execute = RequestFilterPluginEntry::GetDefault()->GetRequestFilterPlugin()
+                    ->CanExecute(false, db_name_, buf, size);
     }
 
     if (can_execute == false) {
@@ -645,4 +646,3 @@ WorkerConfig_t * SlaveIORoutine::GetWorkerConfig() {
 }
 
 }
-

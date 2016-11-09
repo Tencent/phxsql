@@ -40,6 +40,7 @@ void PHXSqlProxyConfig::ReadConfig() {
     is_open_debug_mode_ = GetInteger("Server", "OpenDebugMode", 0);
     is_only_proxy_ = GetInteger("Server", "OnlyProxy", 0);
     is_master_enable_read_port_ = GetInteger("Server", "MasterEnableReadPort", 0);
+    is_enable_try_best_ = GetInteger("Server", "TryBestIfBinlogsvrDead", 0);
     freqctrl_config_ = Get("Server", "FreqCtrlConfig", "");
     log_level_ = GetInteger("Server", "LogLevel", 3);
     log_file_max_size_ = GetInteger("Server", "LogFileMaxSize", 1600);
@@ -111,6 +112,10 @@ int PHXSqlProxyConfig::MasterEnableReadPort() {
     return is_master_enable_read_port_;
 }
 
+int PHXSqlProxyConfig::TryBestIfBinlogsvrDead() {
+    return is_enable_try_best_;
+}
+
 const char * PHXSqlProxyConfig::GetFreqCtrlConfigPath() {
     return freqctrl_config_.c_str();
 }
@@ -132,4 +137,3 @@ int PHXSqlProxyConfig::Sleep() {
 }
 
 }
-

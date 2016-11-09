@@ -25,6 +25,9 @@ class PhxBinlogClient {
     virtual ~PhxBinlogClient();
 
     int GetMaster(std::string *ip, uint32_t *expire_time);
+    int GetMaster(std::string *ip, uint32_t *expire_time, uint32_t *version);
+    int GetGlobalMaster(const std::vector<std::string> &iplist, std::string *ip, uint32_t *expire_time,
+                        uint32_t *version, bool require_majority = true);
     int SetExportIP(const std::string &ip, const uint32_t &port);
 
     int SendBinLog(const std::string &old_gtid, const std::string &new_gtid, const std::string &event_buffer);
@@ -48,7 +51,7 @@ class PhxBinlogClient {
 
  protected:
     int GetGlobalMaster(const std::vector<std::string> &iplist, const uint32_t &port, std::string *ip,
-                        uint32_t *expire_time, uint32_t *version);
+                        uint32_t *expire_time, uint32_t *version, bool require_majority = true);
     int GetGlobalLastSendGtid(const std::vector<std::string> &iplist, const uint32_t &port, const std::string &uuid,
                               std::string * last_send_gtid);
 

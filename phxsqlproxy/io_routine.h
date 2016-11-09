@@ -22,24 +22,21 @@ namespace phxsqlproxy {
 #define MAX_ACTIVE_FD_PER_ROUTINE 1024
 
 class PHXSqlProxyConfig;
-class MasterCache;
 typedef struct tagWorkerConfig WorkerConfig_t;
 class IORoutineMgr;
-class MembershipCache;
+class GroupStatusCache;
 
 class IORoutine : public Coroutine {
 
  public:
-    IORoutine(IORoutineMgr * routine_mgr, MasterCache * master_cache, MembershipCache * membership_cache);
+    IORoutine(IORoutineMgr * routine_mgr, GroupStatusCache * group_status_cache);
 
     virtual ~IORoutine();
 
     void SetClientFD(int fd);
 
  protected:
-    MasterCache * GetMasterCache();
-
-    MembershipCache * GetMembershipCache();
+    GroupStatusCache * GetGroupStatusCache();
 
  private:
     int run();
@@ -89,8 +86,7 @@ class IORoutine : public Coroutine {
  private:
 
     IORoutineMgr * io_routine_mgr_;
-    MasterCache * master_cache_;
-    MembershipCache * membership_cache_;
+    GroupStatusCache * group_status_cache_;
 
     int client_fd_;
     int sqlsvr_fd_;
@@ -102,7 +98,7 @@ class IORoutine : public Coroutine {
 
 class MasterIORoutine : public IORoutine {
  public:
-    MasterIORoutine(IORoutineMgr * routine_mgr, MasterCache * master_cache, MembershipCache * membership_cache);
+    MasterIORoutine(IORoutineMgr * routine_mgr, GroupStatusCache * group_status_cache);
 
     virtual ~MasterIORoutine();
 
@@ -117,7 +113,7 @@ class MasterIORoutine : public IORoutine {
 
 class SlaveIORoutine : public IORoutine {
  public:
-    SlaveIORoutine(IORoutineMgr * routine_mgr, MasterCache * master_cache, MembershipCache * membership_cache);
+    SlaveIORoutine(IORoutineMgr * routine_mgr, GroupStatusCache * group_status_cache);
 
     virtual ~SlaveIORoutine();
 
