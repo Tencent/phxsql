@@ -165,7 +165,7 @@ int IORoutine::ConnectDest() {
 
     SetNonBlock(fd);
 
-    int ret = RoutineConnectWithTimeout(fd, (struct sockaddr*) &addr, sizeof(addr), 200);
+    int ret = RoutineConnectWithTimeout(fd, (struct sockaddr*) &addr, sizeof(addr), config_->ConnectTimeoutMs());
     if (ret != 0) {
         LogError("%s:%d requniqid %llu connect [%s:%d] ret %d, errno (%d:%s)", __func__, __LINE__, req_uniq_id_,
                  dest_ip.c_str(), dest_port, ret, errno, strerror(errno));
@@ -211,7 +211,8 @@ int IORoutine::WriteToDest(int dest_fd, const char * buf, int write_size) {
     int written_once = 0;
     int total_written = 0;
     while (total_written < write_size) {
-        written_once = RoutineWriteWithTimeout(dest_fd, buf + total_written, write_size - total_written, 1000);
+        written_once = RoutineWriteWithTimeout(dest_fd, buf + total_written, write_size - total_written,
+                                               config_->WriteTimeoutMs());
         if (written_once < 0) {
             LogError("requniqid %llu write to %d buf size [%d] failed, ret %d, errno (%d:%s)", req_uniq_id_, dest_fd,
                      write_size, written_once, errno, strerror(errno));

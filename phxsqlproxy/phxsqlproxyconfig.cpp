@@ -46,6 +46,8 @@ void PHXSqlProxyConfig::ReadConfig() {
     log_file_max_size_ = GetInteger("Server", "LogFileMaxSize", 1600);
     log_path_ = Get("Server", "LogFilePath", "/tmp/");
     sleep_ = GetInteger("Server", "Sleep", 0);
+    connect_timeout_ms_ = GetInteger("Server", "ConnectTimeoutMs", 200);
+    write_timeout_ms_ = GetInteger("Server", "WriteTimeoutMs", 1000);
 
     /*
      phxsql_config_ = PhxMySqlConfig :: GetDefault();
@@ -134,6 +136,14 @@ int PHXSqlProxyConfig::GetSvrLogFileMaxSize() {
 
 int PHXSqlProxyConfig::Sleep() {
     return sleep_;
+}
+
+uint32_t PHXSqlProxyConfig::ConnectTimeoutMs() {
+    return connect_timeout_ms_;
+}
+
+uint32_t PHXSqlProxyConfig::WriteTimeoutMs() {
+    return write_timeout_ms_;
 }
 
 }

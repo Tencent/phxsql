@@ -57,6 +57,9 @@ class PHXSqlProxyConfig : public phxsql::PhxBaseConfig {
 
     int Sleep();
 
+    uint32_t ConnectTimeoutMs();
+    uint32_t WriteTimeoutMs();
+
  public:
     WorkerConfig_t * GetMasterWorkerConfig();
 
@@ -100,6 +103,9 @@ class PHXSqlProxyConfig : public phxsql::PhxBaseConfig {
     std::string svr_ip_;
 
     int sleep_;
+
+    uint32_t connect_timeout_ms_;
+    uint32_t write_timeout_ms_;
 };
 
 }
