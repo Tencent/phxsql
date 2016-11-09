@@ -15,7 +15,6 @@ args = argparse.Namespace()
 
 def ParseArguments():
 	parser.add_argument( '-p', '--process_name', help="which binary you want to restart[mysql|phxbinlogsvr|phxsqlproxy]", type=str, option_strings=['mysql', 'phxsqlproxy', 'phxbinlogsvr'], default='all' )
-#, default="" )
 	parser.add_argument( '-b', '--base_dir', help="where phxsql locate, no need to specify it", type=str, default="" )
 	parser.add_argument( '-n', '--new_process', help="where new process locate, we will copy it", type=str, default="" )
 
@@ -46,18 +45,18 @@ if __name__ == '__main__':
 	op = binary_operator.binary_operator( args )
 
 	if args.process_name == 'all':
-		if op.start_binary() != 0:
-			print 'restart all failed, exit.....'
+		if op.kill_all() != 0:
+			print 'kill all failed, exit.....'
 
 	if args.process_name == 'mysql':
-		if op.restart_mysql() != 0:
-			print 'start mysql failed, exit.....'
+		if op.kill_mysql() != 0:
+			print 'kill mysql failed, exit.....'
 	
 	if args.process_name == 'phxsqlproxy':
-		if op.restart_phxsqlproxy() != 0:
-			print 'start phxsqlproxy failed, exit.....'
+		if op.kill_phxsqlproxy() != 0:
+			print 'kill phxsqlproxy failed, exit.....'
 
 	if args.process_name == 'phxbinlogsvr':
-		if op.restart_phxbinlogsvr() != 0:
-			print 'start phxbinlogsvr failed, exit.....'
+		if op.kill_phxbinlogsvr() != 0:
+			print 'kill phxbinlogsvr failed, exit.....'
 
