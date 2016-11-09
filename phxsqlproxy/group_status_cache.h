@@ -14,6 +14,7 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 namespace phxsqlproxy {
 
@@ -38,7 +39,11 @@ class GroupStatusCache : public PhxThread {
 
     bool IsMember(const std::string & ip);
 
+    // use by MasterEnableReadPort=0
+
     int GetSlave(const std::string & master_ip, std::string & slave_ip);
+
+    void MarkFailure(const std::string & ip);
 
  private:
     int UpdateMasterStatus();
@@ -55,6 +60,7 @@ class GroupStatusCache : public PhxThread {
     pthread_rwlock_t master_mutex_;
 
     std::vector<std::string> membership_;
+    std::unordered_map<std::string, uint64_t> last_failure_; // use by MasterEnableReadPort=0
     pthread_rwlock_t membership_mutex_;
 };
 

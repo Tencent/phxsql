@@ -378,12 +378,12 @@ int IORoutine::run() {
             continue;
         }
 
+        int byte_size_tot = 0;
         while (true) {
             //first connect to master mysql to finish auth
             if (sqlsvr_fd_ == -1) {
                 int fd = ConnectDest();
                 if (fd <= 0) {
-                    ClearAll();
                     break;
                 }
                 sqlsvr_fd_ = fd;
@@ -410,7 +410,6 @@ int IORoutine::run() {
             if (return_fd_count < 0) {
                 LogError("requniqid %llu poll fd client_fd_ %d sqlsvr_fd_ %d failed,ret %d", req_uniq_id_, client_fd_,
                          sqlsvr_fd_, return_fd_count);
-                ClearAll();
                 break;
             }
 
@@ -421,22 +420,33 @@ int IORoutine::run() {
 
             int byte_size = TransMsgDirect(client_fd_, sqlsvr_fd_, pf, 2);
             if (byte_size < 0) {
-                ClearAll();
                 break;
             }
+            byte_size_tot += byte_size;
 
             ByteFromMysqlClient(byte_size);
             int byte_size2 = TransMsgDirect(sqlsvr_fd_, client_fd_, pf, 2);
             if (byte_size2 < 0) {
-                ClearAll();
                 break;
             }
+            byte_size_tot += byte_size2;
 
             ByteFromConnectDestSvr(byte_size2);
             if (byte_size || byte_size2) {
                 TimeCostMonitor(GetTimestampMS() - begin);
             }
         }
+
+        if (byte_size_tot == 0) {
+            // MasterEnableReadPort=0
+            if (connect_port_ == GetWorkerConfig()->port_ && !GetWorkerConfig()->is_master_port_) {
+                LogVerbose("%s:%d requniqid %llu mark %s failure", __func__, __LINE__, req_uniq_id_,
+                           connect_dest_.c_str());
+                GetGroupStatusCache()->MarkFailure(connect_dest_);
+            }
+        }
+
+        ClearAll();
     }
     return 0;
 }

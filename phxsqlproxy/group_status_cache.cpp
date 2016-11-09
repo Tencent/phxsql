@@ -186,13 +186,22 @@ bool GroupStatusCache::IsMember(const std::string & ip) {
 
 int GroupStatusCache::GetSlave(const std::string & master_ip, std::string & slave_ip) {
     RWLockManager lock(&membership_mutex_, RWLockManager::READ);
+    slave_ip = "";
+    uint64_t t_last_failure = 0;
     for (auto & itr : membership_) {
         if (itr != master_ip) {
-            slave_ip = itr;
-            return 0;
+            if (slave_ip == "" || last_failure_[itr] < t_last_failure) {
+                slave_ip = itr;
+                t_last_failure = last_failure_[itr];
+            }
         }
     }
-    return -1;
+    return slave_ip != "" ? 0 : -1;
+}
+
+void GroupStatusCache::MarkFailure(const std::string & ip) {
+    RWLockManager lock(&membership_mutex_, RWLockManager::WRITE);
+    last_failure_[ip] = GetTimestampMS();
 }
 
 }
