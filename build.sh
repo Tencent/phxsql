@@ -70,14 +70,14 @@ if [ ! -f colib/lib/libcolib.a ]; then
 fi
 
 if [ ! -f phxpaxos/lib/libphxpaxos.a ]; then
-	if [ ! -f v1.0.2.tar.gz ]; then
-		wget https://github.com/tencent-wechat/phxpaxos/archive/v1.0.2.tar.gz
+	if [ ! -f v1.1.1.tar.gz ]; then
+		wget https://github.com/tencent-wechat/phxpaxos/archive/v1.1.1.tar.gz
 	fi
 
 	rm -rf phxpaxos
 
-	tar zxvf v1.0.2.tar.gz
-	ln -s phxpaxos-1.0.2 phxpaxos
+	tar zxvf v1.1.1.tar.gz
+	ln -s phxpaxos-1.1.1 phxpaxos
 
 	cd phxpaxos/third_party
 	rm -rf glog gmock leveldb protobuf
