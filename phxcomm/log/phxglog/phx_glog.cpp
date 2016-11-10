@@ -71,19 +71,19 @@ void PhxGLog::Log(int level, const char *format, va_list args) {
 }
 
 void PhxGLog::LogDebug(const char *log_str) {
-    LOG_STR(INFO, log_str);
-}
-
-void PhxGLog::LogErr(const char *log_str) {
     LOG_STR(WARNING, log_str);
 }
 
-void PhxGLog::LogImpt(const char *log_str) {
+void PhxGLog::LogErr(const char *log_str) {
     LOG_STR(ERROR, log_str);
 }
 
+void PhxGLog::LogImpt(const char *log_str) {
+    LOG_STR(INFO, log_str);
+}
+
 void PhxGLog::LogInfo(const char *log_str) {
-    return LogImpt(log_str);
+    LOG_STR(INFO, log_str);
 }
 
 }
