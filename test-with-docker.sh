@@ -3,6 +3,8 @@
 set -e
 set -x
 
+free -h
+
 echo "creating containers..."
 
 cid1=$(docker run -d phxsql)
@@ -14,6 +16,10 @@ ip2=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}
 ip3=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $cid3)
 
 sleep 30
+
+docker exec $cid1 ps -ef
+docker exec $cid2 ps -ef
+docker exec $cid3 ps -ef
 
 docker exec -it $cid1 phxbinlogsvr_tools_phxrpc -f InitBinlogSvrMaster -h "$ip1,$ip2,$ip3" -p 17000
 
