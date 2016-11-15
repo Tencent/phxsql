@@ -1,14 +1,15 @@
 FROM buildpack-deps:jessie
 
-RUN groupadd -r mysql && useradd -r -g mysql mysql
-
-RUN apt-get update && apt-get install -y cmake unzip
-
 COPY . /build
-RUN cd /build \
+
+RUN groupadd -r mysql && useradd -r -g mysql mysql \
+	&& apt-get update \
+	&& apt-get install -y cmake --no-install-recommends \
+	&& cd /build \
 	&& ./build.sh \
 	&& mv /build/install_package /phxsql \
-	&& rm -rf /build
+	&& rm -rf /build \
+	&& apt-get purge -y --auto-remove cmake
 
 WORKDIR /phxsql/tools
 
