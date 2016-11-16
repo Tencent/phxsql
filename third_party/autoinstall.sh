@@ -67,7 +67,7 @@ function install_leveldb()
     fi
     cd lib;
     if [ ! -f libleveldb.a ]; then
-        ln -s ../libleveldb.a libleveldb.a
+        ln -s ../out-static/libleveldb.a libleveldb.a
     fi
 
     check_lib_exist $lib_name;
