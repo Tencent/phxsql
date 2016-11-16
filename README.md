@@ -6,7 +6,7 @@ Authors: Junchao Chen, Haochuan Cui, Duokai Huang, Ming Chen and Sifan Liu
 
 Contact us: phxteam@tencent.com
 
-PhxSQL [![Build Status](https://travis-ci.org/tencent-wechat/phxsql.svg?branch=master)](https://travis-ci.org/tencent-wechat/phxsql)
+[![Build Status](https://travis-ci.org/tencent-wechat/phxsql.svg?branch=master)](https://travis-ci.org/tencent-wechat/phxsql)
 
 #PhxSQL features:
   - high availability by automatic failovers: the cluster works well when more than half of cluster nodes work and are interconnected.
