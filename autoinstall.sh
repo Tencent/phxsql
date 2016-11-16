@@ -36,15 +36,14 @@ function scandir(){
 function install_mysql(){
 	cd percona
 	rm plugin/phxsync_phxrpc -rf
-	cmake . -DCMAKE_INSTALL_PREFIX=$base_dir/percona -DMYSQL_DATADIR=$base_dir/percona  -DSYSCONFDIR=$base_dir/percona;
-	rm percona/plugin/phxsync_phxrpc -rf
+	cmake . -DCMAKE_INSTALL_PREFIX=$base_dir/percona -DCMAKE_BUILD_TYPE=Release -DWITH_EMBEDDED_SERVER=OFF
 	make perconaserverclient
 	cd -
 	cp phx_percona/percona/plugin/phxsync_phxrpc percona/plugin -r
 	cp phx_percona/percona/sql/* percona/sql/ -r
-	cp phx_percona/percona/plugin/semisync/semisync_master_plugin.cc  percona/plugin/semisync/semisync_master_plugin.cc 
+	cp phx_percona/percona/plugin/semisync/semisync_master_plugin.cc  percona/plugin/semisync/semisync_master_plugin.cc
 	cd percona
-	cmake . -DCMAKE_INSTALL_PREFIX=$base_dir/percona -DMYSQL_DATADIR=$base_dir/percona  -DSYSCONFDIR=$base_dir/percona;
+	cmake . -DCMAKE_INSTALL_PREFIX=$base_dir/percona -DCMAKE_BUILD_TYPE=Release -DWITH_EMBEDDED_SERVER=OFF
 	cd -
 	echo "[install mysql] done"
 }
