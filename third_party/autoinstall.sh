@@ -21,7 +21,7 @@ function check_dir_exist()
     dir_path=$current_path"/$1";
     if [ ! -d $dir_path ]; then
         perror $dir_path" dir not exist.";
-        exit;
+        exit 1;
     fi
 }
 
@@ -73,7 +73,7 @@ function install_leveldb()
     check_lib_exist $lib_name;
     if [ $? -eq 1 ]; then
         perror "$lib_name install fail. please check compile error info."
-        exit;
+        exit 1;
     fi
 
     psucc "install $lib_name ok."
@@ -125,7 +125,7 @@ function install_protobuf()
     check_protobuf_installed $lib_name;
     if [ $? -eq 1 ]; then
         perror "$lib_name install fail. please check compile error info."
-        exit;
+        exit 1;
     fi
     psucc "install $lib_name ok."
 }
@@ -151,7 +151,7 @@ function install_glog()
     check_lib_exist $lib_name;
     if [ $? -eq 1 ]; then
         perror "$lib_name install fail. please check compile error info."
-        exit;
+        exit 1;
     fi
     psucc "install $lib_name ok."
 }
@@ -176,7 +176,7 @@ function install_colib()
     check_lib_exist $lib_name;
     if [ $? -eq 1 ]; then
         perror "$lib_name install fail. please check compile error info."
-        exit;
+        exit 1;
     fi
     psucc "install $lib_name ok."
 }
@@ -224,7 +224,7 @@ function install_phxpaxos()
     check_phxpaxos_installed $lib_name;
     if [ $? -eq 1 ]; then
         perror "$lib_name install fail. please check compile error info."
-        exit;
+        exit 1;
     fi
 
     psucc "install $lib_name ok."
@@ -245,16 +245,14 @@ function install_phxrpc()
 
     go_back;
     cd $lib_name;
-    cd third_party;
-    rm -rf protobuf;
-    ln -s ../../protobuf protobuf;
-    cd ..;
+    rm -rf third_party;
+    ln -s .. third_party;
     make;
 
     check_lib_exist $lib_name;
     if [ $? -eq 1 ]; then
         perror "$lib_name install fail. please check compile error info."
-        exit;
+        exit 1;
     fi
     psucc "install $lib_name ok."
 }
