@@ -151,7 +151,7 @@ Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as 'p
 | | Port | Port for phxsqlproxy to listen |
 | | LogFilePath  | Directory to store log |
 | | LogLevel | Log level of phxbinlogsvr |
-| | MasterEnableReadPort | Enable readonly-port in master node  |
+| | MasterEnableReadPort | Enable readonly-port in master node. If set to 0, master will forwarding readonly-port requests to one of slaves. |
 | | TryBestIfBinlogsvrDead | After the local phxbinlogsvr is dead, phxsqlproxy will try to get master information from phxbinlogsvr on other machine, if this option set to 1. |
 
 # PhxSQL Usasge

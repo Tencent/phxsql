@@ -145,7 +145,7 @@ PhxSQL需要用到一些第三方库（glog, leveldb, protobuf, phxpaxos, colib,
 | | Port | phxsqlproxy的监听端口 |
 | | QSLogFilePath  | phxsqlproxy的日志目录 |
 | | QSLogLevel | phxsqlproxy的日志级别 |
-| | MasterEnableReadPort | Enable readonly-port in master node |
+| | MasterEnableReadPort | 是否打开master的只读端口。如果设为0，master会将只读端口的请求转发到一台slave上。 |
 | | TryBestIfBinlogsvrDead | 如果这个选项设为1，在本地phxbinlogsvr挂掉后，phxsqlproxy会重试从别的机器上的phxbinlogsvr获取master信息。 |
 
 # PhxSQL使用
