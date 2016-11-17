@@ -32,6 +32,7 @@ class PHXBinlogSvrBaseConfig : public phxsql::PhxBaseConfig {
     const char * GetPaxosLogPath() const;
     int GetPackageMode() const;
     uint32_t GetPaxosLogNum() const;
+    uint32_t GetUDPMaxSize() const;
 
     uint32_t GetMasterLeaseTime() const;
     uint32_t GetMasterExtLeaseTime() const;
@@ -96,6 +97,7 @@ class PHXBinlogSvrBaseConfig : public phxsql::PhxBaseConfig {
     int paxos_port_;
     uint32_t paxos_log_num_;
     uint32_t packet_mode_;
+    uint32_t udp_max_size_;
 
     uint32_t log_level_;
 
