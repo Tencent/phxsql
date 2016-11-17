@@ -137,6 +137,7 @@ Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as 'p
 | PaxosOption| PaxosLogPath| Directory where to store paxos data |
 | | PaxosPort| Port for paxos to connect each other |
 | | PacketMode | The maximum size of paxos log for PhxPaxos,1 means 100M, but the network timeout will be 1 minute, 0 means 50M and network timeout is 2s(changed in dynamic).| 
+| | UDPMaxSize | Our default network use udp and tcp combination, a message we use udp or tcp to send decide by a threshold. Message size under UDPMaxSize we use udp to send. |
 | Server | IP | IP for phxbinlogsvr to listen |
 | | Port | Port for phxbinlogsvr to listen |
 | |  LogFilePath | Directory to store log |
@@ -151,6 +152,7 @@ Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as 'p
 | | LogFilePath  | Directory to store log |
 | | LogLevel | Log level of phxbinlogsvr |
 | | MasterEnableReadPort | Enable readonly-port in master node  |
+| | TryBestIfBinlogsvrDead | After the local phxbinlogsvr is dead, phxsqlproxy will try to get master information from phxbinlogsvr on other machine, if this option set to 1. |
 
 # PhxSQL Usasge
 

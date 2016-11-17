@@ -131,6 +131,7 @@ PhxSQL需要用到一些第三方库（glog, leveldb, protobuf, phxpaxos, colib,
 | PaxosOption| PaxosLogPath| Phxbinlogsvr中paxos库的数据目录|
 | | PaxosPort|Phxbinlogsvr中paxos库的通信端口|
 | | PacketMode | Phxbinlogsvr在paxos协议中是否增大包的大小限制， 1为每个包的大小为100m，但超时限制变为1分钟，0 为每个包的大小为50m，超时限制2s起（动态变化）|
+| | UDPMaxSize | Phxpaxos默认使用udp和tcp混合的通讯方式，根据这个阈值觉得使用udp还是tcp。大小小于UDPMaxSize的消息会使用udp发送。 |
 | Server | IP | Phxbinlogsvr的监听ip |
 | | Port | Phxbinlogsvr的监听端口 |
 | |  LogFilePath | Phxbinlogsvr的日志目录 |
@@ -145,6 +146,7 @@ PhxSQL需要用到一些第三方库（glog, leveldb, protobuf, phxpaxos, colib,
 | | QSLogFilePath  | phxsqlproxy的日志目录 |
 | | QSLogLevel | phxsqlproxy的日志级别 |
 | | MasterEnableReadPort | Enable readonly-port in master node |
+| | TryBestIfBinlogsvrDead | 如果这个选项设为1，在本地phxbinlogsvr挂掉后，phxsqlproxy会重试从别的机器上的phxbinlogsvr获取master信息。 |
 
 # PhxSQL使用
 
