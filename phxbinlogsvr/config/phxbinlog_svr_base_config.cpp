@@ -45,6 +45,7 @@ void PHXBinlogSvrBaseConfig::ReadPaxosConfig() {
     paxos_port_ = GetInteger("PaxosOption", "PaxosPort", 0);
     paxos_log_num_ = GetInteger("PaxosOption", "LogNum", 1000000);
     packet_mode_ = GetInteger("PaxosOption", "PacketMode", 0);
+    udp_max_size_ = GetInteger("PaxosOption", "UDPMaxSize", 4096);
 }
 
 void PHXBinlogSvrBaseConfig::ReadAgentConfig() {
@@ -113,6 +114,10 @@ int PHXBinlogSvrBaseConfig::GetPackageMode() const {
 
 uint32_t PHXBinlogSvrBaseConfig::GetPaxosLogNum() const {
     return paxos_log_num_;
+}
+
+uint32_t PHXBinlogSvrBaseConfig::GetUDPMaxSize() const {
+    return udp_max_size_;
 }
 
 uint32_t PHXBinlogSvrBaseConfig::GetMasterLeaseTime() const {

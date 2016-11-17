@@ -118,10 +118,11 @@ void PaxosAgent::SetPaxosOption() {
     }
 
     paxos_option_.bIsLargeValueMode = option_->GetBinLogSvrConfig()->GetPackageMode();
+    paxos_option_.iUDPMaxSize = option_->GetBinLogSvrConfig()->GetUDPMaxSize();
 
-    ColorLogInfo("set gourp count %u path %s log path %s, package mode %d", paxos_option_.iGroupCount,
+    ColorLogInfo("set gourp count %u path %s log path %s, package mode %d, udp size %u", paxos_option_.iGroupCount,
                  paxos_option_.sLogStoragePath.c_str(), option_->GetBinLogSvrConfig()->GetPaxosLogPath(),
-                 option_->GetBinLogSvrConfig()->GetPackageMode());
+                 option_->GetBinLogSvrConfig()->GetPackageMode(), paxos_option_.iUDPMaxSize);
     SetPaxosNodeList(false);
 }
 
