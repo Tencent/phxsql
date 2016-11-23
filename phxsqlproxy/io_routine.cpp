@@ -233,41 +233,12 @@ void IORoutine::SetClientFD(int fd) {
     ClearAll();
     req_uniq_id_ = ((uint64_t)(random_engine()) << 32) | random_engine();
     client_fd_ = fd;
-    int port = 0;
-    int ret = GetPeerName(fd, client_ip_, port);
-    if (ret == 0) {
-        LogVerbose("requniqid %llu receive connect from [%s:%d]", req_uniq_id_, client_ip_.c_str(), port);
+    int ret1 = GetSockName(fd, listen_ip_, listen_port_);
+    int ret2 = GetPeerName(fd, client_ip_, client_port_);
+    if (ret1 == 0 && ret2 == 0) {
+        LogVerbose("requniqid %llu receive connect from [%s:%d]",
+                   req_uniq_id_, client_ip_.c_str(), client_port_);
     }
-}
-
-int IORoutine::FakeClientIPInAuthBuf(char * buf, size_t buf_len) {
-    if (buf_len < 36) {
-        LogError("requniqid %llu %s failed in %d", req_uniq_id_, __func__, __LINE__);
-        return -__LINE__;
-    }
-    char * reserverd_begin = buf + 14;
-    char ip_buf[INET6_ADDRSTRLEN] = { 0 };
-
-    uint32_t ip = 0;
-    memcpy(&ip, reserverd_begin, sizeof(uint32_t));
-    if (ip) {
-        if (inet_ntop(AF_INET, reserverd_begin, ip_buf, INET6_ADDRSTRLEN) != NULL) {
-            if (!GetGroupStatusCache()->IsMember(client_ip_)) {
-                LogError("requniqid %llu receive fake ip package from [%s], fake ip [%s]", req_uniq_id_,
-                         client_ip_.c_str(), ip_buf);
-                return -__LINE__;
-            }
-        } else
-            return -__LINE__;
-    } else {
-        int ret = inet_pton(AF_INET, client_ip_.c_str(), reserverd_begin);
-        if (ret <= 0) {
-            LogError("%s:%d requniqid %llu ret %d errno (%d:%s)", __func__, __LINE__, req_uniq_id_, ret, errno,
-                     strerror(errno));
-            return -__LINE__;
-        }
-    }
-    return 0;
 }
 
 void IORoutine::GetDBNameFromAuthBuf(const char * buf, int buf_size) {
@@ -335,11 +306,6 @@ int IORoutine::TransMsgDirect(int source_fd, int dest_fd, struct pollfd pf[], in
                 if (source_fd == client_fd_) {
                     if (!is_authed_) {
                         GetDBNameFromAuthBuf(buf, read_once);
-
-                        if (FakeClientIPInAuthBuf(buf, read_once) != 0) {
-                            LogError("requniqid %llu FakeClientIPInAuthBuf failed", req_uniq_id_);
-                            return -1;
-                        }
                         is_authed_ = true;
                     } else {
                         GetDBNameFromReqBuf(buf, read_once);
@@ -390,6 +356,16 @@ int IORoutine::run() {
                 sqlsvr_fd_ = fd;
                 SetNoDelay(client_fd_);
                 SetNoDelay(sqlsvr_fd_);
+
+                if (listen_port_ == GetWorkerConfig()->port_) {
+                    string proxy_line = "PROXY TCP4 " + client_ip_ + " " + listen_ip_ + " " +
+                                        UIntToStr(client_port_) + " " + UIntToStr(listen_port_) + "\r\n";
+                    int ret = WriteToDest(sqlsvr_fd_, proxy_line.c_str(), proxy_line.size());
+                    if (ret < 0) {
+                        LogError("send proxy line error: %s", proxy_line.c_str());
+                        break;
+                    }
+                }
             }
 
             struct pollfd pf[2];
@@ -440,7 +416,7 @@ int IORoutine::run() {
 
         if (byte_size_tot == 0) {
             // MasterEnableReadPort=0
-            if (connect_port_ == GetWorkerConfig()->port_ && !GetWorkerConfig()->is_master_port_) {
+            if (connect_port_ == GetWorkerConfig()->proxy_port_ && !GetWorkerConfig()->is_master_port_) {
                 LogVerbose("%s:%d requniqid %llu mark %s failure", __func__, __LINE__, req_uniq_id_,
                            connect_dest_.c_str());
                 GetGroupStatusCache()->MarkFailure(connect_dest_);
@@ -527,7 +503,7 @@ int MasterIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port) {
         dest_port = config_->GetMysqlPort();
     } else {
         dest_ip = master_ip;
-        dest_port = GetWorkerConfig()->port_;
+        dest_port = GetWorkerConfig()->proxy_port_;
     }
 
     LogVerbose("%s:%d requniqid %llu ret ip [%s] port [%d]", __func__, __LINE__, req_uniq_id_, dest_ip.c_str(),
@@ -599,7 +575,7 @@ int SlaveIORoutine::GetDestEndpoint(std::string & dest_ip, int & dest_port) {
                             req_uniq_id_, master_ip.c_str());
                 return -__LINE__;
             }
-            dest_port = GetWorkerConfig()->port_;
+            dest_port = GetWorkerConfig()->proxy_port_;
         } else {
             dest_ip = "127.0.0.1";
             dest_port = config_->GetMysqlPort();

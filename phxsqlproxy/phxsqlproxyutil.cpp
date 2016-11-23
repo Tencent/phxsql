@@ -127,6 +127,26 @@ void GetMysqlBufDebugString(const char * buf, int len, std::string & debug_str) 
     }
 }
 
+int GetSockName(int fd, std::string & ip, int & port) {
+    struct sockaddr_in socket_address;
+    socklen_t sock_len = sizeof(socket_address);
+
+    int ret = getsockname(fd, (struct sockaddr*) &socket_address, &sock_len);
+    if (ret == -1) {
+        LogError("getsockname fd [%d] failed, ret %d, errno (%d:%s)", fd, ret, errno, strerror(errno));
+        return -__LINE__;
+    }
+
+    char buf[INET6_ADDRSTRLEN] = { 0 };
+    if (inet_ntop(socket_address.sin_family, &socket_address.sin_addr, buf, INET6_ADDRSTRLEN) == NULL) {
+        LogError("inet_ntop failed, ret NULL, errno(%d:%s)", errno, strerror(errno));
+        return -__LINE__;
+    }
+    ip = string(buf);
+    port = ntohs(socket_address.sin_port);
+    return 0;
+}
+
 int GetPeerName(int fd, std::string & ip, int & port) {
     struct sockaddr_in socket_address;
     socklen_t sock_len = sizeof(socket_address);
@@ -189,6 +209,12 @@ uint64_t DecodedLengthBinary(const char * buf, int len, int & len_field_size) {
             break;
     }
     return package_len;
+}
+
+std::string UIntToStr(uint32_t i) {
+    char buf[16];
+    snprintf(buf, sizeof(buf), "%u", i);
+    return std::string(buf);
 }
 
 }

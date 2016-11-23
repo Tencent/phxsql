@@ -21,6 +21,7 @@ class PhxMySqlConfig : public phxsql::PhxBaseConfig {
  public:
     const char *GetMySQLIP() const;
     int GetMySQLPort() const;
+    const char *GetMySQLSocket() const;
  protected:
     PhxMySqlConfig(const char *filename = "my.cnf");
     virtual ~PhxMySqlConfig();
@@ -33,6 +34,7 @@ class PhxMySqlConfig : public phxsql::PhxBaseConfig {
  private:
     std::string mysql_ip_;
     uint32_t mysql_port_;
+    std::string mysql_socket_;
 };
 
 }

@@ -33,8 +33,13 @@ const char * PhxMySqlConfig::GetMySQLIP() const {
     return mysql_ip_.c_str();
 }
 
+const char * PhxMySqlConfig::GetMySQLSocket() const {
+    return mysql_socket_.c_str();
+}
+
 void PhxMySqlConfig::ReadConfig() {
     mysql_port_ = GetInteger("mysqld", "port", 4306);
+    mysql_socket_ = Get("mysqld", "socket", "");
     phxsql::LogVerbose("%s read mysql port %d", __func__, mysql_port_);
 }
 

@@ -71,9 +71,16 @@ int MySQLCommand::Connect() {
     bool reconnect = true;
     mysql_options(mysql_, MYSQL_OPT_RECONNECT, (char*) &reconnect);
 
+    const char *ip = option_->ip.c_str();
+    const char *socket = NULL;
+    if (option_->ip == "127.0.0.1") {
+        ip = NULL;
+        socket = Option::GetDefault()->GetMySqlConfig()->GetMySQLSocket();
+    }
+
     if (NULL
-            == mysql_real_connect(mysql_, option_->ip.c_str(), option_->username.c_str(), option_->pwd.c_str(), "",
-                                  option_->port, NULL, 0)) {
+            == mysql_real_connect(mysql_, ip, option_->username.c_str(), option_->pwd.c_str(), "",
+                                  option_->port, socket, 0)) {
         STATISTICS(MySqlConnectFail());
         ColorLogError("ERR: mysql_real_connect fail, %s", mysql_error(mysql_));
         return MYSQL_FAIL;

@@ -20,6 +20,7 @@ namespace phxsqlproxy {
 typedef struct tagWorkerConfig {
     const char * listen_ip_;
     int port_;
+    int proxy_port_;
     int fork_proc_count_;
     int worker_thread_count_;
     int io_routine_count_;

@@ -72,22 +72,26 @@ int TickFunc(void* args) {
 template<class T>
 int StartWorker(PHXSqlProxyConfig * config, WorkerConfig_t * worker_config) {
     const char * listen_ip = worker_config->listen_ip_;
-    int port = worker_config->port_;
     int fork_proc_count = worker_config->fork_proc_count_;
     int worker_thread_count = worker_config->worker_thread_count_;
-    int listen_fd = CreateTcpSocket(port, listen_ip, true);
-    if (listen_fd <= 0) {
-        LogError("creat tcp socket failed ret %d, errno (%d:%s)", listen_fd, errno, strerror(errno));
-        printf("creat tcp socket failed ret %d, errno (%d:%s)", listen_fd, errno, strerror(errno));
-        return -__LINE__;
-    }
 
-    int ret = listen(listen_fd, 1024);
-    if (ret < 0) {
-        LogError("listen in [%s:%d] fd %d ret %d errno (%d:%s)", listen_ip, port, listen_fd, ret, errno,
-                 strerror(errno));
-        printf("creat tcp socket failed ret %d, errno (%d:%s)", listen_fd, errno, strerror(errno));
-        return -__LINE__;
+    int listen_fd[2];
+    int port[2] = {worker_config->port_, worker_config->proxy_port_};
+    for (int i = 0; i < 2; ++i) {
+        listen_fd[i] = CreateTcpSocket(port[i], listen_ip, true);
+        if (listen_fd[i] <= 0) {
+            LogError("creat tcp socket failed ret %d, errno (%d:%s)", listen_fd[i], errno, strerror(errno));
+            printf("creat tcp socket failed ret %d, errno (%d:%s)", listen_fd[i], errno, strerror(errno));
+            return -__LINE__;
+        }
+
+        int ret = listen(listen_fd[i], 1024);
+        if (ret < 0) {
+            LogError("listen in [%s:%d] fd %d ret %d errno (%d:%s)", listen_ip, port[i], listen_fd[i], ret,
+                     errno, strerror(errno));
+            printf("creat tcp socket failed ret %d, errno (%d:%s)", listen_fd[i], errno, strerror(errno));
+            return -__LINE__;
+        }
     }
 
     //SetNonBlock( listen_fd );
@@ -128,8 +132,10 @@ int StartWorker(PHXSqlProxyConfig * config, WorkerConfig_t * worker_config) {
             worker_thread->start();
         }
 
-        AcceptThread * accept_thread = new AcceptThread(config, worker_threads, listen_fd);
-        accept_thread->start();
+        for (int i = 0; i < 2; ++i) {
+            AcceptThread * accept_thread = new AcceptThread(config, worker_threads, listen_fd[i]);
+            accept_thread->start();
+        }
 
         co_eventloop(co_get_epoll_ct(), TickFunc, 0);
         exit(0);

@@ -41,12 +41,12 @@ void co_init_curr_thread_env();
 namespace phxsqlproxy {
 
 AcceptThread::AcceptThread(PHXSqlProxyConfig * config, const std::vector<WorkerThread *> & worker_threads,
-                           int lisen_fd) {
+                           int listen_fd) {
     for (size_t i = 0; i < worker_threads.size(); ++i) {
         worker_threads_.push_back(worker_threads[i]);
     }
     config_ = config;
-    listen_fd_ = lisen_fd;
+    listen_fd_ = listen_fd;
 }
 
 AcceptThread::~AcceptThread() {

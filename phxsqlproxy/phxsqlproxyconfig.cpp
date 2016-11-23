@@ -84,20 +84,28 @@ WorkerConfig_t * PHXSqlProxyConfig::GetSlaveWorkerConfig() {
 void PHXSqlProxyConfig::ReadMasterWorkerConfig(WorkerConfig_t * worker_config) {
     worker_config->listen_ip_ = svr_ip_.c_str();
     worker_config->port_ = svr_port_;
+    worker_config->proxy_port_ = GetInteger("Server", "MasterProxyPort", 0);
     worker_config->fork_proc_count_ = GetInteger("Server", "MasterForkProcCnt", 1);
     worker_config->worker_thread_count_ = GetInteger("Server", "MasterWorkerThread", 3);
     worker_config->io_routine_count_ = GetInteger("Server", "MasterIORoutineCnt", 1000);
+    if (!worker_config->proxy_port_) {
+        worker_config->proxy_port_ = worker_config->port_ + 2;
+    }
     worker_config->is_master_port_ = true;
 }
 
 void PHXSqlProxyConfig::ReadSlaveWorkerConfig(WorkerConfig_t * worker_config) {
     worker_config->listen_ip_ = svr_ip_.c_str();
     worker_config->port_ = GetInteger("Server", "SlavePort", 0);
+    worker_config->proxy_port_ = GetInteger("Server", "SlaveProxyPort", 0);
     worker_config->fork_proc_count_ = GetInteger("Server", "SlaveForkProcCnt", 1);
     worker_config->worker_thread_count_ = GetInteger("Server", "SlaveWorkerThread", 3);
     worker_config->io_routine_count_ = GetInteger("Server", "SlaveIORoutineCnt", 1000);
     if (!worker_config->port_) {
         worker_config->port_ = svr_port_ + 1;
+    }
+    if (!worker_config->proxy_port_) {
+        worker_config->proxy_port_ = worker_config->port_ + 2;
     }
     worker_config->is_master_port_ = false;
 }

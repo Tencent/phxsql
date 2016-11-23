@@ -33,8 +33,12 @@ uint64_t GetTimestampMS();
 
 void GetMysqlBufDebugString(const char * buf, int len, std::string & debug_str);
 
+int GetSockName(int fd, std::string & ip, int & port);
+
 int GetPeerName(int fd, std::string & ip, int & port);
 
 uint64_t DecodedLengthBinary(const char * buf, int len, int & len_field_size);
+
+std::string UIntToStr(uint32_t i);
 
 }

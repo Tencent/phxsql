@@ -69,8 +69,6 @@ class IORoutine : public Coroutine {
 
     virtual bool CanExecute(const char * buf, int size);
 
-    int FakeClientIPInAuthBuf(char * buf, size_t buf_len);
-
     void GetDBNameFromAuthBuf(const char * buf, int buf_size);
 
     void GetDBNameFromReqBuf(const char * buf, int buf_size);
@@ -90,7 +88,10 @@ class IORoutine : public Coroutine {
 
     int client_fd_;
     int sqlsvr_fd_;
+    std::string listen_ip_;
+    int listen_port_;
     std::string client_ip_;
+    int client_port_;
     uint64_t last_received_request_timestamp_;
     uint64_t last_sent_request_timestamp_;
     int last_read_fd_;
