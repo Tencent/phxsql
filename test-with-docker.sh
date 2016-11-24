@@ -44,7 +44,7 @@ sleep 10
 
 time=$(date +%Y%m%d%H%M%S)
 
-echo "create database and insert $tiem..."
+echo "create database and insert $time..."
 
 docker exec $cid1 mysql -u root -h $ip1 -P 54321 -e "create database if not exists test_phxsql"
 docker exec $cid1 mysql -u root -h $ip1 -P 54321 test_phxsql -e "create table if not exists test_phxsql(name varchar(80))"
