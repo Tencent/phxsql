@@ -12,6 +12,7 @@
 
 #include "co_routine.h"
 #include "phxcoroutine.h"
+#include "proxy_protocol.h"
 #include <string>
 #include <stack>
 
@@ -72,6 +73,15 @@ class IORoutine : public Coroutine {
     void GetDBNameFromAuthBuf(const char * buf, int buf_size);
 
     void GetDBNameFromReqBuf(const char * buf, int buf_size);
+
+ private:
+    int ProcessProxyHeader(int fd);
+    int ProcessProxyHeaderV1(char * hdr, int read_count);
+    int ProcessProxyHeaderV2(const ProxyHdrV2_t & hdr, int read_count);
+    int MakeProxyHeader(std::string & header);
+    int MakeProxyHeaderV1(std::string & header);
+    int MakeProxyHeaderV2(std::string & header);
+
  protected:
     uint64_t req_uniq_id_;
 
@@ -88,10 +98,10 @@ class IORoutine : public Coroutine {
 
     int client_fd_;
     int sqlsvr_fd_;
-    std::string listen_ip_;
-    int listen_port_;
     std::string client_ip_;
     int client_port_;
+    std::string server_ip_;
+    int server_port_;
     uint64_t last_received_request_timestamp_;
     uint64_t last_sent_request_timestamp_;
     int last_read_fd_;

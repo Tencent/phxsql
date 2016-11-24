@@ -177,5 +177,29 @@ int Coroutine::RoutineWriteWithTimeout(int dest_fd, const char * buf, int write_
     return written_once;
 }
 
+int Coroutine::RoutinePeekWithTimeout(int source_fd, char * buf, int buf_size, int timeout_ms) {
+    assert(IsNonBlock(source_fd));
+    struct pollfd pf[1];
+    int nfds = 0;
+    memset(pf, 0, sizeof(pf));
+    pf[0].fd = source_fd;
+    pf[0].events = (POLLIN | POLLERR | POLLHUP);
+    nfds++;
+
+    int return_fd_count = co_poll(co_get_epoll_ct(), pf, nfds, timeout_ms);
+    if (return_fd_count < 0) {
+        return return_fd_count;
+    }
+
+    if (pf[0].revents & POLLIN) {
+        return recv(source_fd, buf, buf_size, MSG_PEEK);
+    } else if (pf[0].revents & POLLHUP) {
+        return return_fd_count;
+    } else if (pf[0].revents & POLLERR) {
+        return return_fd_count;
+    }
+    return return_fd_count;
+}
+
 }
 

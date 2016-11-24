@@ -48,6 +48,8 @@ void PHXSqlProxyConfig::ReadConfig() {
     sleep_ = GetInteger("Server", "Sleep", 0);
     connect_timeout_ms_ = GetInteger("Server", "ConnectTimeoutMs", 200);
     write_timeout_ms_ = GetInteger("Server", "WriteTimeoutMs", 1000);
+    proxy_protocol_ = GetInteger("Server", "ProxyProtocol", 0);
+    proxy_protocol_timeout_ms_ = GetInteger("Server", "ProxyProtocolTimeoutMs", 1000);
 
     /*
      phxsql_config_ = PhxMySqlConfig :: GetDefault();
@@ -152,6 +154,14 @@ uint32_t PHXSqlProxyConfig::ConnectTimeoutMs() {
 
 uint32_t PHXSqlProxyConfig::WriteTimeoutMs() {
     return write_timeout_ms_;
+}
+
+int PHXSqlProxyConfig::ProxyProtocol() {
+    return proxy_protocol_;
+}
+
+uint32_t PHXSqlProxyConfig::ProxyProtocolTimeoutMs() {
+    return proxy_protocol_timeout_ms_;
 }
 
 }

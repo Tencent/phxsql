@@ -217,5 +217,19 @@ std::string UIntToStr(uint32_t i) {
     return std::string(buf);
 }
 
+std::vector<std::string> SplitStr(const std::string & str, const std::string & delim) {
+    std::vector<std::string> vec;
+    for (size_t pos = 0; pos < str.size();) {
+        size_t next = str.find(delim, pos);
+        if (next == std::string::npos) {
+            vec.push_back(str.substr(pos));
+            break;
+        }
+        vec.push_back(str.substr(pos, next - pos));
+        pos = next + delim.size();
+    }
+    return vec;
+}
+
 }
 

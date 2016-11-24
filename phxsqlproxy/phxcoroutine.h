@@ -38,7 +38,9 @@ class Coroutine {
 
     static int RoutineWriteWithTimeout(int dest_fd, const char * buf, int write_size, int timeout_ms);
 
-    static int RoutineReadWithTimeout(int source_fd, char * buf, int write_size, int timeout_ms);
+    static int RoutineReadWithTimeout(int source_fd, char * buf, int buf_size, int timeout_ms);
+
+    static int RoutinePeekWithTimeout(int source_fd, char * buf, int buf_size, int timeout_ms);
 
  private:
     stCoRoutine_t * routine_;

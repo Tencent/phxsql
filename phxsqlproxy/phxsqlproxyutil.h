@@ -11,6 +11,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <inttypes.h>
 
 namespace phxsqlproxy {
@@ -40,5 +41,7 @@ int GetPeerName(int fd, std::string & ip, int & port);
 uint64_t DecodedLengthBinary(const char * buf, int len, int & len_field_size);
 
 std::string UIntToStr(uint32_t i);
+
+std::vector<std::string> SplitStr(const std::string & str, const std::string & delim);
 
 }
