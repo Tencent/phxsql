@@ -70,14 +70,22 @@ struct Mysql_replication phx_sync_master_plugin = { MYSQL_REPLICATION_INTERFACE_
  Plugin library descriptor
  */
 
-mysql_declare_plugin (phxsync_master) { MYSQL_REPLICATION_PLUGIN, &phx_sync_master_plugin, "rpl_phx_sync_master",
-        "Mario Huang", "phx-synchronous replication", PLUGIN_LICENSE_GPL, phx_sync_master_plugin_init, /* Plugin Init */
-        phx_sync_master_plugin_deinit, /* Plugin Deinit */
-        0x0100 /* 1.0 */, NULL, /* status variables */
-        NULL, /* system variables */
-        //phx_sync_master_status_vars,
-        //phx_sync_master_system_vars,
-        NULL, /* config options */
-        0, /* flags */
+mysql_declare_plugin (phxsync_master_phxrpc)
+{
+    MYSQL_REPLICATION_PLUGIN,
+    &phx_sync_master_plugin,
+    "rpl_phx_sync_master",
+    "Mario Huang",
+    "phx-synchronous replication",
+    PLUGIN_LICENSE_GPL,
+    phx_sync_master_plugin_init, /* Plugin Init */
+    phx_sync_master_plugin_deinit, /* Plugin Deinit */
+    0x0100 /* 1.0 */,
+    NULL, /* status variables */
+    NULL, /* system variables */
+    //phx_sync_master_status_vars,
+    //phx_sync_master_system_vars,
+    NULL, /* config options */
+    0, /* flags */
 }
 mysql_declare_plugin_end;

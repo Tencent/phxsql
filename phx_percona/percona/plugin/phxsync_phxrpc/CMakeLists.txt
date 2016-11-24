@@ -13,10 +13,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
+SET(BASE_PATH ${CMAKE_SOURCE_DIR}/../)
+
 ADD_DEFINITIONS(-std=gnu++0x -DNO_USE_PAXOS_PLUGIN -DMYSQL_SERVER )
 EXEC_PROGRAM(g++ ARGS -print-file-name=libstdc++.a OUTPUT_VARIABLE STDCLIBPATH)
-
-SET(BASE_PATH ${CMAKE_SOURCE_DIR}/../)
+EXEC_PROGRAM(cp ARGS ${STDCLIBPATH} ${BASE_PATH}/.lib/extlib/libstdcxx.a)
 
 INCLUDE_DIRECTORIES(  
 	${BASE_PATH}/include
@@ -25,31 +26,19 @@ INCLUDE_DIRECTORIES(
 )
 
 SET( PHXCLIENTLIB_SRC 
-		libphxbinlogsvrclient_phxrpc.a
-		libphxglog.a
-		libglog.a
-		libphxrpc.a
-		libprotobuf.a 
+		${BASE_PATH}/.lib/extlib/libphxbinlogsvrclient_phxrpc.a
+		${BASE_PATH}/.lib/extlib/libphxglog.a
+		${BASE_PATH}/third_party/glog/lib/libglog.a
+		${BASE_PATH}/third_party/phxrpc/lib/libphxrpc.a
+		${BASE_PATH}/third_party/protobuf/lib/libprotobuf.a
+		${BASE_PATH}/.lib/extlib/libstdcxx.a
 		pthread
-		${STDCLIBPATH}
 		)
-
-SET( PHXCLIENTLIB_DIR 
-		${BASE_PATH}/third_party/phxrpc/lib
-		${BASE_PATH}/third_party/phxpaxos/lib
-		${BASE_PATH}/third_party/glog/lib 
-		${BASE_PATH}/third_party/protobuf/lib 
-		${BASE_PATH}/third_party/boost/lib 
-		${BASE_PATH}/.lib/extlib
-		)
-
-LINK_DIRECTORIES( ${PHXCLIENTLIB_DIR} )
 
 SET( PHXSYNC_MASTER_PHXRPC_SOURCES  phxsync_master_phxrpc_plugin.cc phxsync_utils.cc init_with_phxbinlogsvr.cc )
 
-MYSQL_ADD_PLUGIN( phxsync_master_phxrpc ${PHXSYNC_MASTER_PHXRPC_SOURCES})
-
-TARGET_LINK_LIBRARIES( phxsync_master_phxrpc ${PHXCLIENTLIB_SRC} )
+MYSQL_ADD_PLUGIN( phxsync_master_phxrpc ${PHXSYNC_MASTER_PHXRPC_SOURCES}
+				  LINK_LIBRARIES ${PHXCLIENTLIB_SRC} )
 
 SET_TARGET_PROPERTIES( phxsync_master_phxrpc PROPERTIES LINK_FLAGS
 	"${mysqld_link_flags} -Wl,-soname,--whole-archive")

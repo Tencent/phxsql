@@ -74,7 +74,6 @@ install:
 	@cp $(SRC_BASE_PATH)/README.md $(PREFIX)/install_package/;
 	@cp $(SRC_BASE_PATH)/phxrpc_package_config/* $(PREFIX)/install_package/ -rf;
 	@cp $(SRC_BASE_PATH)/.sbin/* $(PREFIX)/install_package/sbin/ -rf;
-	@cp $(SRC_BASE_PATH)/percona/lib/mysql/plugin/*phxsync* $(PREFIX)/install_package/lib/ -rf;
 	@cp $(SRC_BASE_PATH)/percona/bin/mysqld $(PREFIX)/install_package/sbin/ -rf;
 	@cp $(SRC_BASE_PATH)/percona/bin $(PREFIX)/install_package/percona.src/ -r;
 	@cp $(SRC_BASE_PATH)/percona/lib $(PREFIX)/install_package/percona.src/ -r;

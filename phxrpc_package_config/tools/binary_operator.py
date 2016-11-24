@@ -71,8 +71,8 @@ class binary_operator:
 		return 0
 
 	def start_mysql( self ):
-		cmd = 'nohup sh %s --defaults-file=%s --super_read_only --plugin-load=%s &' \
-				%( format_path('%s/bin/mysqld_safe'%self.m_args.base_dir), format_path('%s/etc/my.cnf'%self.m_args.base_dir), name_config.phxsync_plugin )
+		cmd = 'nohup sh %s --defaults-file=%s --super_read_only &' \
+				%( format_path('%s/bin/mysqld_safe'%self.m_args.base_dir), format_path('%s/etc/my.cnf'%self.m_args.base_dir) )
 		return os.system(cmd)
 
 

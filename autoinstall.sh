@@ -43,7 +43,7 @@ function install_mysql(){
 	cp phx_percona/percona/sql/* percona/sql/ -r
 	cp phx_percona/percona/plugin/semisync/semisync_master_plugin.cc  percona/plugin/semisync/semisync_master_plugin.cc
 	cd percona
-	cmake . -DCMAKE_INSTALL_PREFIX=$base_dir/percona -DCMAKE_BUILD_TYPE=Release -DWITH_EMBEDDED_SERVER=OFF
+	cmake . -DCMAKE_INSTALL_PREFIX=$base_dir/percona -DCMAKE_BUILD_TYPE=Release -DWITH_EMBEDDED_SERVER=OFF -DWITH_PHXSYNC_MASTER_PHXRPC=1
 	cd -
 	echo "[install mysql] done"
 }
