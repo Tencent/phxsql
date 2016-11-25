@@ -9,6 +9,6 @@ compiler: g++
 git:
     submodules: false
 script:
-    - docker build -t phxsql . && ./test-with-docker.sh
+    - docker build -t phxsql/phxsql:latest . && ./test-with-docker.sh
 notifications:
     email: true

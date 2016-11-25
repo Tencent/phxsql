@@ -3,7 +3,7 @@
 set -e
 
 create_containers() {
-    cid=$(docker run -d phxsql)
+    cid=$(docker run -d phxsql/phxsql:latest)
     ip=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $cid)
     echo "created container $cid $ip"
     read $1 $2 <<< "$cid $ip"
@@ -11,7 +11,7 @@ create_containers() {
 
 check_processes() {
     cid=$1
-    proc=$(docker exec $cid ps -ef)
+    proc=$(docker top $cid)
     for binary in phxbinlogsvr phxsqlproxy mysqld_safe; do
         if [[ ! $proc =~ $binary ]]; then
             echo "$binary in $cid hasn't started"
