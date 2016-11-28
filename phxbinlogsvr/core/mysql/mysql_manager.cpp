@@ -302,7 +302,7 @@ int MySqlManager::CreateAdmin(const string &admin_username, const string &admin_
         host_list.push_back("127.0.0.1");
         host_list.push_back("localhost");
         for (auto host : host_list) {
-            string grant_string = MySqlStringHelper::GetGrantAdminUserStr(admin_username, admin_pwd, ip);
+            string grant_string = MySqlStringHelper::GetGrantAdminUserStr(admin_username, admin_pwd, host);
             int ret = Query(grant_string);
             if (ret) {
                 return ret;
