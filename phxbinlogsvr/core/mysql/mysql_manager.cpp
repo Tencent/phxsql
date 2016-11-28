@@ -169,7 +169,7 @@ int MySqlManager::CheckUserGrantExist(const string &username, const string &pwd,
                                       const string &grant_flag_string) {
 
     MySqlOption mysql_option;
-    mysql_option.ip = "127.0.0.1";
+    mysql_option.ip = option_->GetBinLogSvrConfig()->GetEngineIP();
     mysql_option.port = option_->GetMySqlConfig()->GetMySQLPort();
     mysql_option.username = username;
     mysql_option.pwd = pwd;
