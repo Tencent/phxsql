@@ -8,6 +8,7 @@
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
+
 #pragma once
 
 #include <stdint.h>
@@ -41,9 +42,11 @@ class ReplicationCtx {
 
     void SelfConn(bool self);
     bool IsSelfConn();
+	bool IsClose();
 
     void CloseMasterFD();
     void CloseSlaveFD();
+	void CloseRepl();
 
     void Close();
 
@@ -51,7 +54,7 @@ class ReplicationCtx {
 
  private:
     uint8_t m_seq;
-    bool is_selfconn_, is_inited_;
+    bool is_selfconn_, is_inited_, is_close_;
     int master_fd_;
     int slave_fd_;
 
