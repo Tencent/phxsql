@@ -68,4 +68,3 @@ class WorkerThread : public PhxThread {
 };
 
 }
-

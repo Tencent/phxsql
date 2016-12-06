@@ -50,4 +50,3 @@ const std::thread & PhxThread::get_thread() const {
 }
 
 }
-
