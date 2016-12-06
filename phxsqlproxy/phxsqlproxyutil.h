@@ -24,7 +24,9 @@ bool IsNonBlock(int sock_fd);
 
 int SetNonBlock(int sock_fd);
 
-void SetAddr(const char *ip, const unsigned short port, struct sockaddr_in &addr);
+int SetAddr(const char * ip, const unsigned short port, struct sockaddr_in & addr);
+
+int SetAddr6(const char * ip, const unsigned short port, struct sockaddr_in6 & addr);
 
 bool IsAuthReqPkg(const char * buf, int len);
 
@@ -33,6 +35,8 @@ bool IsAuthFinishPkg(const char * buf, int len);
 uint64_t GetTimestampMS();
 
 void GetMysqlBufDebugString(const char * buf, int len, std::string & debug_str);
+
+int SockAddrToIPPort(struct sockaddr * addr, std::string & ip, int & port);
 
 int GetSockName(int fd, std::string & ip, int & port);
 

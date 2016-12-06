@@ -10,35 +10,16 @@
 
 #pragma once
 
-#include <sys/types.h>
 #include <sys/socket.h>
-
-//struct sockaddr;
-//struct socklen_t;
-struct stCoRoutine_t;
 
 namespace phxsqlproxy {
 
-class Coroutine {
- public:
-    Coroutine();
-    virtual ~Coroutine();
+int RoutineConnectWithTimeout(int fd, const struct sockaddr *address, socklen_t address_len, int timeout_ms);
 
-    virtual int run() = 0;
+int RoutineWriteWithTimeout(int dest_fd, const char * buf, int write_size, int timeout_ms);
 
-    int start();
+int RoutineReadWithTimeout(int source_fd, char * buf, int buf_size, int timeout_ms);
 
-    void SetRoutineIdx(int routine_idx);
-
-    void resume();
-
-    void yield();
-
- private:
-    stCoRoutine_t * routine_;
-
- protected:
-    int routine_idx_;
-};
+int RoutinePeekWithTimeout(int source_fd, char * buf, int buf_size, int timeout_ms);
 
 }

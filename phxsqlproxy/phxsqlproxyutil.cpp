@@ -59,19 +59,38 @@ int SetNonBlock(int sock_fd) {
     return ret;
 }
 
-void SetAddr(const char *ip_string, const unsigned short port, struct sockaddr_in &addr) {
+int SetAddr(const char * ip_string, const unsigned short port, struct sockaddr_in & addr) {
     bzero(&addr, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
-    int ip = 0;
     if (!ip_string || '\0' == *ip_string || 0 == strcmp(ip_string, "0") || 0 == strcmp(ip_string, "0.0.0.0")
             || 0 == strcmp(ip_string, "*")) {
-        ip = htonl(INADDR_ANY);
+        addr.sin_addr.s_addr = htonl(INADDR_ANY);
     } else {
-        ip = inet_addr(ip_string);
+        int ret = inet_pton(AF_INET, ip_string, &addr.sin_addr);
+        if (ret <= 0) {
+            LogError("inet_pton failed, ip [%s], ret %d, errno(%d:%s)", ip_string, ret, errno, strerror(errno));
+            return -1;
+        }
     }
-    addr.sin_addr.s_addr = ip;
+    return 0;
+}
 
+int SetAddr6(const char * ip_string, const unsigned short port, struct sockaddr_in6 & addr) {
+    bzero(&addr, sizeof(addr));
+    addr.sin6_family = AF_INET6;
+    addr.sin6_port = htons(port);
+    if (!ip_string || '\0' == *ip_string || 0 == strcmp(ip_string, "0") || 0 == strcmp(ip_string, "::")
+            || 0 == strcmp(ip_string, "*")) {
+        addr.sin6_addr = in6addr_any;
+    } else {
+        int ret = inet_pton(AF_INET6, ip_string, &addr.sin6_addr);
+        if (ret <= 0) {
+            LogError("inet_pton failed, ip [%s], ret %d, errno(%d:%s)", ip_string, ret, errno, strerror(errno));
+            return -1;
+        }
+    }
+    return 0;
 }
 
 int CreateTcpSocket(const unsigned short port /* = 0 */, const char *ip /* = "*" */, bool is_reuse /* = false */) {
@@ -83,7 +102,9 @@ int CreateTcpSocket(const unsigned short port /* = 0 */, const char *ip /* = "*"
                 setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr));
             }
             struct sockaddr_in addr;
-            SetAddr(ip, port, addr);
+            if (SetAddr(ip, port, addr) != 0) {
+                return -1;
+            }
             int ret = bind(fd, (struct sockaddr*) &addr, sizeof(addr));
             if (ret != 0) {
                 close(fd);
@@ -127,44 +148,58 @@ void GetMysqlBufDebugString(const char * buf, int len, std::string & debug_str) 
     }
 }
 
-int GetSockName(int fd, std::string & ip, int & port) {
-    struct sockaddr_in socket_address;
-    socklen_t sock_len = sizeof(socket_address);
+int SockAddrToIPPort(struct sockaddr * addr, std::string & ip, int & port) {
+    if (addr->sa_family == AF_INET) {
+        struct sockaddr_in * addr_in = (struct sockaddr_in *) addr;
+        char buf[INET_ADDRSTRLEN] = { 0 };
+        if (inet_ntop(AF_INET, &addr_in->sin_addr, buf, sizeof(buf)) == NULL) {
+            LogError("inet_ntop failed, ret NULL, errno(%d:%s)", errno, strerror(errno));
+            return -__LINE__;
+        }
+        ip = string(buf);
+        port = ntohs(addr_in->sin_port);
+    } else if (addr->sa_family == AF_INET6) {
+        struct sockaddr_in6 * addr_in6 = (struct sockaddr_in6 *) addr;
+        char buf[INET6_ADDRSTRLEN] = { 0 };
+        if (inet_ntop(AF_INET6, &addr_in6->sin6_addr, buf, sizeof(buf)) == NULL) {
+            LogError("inet_ntop failed, ret NULL, errno(%d:%s)", errno, strerror(errno));
+            return -__LINE__;
+        }
+        ip = string(buf);
+        port = ntohs(addr_in6->sin6_port);
+    } else {
+        LogError("unknow sa_family %d", addr->sa_family);
+        return -__LINE__;
+    }
+    return 0;
+}
 
-    int ret = getsockname(fd, (struct sockaddr*) &socket_address, &sock_len);
+int GetSockName(int fd, std::string & ip, int & port) {
+    struct sockaddr_storage addr_storage;
+    struct sockaddr * addr = (struct sockaddr *) &addr_storage;
+    socklen_t sock_len = sizeof(addr_storage);
+
+    int ret = getsockname(fd, addr, &sock_len);
     if (ret == -1) {
         LogError("getsockname fd [%d] failed, ret %d, errno (%d:%s)", fd, ret, errno, strerror(errno));
         return -__LINE__;
     }
 
-    char buf[INET6_ADDRSTRLEN] = { 0 };
-    if (inet_ntop(socket_address.sin_family, &socket_address.sin_addr, buf, INET6_ADDRSTRLEN) == NULL) {
-        LogError("inet_ntop failed, ret NULL, errno(%d:%s)", errno, strerror(errno));
-        return -__LINE__;
-    }
-    ip = string(buf);
-    port = ntohs(socket_address.sin_port);
-    return 0;
+    return SockAddrToIPPort(addr, ip, port);
 }
 
 int GetPeerName(int fd, std::string & ip, int & port) {
-    struct sockaddr_in socket_address;
-    socklen_t sock_len = sizeof(socket_address);
+    struct sockaddr_storage addr_storage;
+    struct sockaddr * addr = (struct sockaddr *) &addr_storage;
+    socklen_t sock_len = sizeof(addr_storage);
 
-    int ret = getpeername(fd, (struct sockaddr*) &socket_address, &sock_len);
+    int ret = getpeername(fd, addr, &sock_len);
     if (ret == -1) {
         LogError("getpeername fd [%d] failed, ret %d, errno (%d:%s)", fd, ret, errno, strerror(errno));
         return -__LINE__;
     }
 
-    char buf[INET6_ADDRSTRLEN] = { 0 };
-    if (inet_ntop(socket_address.sin_family, &socket_address.sin_addr, buf, INET6_ADDRSTRLEN) == NULL) {
-        LogError("inet_ntop failed, ret NULL, errno(%d:%s)", errno, strerror(errno));
-        return -__LINE__;
-    }
-    ip = string(buf);
-    port = ntohs(socket_address.sin_port);
-    return 0;
+    return SockAddrToIPPort(addr, ip, port);
 }
 
 uint64_t DecodedLengthBinary(const char * buf, int len, int & len_field_size) {
@@ -232,4 +267,3 @@ std::vector<std::string> SplitStr(const std::string & str, const std::string & d
 }
 
 }
-

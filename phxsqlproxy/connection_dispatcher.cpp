@@ -17,6 +17,7 @@
 #include "io_routine.h"
 #include "phxsqlproxyutil.h"
 #include "phxcoroutine.h"
+#include "routineutil.h"
 #include "monitor_plugin.h"
 #include "connection_dispatcher.h"
 #include "phxcomm/phx_log.h"
@@ -74,4 +75,3 @@ int ConnectionDispatcher::AssignFD(int fd) {
 }
 
 }
-

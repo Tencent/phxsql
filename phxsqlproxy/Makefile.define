@@ -1,23 +1,12 @@
-# Copyright (c) 2016 Tencent.  See the AUTHORS file for names 
-# of contributors.
-# 
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Library General Public
-# License as published by the Free Software Foundation; either
-# version 2 of the License, or (at your option) any later version.
-# 
-# This library is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Library General Public License for more details.
-# 
-# You should have received a copy of the GNU Library General Public
-# License along with this library; if not, write to the
-# Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
-# Boston, MA  02110-1301, USA.
-# 
+# Tencent is pleased to support the open source community by making PhxSQL available.
+# Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
+# Licensed under the GNU General Public License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+#
+# https://opensource.org/licenses/GPL-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-allobject=libphxsqlproxyconfig.a phxsqlproxy_phxrpc libphxsqlproxylib_phxrpc.a libphxsqlproxylib_phxrpc_sk.a 
+allobject=libphxsqlproxyconfig.a phxsqlproxy_phxrpc libphxsqlproxylib_phxrpc.a
 
 PHXSQLPROXYCONFIG_OBJ=phxsqlproxyconfig.o
 
@@ -39,7 +28,7 @@ PHXSQLPROXY_PHXRPC_INCS=$(SRC_BASE_PATH)/phxsqlproxy
 
 PHXSQLPROXY_PHXRPC_EXTRA_CPPFLAGS=-pipe -fPIC -Wno-deprecated -D__STDC_FORMAT_MACROS -O2
 
-PHXSQLPROXYLIB_PHXRPC_OBJ=phxsqlproxymain.o phxsqlproxyconfig.o phxsqlproxyutil.o phxcoroutine.o phxthread.o group_status_cache.o accept_thread.o io_routine.o monitor_routine.o worker_thread.o connection_dispatcher.o heartbeat_thread.o
+PHXSQLPROXYLIB_PHXRPC_OBJ=phxsqlproxymain.o phxsqlproxyconfig.o phxsqlproxyutil.o routineutil.o phxcoroutine.o phxthread.o group_status_cache.o accept_thread.o io_routine.o io_router.o io_channel.o proxy_protocol_handler.o monitor_routine.o worker_thread.o connection_dispatcher.o heartbeat_thread.o
 
 PHXSQLPROXYLIB_PHXRPC_LIB=phxsqlproxylib_phxrpc phxbinlogsvr/config:phxbinlogconfig phxsqlproxy/plugin/monitor:monitor_plugin phxsqlproxy/plugin/requestfilter:freqfilter_plugin phxcomm/log/phxlog:phxlog phxcomm/configparser:phxconfig
 
@@ -48,14 +37,3 @@ PHXSQLPROXYLIB_PHXRPC_SYS_LIB=$(COLIB_LIB_PATH)/libcolib.a $(MYSQL_LIB_PATH)/lib
 PHXSQLPROXYLIB_PHXRPC_INCS=$(SRC_BASE_PATH)/phxsqlproxy  $(COLIB_INCLUDE_PATH) $(MYSQL_INCLUDE_PATH) 
 
 PHXSQLPROXYLIB_PHXRPC_EXTRA_CPPFLAGS=-pipe -fPIC -Wno-deprecated -D__STDC_FORMAT_MACROS -ldl -O2
-
-PHXSQLPROXYLIB_PHXRPC_SK_OBJ=phxsqlproxymain.o phxsqlproxyconfig.o phxsqlproxyutil.o phxcoroutine.o phxthread.o group_status_cache.o accept_thread.o io_routine.o monitor_routine.o worker_thread.o connection_dispatcher.o heartbeat_thread.o
-
-PHXSQLPROXYLIB_PHXRPC_SK_LIB=phxsqlproxylib_phxrpc_sk phxbinlogsvr/config:phxbinlogconfig phxsqlproxy/plugin/monitor:monitor_plugin phxsqlproxy/plugin/requestfilter:freqfilter_plugin phxcomm/log/phxlog:phxlog phxcomm/configparser:phxconfig
-
-PHXSQLPROXYLIB_PHXRPC_SK_SYS_LIB=$(COLIB_LIB_PATH)/libcolib.a $(MYSQL_LIB_PATH)/libperconaserverclient.a -ldl -lrt -lz
-
-PHXSQLPROXYLIB_PHXRPC_SK_INCS=$(SRC_BASE_PATH)/phxsqlproxy  $(COLIB_INCLUDE_PATH) $(MYSQL_INCLUDE_PATH) 
-
-PHXSQLPROXYLIB_PHXRPC_SK_EXTRA_CPPFLAGS=-pipe -fPIC -Wno-deprecated -D__STDC_FORMAT_MACROS -ldl -O2
-
