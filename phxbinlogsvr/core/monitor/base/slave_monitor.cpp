@@ -8,6 +8,7 @@
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
+
 #include "slave_monitor.h"
 #include "mysql_manager.h"
 #include "mysql_string_helper.h"
@@ -25,6 +26,7 @@ using std::string;
 using phxsql::LockManager;
 using phxsql::LogVerbose;
 using phxsql::ColorLogInfo;
+using phxsql::ColorLogError;
 
 namespace phxbinlog {
 
@@ -96,8 +98,9 @@ int SlaveMonitor::SlaveStart(const Option *option, const string &master_ip, cons
     }
 
     if (replica_username == "") {
+		ColorLogError("%s replica user has not been set, wait",__func__);
         return MYSQL_FAIL;
-    }
+	}
 
     ret = mysql_manager->Query(
             MySqlStringHelper::GetChangeMasterQueryString(master_ip, master_port, replica_username, replica_pwd));
@@ -120,6 +123,10 @@ int SlaveMonitor::SlaveStart(const Option *option, const string &master_ip, cons
 }
 
 int SlaveMonitor::CheckSlaveRunningStatus(const Option *option, const char *export_ip, const uint32_t *export_port) {
+	if(IsSlaveConnecting()) {
+		ColorLogInfo("%s slave is connecting, skip", __func__);
+		return OK;
+	}
     MySqlManager *mysql_manager = MySqlManager::GetGlobalMySqlManager(option);
 
     string slave_running;
@@ -127,6 +134,7 @@ int SlaveMonitor::CheckSlaveRunningStatus(const Option *option, const char *expo
     if (ret) {
         return OK;
     }
+	ColorLogInfo("%s slave is running %s", __func__, slave_running.c_str());
 
     if (strcasecmp(slave_running.c_str(), "ON")) {
         if (export_ip) {
@@ -135,8 +143,6 @@ int SlaveMonitor::CheckSlaveRunningStatus(const Option *option, const char *expo
             return SlaveMonitor::SlaveStart(option, "127.0.0.1", option->GetBinLogSvrConfig()->GetEnginePort());
         }
     }
-
-    ColorLogInfo("%s slave is running %s", __func__, slave_running.c_str());
 
     return OK;
 }

@@ -20,11 +20,11 @@ class EventManager;
 class MasterManager;
 class ReplicationImpl {
  public:
-    ReplicationImpl(const Option *option);
+    ReplicationImpl(const Option *option, const int &slave_fd);
     virtual ~ReplicationImpl();
 
  public:
-    virtual int Process(const int &slave_id);
+    virtual int Process();
     void Close();
 
  private:

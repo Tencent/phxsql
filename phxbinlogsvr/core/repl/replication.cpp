@@ -13,6 +13,7 @@
 
 #include "phxcomm/net.h"
 #include "phxcomm/phx_log.h"
+#include "phxcomm/lock_manager.h"
 #include "phxbinlogsvr/config/phxbinlog_config.h"
 #include "phxbinlogsvr/define/errordef.h"
 
@@ -22,81 +23,76 @@
 #include <string.h>
 
 using phxsql::ColorLogError;
+using phxsql::LogVerbose;
+using phxsql::LockManager;
 
 namespace phxbinlog {
 
 ReplicationManager::ReplicationManager(const Option *option) {
     pthread_mutex_init(&m_mutex, NULL);
     option_ = option;
+	thread_fd_ = 0;
+	impl_ = NULL;
 }
 
 ReplicationManager::~ReplicationManager() {
     pthread_mutex_destroy(&m_mutex);
+	if(impl_)
+		delete impl_, impl_=NULL;
 }
 
 const Option *ReplicationManager::GetOption() const {
     return option_;
 }
 
-void ReplicationManager::AddSlaveFD(int slave_fd) {
-    pthread_mutex_lock(&m_mutex);
-    fd_queue_.push(slave_fd);
-    pthread_mutex_unlock(&m_mutex);
+ReplicationImpl * ReplicationManager::GetImpl() {
+	return impl_;
 }
 
-void ReplicationManager::AddImpl(ReplicationImpl *impl) {
-    pthread_mutex_lock(&m_mutex);
-    impllist_.push_back(impl);
-    pthread_mutex_unlock(&m_mutex);
+void ReplicationManager::CloseImpl() {
+	if(impl_){
+		impl_->Close();
+	}
+
+	if(thread_fd_>0){
+		pthread_join(thread_fd_, NULL);
+		thread_fd_ = 0;
+	}
+
+	if(impl_) {
+		delete impl_;
+		impl_ = NULL;
+	}
 }
 
-void ReplicationManager::ClearImpl() {
-    pthread_mutex_lock(&m_mutex);
-    for (size_t i = 0; i < impllist_.size(); ++i)
-        impllist_[i]->Close();
-    impllist_.clear();
-    pthread_mutex_unlock(&m_mutex);
+void ReplicationManager::StartImpl(const int &slave_fd) {
+    CloseImpl();
+	impl_ = new ReplicationImpl(option_,slave_fd);
 }
 
-int ReplicationManager::GetSlaveFD() {
-    int fd = -1;
-    pthread_mutex_lock(&m_mutex);
-    if (!fd_queue_.empty()) {
-        fd = fd_queue_.front();
-        fd_queue_.pop();
-    }
-    pthread_mutex_unlock(&m_mutex);
-    return fd;
-}
+void ReplicationManager::DealWithSlave(int slave_fd) {
 
-void ReplicationManager::DealWithSlave(int slave_id) {
-    ClearImpl();
-    AddSlaveFD(slave_id);
+	StartImpl(slave_fd);
+    thread_fd_ = 0;
+    pthread_create(&thread_fd_, NULL, &SlaveManager, this);
 
-    pthread_t id;
-    pthread_create(&id, NULL, &SlaveManager, this);
 }
 
 void *ReplicationManager::SlaveManager(void *arg) {
     ReplicationManager *manager = (ReplicationManager*) arg;
+    ReplicationImpl * impl = manager->GetImpl();
+	if(!impl){
+		LogVerbose("%s impl has been closed",__func__);
+		return NULL;
+	}
 
-    int slave_id = manager->GetSlaveFD();
-    if (slave_id == -1)
-        return NULL;
-
-    ReplicationImpl impl(manager->GetOption());
-
-    manager->AddImpl(&impl);
-
-    int ret = impl.Process(slave_id);
+    int ret = impl->Process();
     if (ret) {
-        ColorLogError("deal with salve fail\n");
+        ColorLogError("deal with salve fail");
     }
-
-    manager->ClearImpl();
+	ColorLogError("deal with salve done, impl %p", &impl);
 
     return NULL;
 }
 
 }
-

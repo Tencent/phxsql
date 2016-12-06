@@ -37,8 +37,9 @@ using phxsql::Utils;
 
 namespace phxbinlog {
 
-ReplicationImpl::ReplicationImpl(const Option *option) {
+ReplicationImpl::ReplicationImpl(const Option *option, const int &slave_fd) {
     ctx_ = new ReplicationCtx(option);
+    ctx_->SetSlaveFD(slave_fd);
     option_ = option;
     event_manager_ = EventManager::GetGlobalEventManager(option);
     master_manager_ = MasterManager::GetGlobalMasterManager(option);
@@ -50,19 +51,27 @@ ReplicationImpl::~ReplicationImpl() {
 }
 
 void ReplicationImpl::Close() {
-    if (ctx_)
+    if (ctx_){
         ctx_->Close();
+		//wake up transfer
+		event_manager_->Notify();
+	}
 }
 
-int ReplicationImpl::Process(const int &slave_fd) {
+int ReplicationImpl::Process() {
+	if(ctx_->GetSlaveFD()<0){
+		ColorLogInfo("%s slave fd %d close", __func__, ctx_->GetSlaveFD());
+		return SOCKET_FAIL;
+	}
+
     int master_fd = InitFakeMaster();
     if (master_fd < 0) {
         return SOCKET_FAIL;
     }
 
-    ctx_->SetSlaveFD(slave_fd);
+    ColorLogInfo("%p process master fd %d, slave fd %d", this, master_fd, ctx_->GetSlaveFD());
+
     ctx_->SetMasterFD(master_fd);
-    ColorLogInfo("%p process slave fd %d master fd %d", this, slave_fd, master_fd);
 
     ReplicationSlave *slave = new ReplicationSlave(ctx_);
     ReplicationTransfer *transfer = new ReplicationTransfer(ctx_);

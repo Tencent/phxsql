@@ -255,7 +255,6 @@ int EventStorage::GetEvent(EventData *data, bool wait) {
     LockManager lock(&mutex_);
     while (true) {
         ret = event_file_manager_->ReadData(data);
-        ColorLogInfo("%s get gtid %s ret %d", __func__, data->gtid().c_str(), ret);
         if (ret == DATA_EMPTY && wait) {
             ColorLogInfo("no data wait");
             Wait();
@@ -268,7 +267,6 @@ int EventStorage::GetEvent(EventData *data, bool wait) {
         }
         break;
     }
-
     return ret;
 }
 
@@ -575,8 +573,8 @@ void EventStorage::Notify() {
 }
 
 void EventStorage::Wait() {
-    pthread_cond_wait(&cond_, &mutex_);
-    return;
+	pthread_cond_wait(&cond_, &mutex_);
+	return;
 }
 
 uint64_t EventStorage::GetLastestCheckPointInstanceID() {
@@ -597,4 +595,4 @@ void EventStorage::CheckPointDone() {
 }
 
 }
-
+_

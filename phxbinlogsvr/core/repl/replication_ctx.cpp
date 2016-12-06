@@ -8,6 +8,7 @@
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
+
 #include "replication_ctx.h"
 
 #include "phxcomm/lock_manager.h"
@@ -33,6 +34,7 @@ ReplicationCtx::ReplicationCtx(const Option *option) {
     option_ = option;
     master_fd_ = -1;
     slave_fd_ = -1;
+	is_close_=false;
 }
 
 ReplicationCtx::~ReplicationCtx() {
@@ -41,9 +43,15 @@ ReplicationCtx::~ReplicationCtx() {
     pthread_mutex_destroy(&info_mutex_);
 }
 
+void ReplicationCtx::CloseRepl() {
+    LockManager lock(&info_mutex_);
+	is_close_ = true;
+}
+
 void ReplicationCtx::Close() {
     CloseMasterFD();
     CloseSlaveFD();
+	CloseRepl();
     Notify();
 }
 
@@ -77,6 +85,7 @@ void ReplicationCtx::Wait() {
 }
 
 void ReplicationCtx::SetMasterFD(const int &fd) {
+	is_close_ = false;
     master_fd_ = fd;
 }
 
@@ -124,5 +133,8 @@ bool ReplicationCtx::IsSelfConn() {
     return is_selfconn_;
 }
 
+bool ReplicationCtx::IsClose() {
+    return is_close_;
 }
 
+}

@@ -8,6 +8,7 @@
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
+
 #include "replication_slave.h"
 
 #include <string.h>
@@ -64,7 +65,7 @@ int ReplicationSlave::Process() {
         ret = ProcessWithMasterMsg();
         if (ret) {
             ColorLogError("%s process master msg fail ret %d", __func__, ret);
-            return ret;
+			break;
         }
 
         if (status_ == CommandStatus::RUNNING) {
@@ -98,7 +99,7 @@ int ReplicationSlave::Process() {
         STATISTICS(ReplLoginFail());
     }
     ColorLogInfo("%s slave exit, ret %d", __func__, ret);
-
+    SlaveMonitor::SlaveConnecting(false);
     return ret;
 }
 
@@ -441,4 +442,3 @@ int ReplicationSlave::SlaveInitDone() {
 }
 
 }
-

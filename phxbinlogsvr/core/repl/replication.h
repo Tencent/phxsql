@@ -26,21 +26,21 @@ class ReplicationManager {
     ~ReplicationManager();
 
     void DealWithSlave(int slave_id);
-
     const Option *GetOption() const;
- private:
-    void AddSlaveFD(int slave_fd);
-    int GetSlaveFD();
 
-    void AddImpl(ReplicationImpl *impl);
-    void ClearImpl();
+ private:
+	void WaitStop();
+
+    void CloseImpl();
+	void StartImpl(const int &slave_fd);
+	ReplicationImpl * GetImpl();
 
     static void *SlaveManager(void *);
  private:
     pthread_mutex_t m_mutex;
-    std::queue<int> fd_queue_;
     const Option *option_;
-    std::vector<ReplicationImpl *> impllist_;
+    ReplicationImpl * impl_;
+	pthread_t thread_fd_;
 };
 
 }

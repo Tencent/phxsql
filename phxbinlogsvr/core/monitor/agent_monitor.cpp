@@ -8,6 +8,7 @@
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
+
 #include "agent_monitor.h"
 
 #include "event_manager.h"
@@ -299,7 +300,7 @@ int AgentMonitor::CheckMasterInit() {
             return ret;
         ColorLogInfo("%s relay log has existed, relaylog size %zu", __func__, gtid_list.size());
 
-        return CheckSlaveRunningStatus();
+        //return CheckSlaveRunningStatus();
     }
 
     return ret;
@@ -380,3 +381,4 @@ void AgentMonitor::CheckCheckPointFiles() {
 }
 
 }
+

@@ -128,5 +128,8 @@ int EventManager::GetEvents(string *data, uint32_t want_num) {
     return ret;
 }
 
+void EventManager::Notify() {
+	event_storage_->Notify();
 }
 
+}
