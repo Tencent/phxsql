@@ -595,4 +595,3 @@ void EventStorage::CheckPointDone() {
 }
 
 }
-_
