@@ -235,7 +235,7 @@ PhxSQL集群中对MySQL的管理使用两个账号管理员帐号和数据同步
    >根据 "`初始化PhxSQL`" 步骤安装PhxSQL
 3. 执行成功后，机器A的phxbinlogsvr将会在一段时间后开始接收数据
 4. 从集群内任意一台机器的percona导出一份镜像数据
-5. kill掉机器A上的phxbinlogsvr, 并通过本地的MySQL端口进入MySQL，执行`set super_read_only = 0; set read_only = 0`;
+5. kill掉机器A上的phxbinlogsvr, 并通过本地的MySQL端口进入MySQL，执行`set global super_read_only = 0; set global read_only = 0`;
 5. 将镜像数据导入到机器A上的percona，并kill掉机器A上的phxbinlogsvr
 6. 一段时间（~1分钟）后，机器A开始正常工作
 

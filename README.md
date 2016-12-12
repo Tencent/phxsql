@@ -241,7 +241,7 @@ Once it is succesfully executed, A will not learn binlog after a small period.
 2. Install PhxSQL on A.
 3. A will begin to learn data after installation is finished.
 4. Copy a snapshot of MySQL from any other nodes to A.
-5. Kill phxbinlogsvr and access MySQL through the local port( or socket ). then execute `set super_read_only = 0; set read_only = 0`;
+5. Kill phxbinlogsvr and access MySQL through the local port( or socket ). then execute `set global super_read_only = 0; set global read_only = 0`;
 6. Dump the snapshot into MySQL.
 7. A will begin to work after a while.
 
