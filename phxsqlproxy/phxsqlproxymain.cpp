@@ -50,7 +50,7 @@ using namespace phxsql;
 void co_init_curr_thread_env();
 
 void SignalStop(int signal_value) {
-    LogError("receive signal %d", signal_value);
+    // LogError("receive signal %d", signal_value);
 }
 
 void SignalHandler(void) {
