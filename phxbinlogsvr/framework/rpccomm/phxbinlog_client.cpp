@@ -68,7 +68,7 @@ int PhxBinlogClient::SendBinLog(const string &oldgtid, const string &newgtid, co
     }
 
     uint32_t old_timeout = stub_interface_->GetTimeOutMS();
-    stub_interface_->SetTimeOutMS(-1);
+    stub_interface_->SetTimeOutMS(0); // never timeout
     int ret = stub_interface_->SendBinLog(buffer);
     stub_interface_->SetTimeOutMS(old_timeout);
     return ret;
