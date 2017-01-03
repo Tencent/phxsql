@@ -19,7 +19,7 @@ class StorageManager;
 class MasterManager;
 class EventMonitor : public phxsql::ThreadBase {
  public:
-    EventMonitor(const Option *option, StorageManager *event_storage);
+    EventMonitor(const Option *option);
     virtual ~EventMonitor();
     virtual int Process();
  private:
@@ -27,6 +27,7 @@ class EventMonitor : public phxsql::ThreadBase {
 
  private:
     StorageManager *storage_manager_;
+    MasterManager *master_manager_;
     const Option *option_;
     bool stop_;
 };

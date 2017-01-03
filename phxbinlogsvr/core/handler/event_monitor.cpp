@@ -13,6 +13,7 @@
 #include "master_monitor.h"
 #include "event_storage.h"
 #include "storage_manager.h"
+#include "mysql_manager.h"
 
 #include "phxcomm/phx_log.h"
 #include "phxbinlogsvr/statistics/phxbinlog_stat.h"
@@ -28,9 +29,10 @@ using phxsql::ColorLogInfo;
 
 namespace phxbinlog {
 
-EventMonitor::EventMonitor(const Option *option, StorageManager *storage_manager) {
-    storage_manager_ = storage_manager;
+EventMonitor::EventMonitor(const Option *option) {
     option_ = option;
+    storage_manager_ = StorageManager::GetGlobalStorageManager(option);
+    master_manager_ = MasterManager::GetGlobalMasterManager(option);
     stop_ = false;
 
     Run();
@@ -47,12 +49,19 @@ int EventMonitor::CheckRunningStatus() {
     if (option_->GetBinLogSvrConfig()->IsForceMakingCheckPoint()) {
         ret = MasterMonitor::GetMySQLMaxGTIDList(option_, &gtid_list);
     } else {
-        MasterManager *mastermanager = MasterManager::GetGlobalMasterManager(option_);
         vector < string > member_iplist;
-        mastermanager->GetMemberIPList(&member_iplist);
+        master_manager_->GetMemberIPList(&member_iplist);
 
         ret = MasterMonitor::GetGlobalMySQLMaxGTIDList(option_, member_iplist, &gtid_list);
     }
+
+    if(master_manager_->IsMaster()) {
+        for (auto &gtid : gtid_list) {
+            gtid = MySqlManager::ReduceGtidByOne(gtid);
+            LogVerbose("%s master get new gtid %s",__func__, gtid.c_str());
+        }
+    }
+
     LogVerbose("%s get gtid list ret %d", __func__, ret);
     if (ret == OK) {
         ret = storage_manager_->MakeCheckPoint(gtid_list);

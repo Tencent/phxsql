@@ -83,7 +83,8 @@ event_index_status EventIndex::GetGTIDIndex(const string &gtid, ::google::protob
                                             bool lower_bound) {
     string buffer;
 
-    leveldb::Iterator* it = level_db_->NewIterator(leveldb::ReadOptions());
+    leveldb::ReadOptions rop = leveldb::ReadOptions();
+    leveldb::Iterator* it = level_db_->NewIterator(rop);
     if (it == NULL) {
         return event_index_status::DB_ERROR;
     }
@@ -91,7 +92,8 @@ event_index_status EventIndex::GetGTIDIndex(const string &gtid, ::google::protob
     event_index_status ret = event_index_status::DATA_NOT_FOUND;
     it->Seek(gtid);
     if (it->Valid()) {
-        LogVerbose("%s find key %s, want key %s", __func__, it->key().ToString().c_str(), gtid.c_str());
+        LogVerbose("%s find key %s, want key %s", 
+                   __func__, it->key().ToString().c_str(), gtid.c_str());
 
         if (it->key().ToString() == gtid
                 || (lower_bound && GtidHandler::GetUUIDByGTID(it->key().ToString()) == GtidHandler::GetUUIDByGTID(gtid))) {
@@ -128,6 +130,7 @@ event_index_status EventIndex::IsExist(const string &gtid) {
 }
 
 event_index_status EventIndex::DeleteGTIDIndex(const string &gtid) {
+    LogVerbose("%s delete gtid %s",__func__, gtid.c_str());
     leveldb::Status status = level_db_->Delete(leveldb::WriteOptions(), gtid);
 
     if (status.ok() || status.IsNotFound())

@@ -34,9 +34,8 @@ EventManager *EventManager::GetGlobalEventManager(const Option *option) {
 
 EventManager::EventManager(const Option *option) {
     StorageManager *storage_manager = StorageManager::GetGlobalStorageManager(option);
-
     event_storage_ = storage_manager->GetEventStorage();
-    event_monitor_ = new EventMonitor(option, storage_manager);
+    event_monitor_ = new EventMonitor(option);
     option_ = option;
 }
 
@@ -129,7 +128,7 @@ int EventManager::GetEvents(string *data, uint32_t want_num) {
 }
 
 void EventManager::Notify() {
-	event_storage_->Notify();
+    event_storage_->Notify();
 }
 
 }

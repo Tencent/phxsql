@@ -19,12 +19,14 @@
 #include "phxcomm/phx_log.h"
 #include "phxbinlogsvr/config/phxbinlog_config.h"
 #include "phxbinlogsvr/define/errordef.h"
+#include "phxbinlogsvr/core/gtid_handler.h"
 
 #include <string.h>
 #include <assert.h>
 
 using std::string;
 using std::vector;
+using std::pair;
 using phxsql::ColorLogWarning;
 using phxsql::ColorLogError;
 using phxsql::LogVerbose;
@@ -97,7 +99,7 @@ int MySqlManager::Query(const string& query_string, const string &ip) {
     mysql_option.pwd = GetAdminPwd();
     if (mysql_option.username == "") {
         mysql_option.username = "root";
-		mysql_option.pwd = "";
+        mysql_option.pwd = "";
     }
     LogVerbose("%s username %s pwd %s query %s", __func__, mysql_option.username.c_str(), mysql_option.pwd.c_str(),
                query_string.c_str());
@@ -114,7 +116,7 @@ int MySqlManager::Query(const string &query_string, vector<vector<string> > *res
     mysql_option.pwd = GetAdminPwd();
     if (mysql_option.username == "") {
         mysql_option.username = "root";
-		mysql_option.pwd = "";
+        mysql_option.pwd = "";
     }
     LogVerbose("%s username %s pwd %s query %s", __func__, mysql_option.username.c_str(), mysql_option.pwd.c_str(),
                query_string.c_str());
@@ -131,7 +133,7 @@ int MySqlManager::GetValue(const std::string &value_type, const std::string &val
     mysql_option.pwd = GetAdminPwd();
     if (mysql_option.username == "") {
         mysql_option.username = "root";
-		mysql_option.pwd = "";
+        mysql_option.pwd = "";
     }
     LogVerbose("%s username %s pwd %s", __func__, mysql_option.username.c_str(), mysql_option.pwd.c_str());
 
@@ -200,7 +202,7 @@ bool MySqlManager::CheckAdminAccount(const string &admin_username, const string 
 }
 
 int MySqlManager::ChangePwd(const string &username, const string &pwd) {
-	return Query(MySqlStringHelper::GetChangePwdStr(username,pwd));
+    return Query(MySqlStringHelper::GetChangePwdStr(username,pwd));
 }
 
 int MySqlManager::CreateUser(const string &username,const string &pwd) {
@@ -331,7 +333,7 @@ int MySqlManager::CreateReplica(const string &admin_username, const string &repl
         }
         LogVerbose("%s grant %s user %s done", __func__, grant_string.c_str(), replica_username.c_str());
     }
-	return OK;
+    return OK;
 }
 
 int MySqlManager::CreateMySqlAdminInfo(const string &now_admin_username, const string &now_admin_pwd,
@@ -409,6 +411,12 @@ int MySqlManager::AddMemberAdminPermission(const std::string &member_ip) {
 
 int MySqlManager::RemoveMemberAdminPermission(const std::string &member_ip) {
     return RemoveMemberAdminPermission(GetAdminUserName(), GetAdminPwd(), member_ip);
+}
+
+string MySqlManager::ReduceGtidByOne(const string &gtid) {
+    pair<string, size_t> gtid_item = GtidHandler::ParseGTID(gtid);
+    gtid_item.second--;
+    return GtidHandler::GenGTID(gtid_item.first, gtid_item.second);
 }
 
 }

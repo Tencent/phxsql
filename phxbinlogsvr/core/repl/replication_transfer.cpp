@@ -83,7 +83,7 @@ int ReplicationTransfer::Process() {
             ctx_->SetSeq(seq);
             if (ret) {
                 ColorLogError("%s send buffer fail len %zu ret %d seq %d", "slave", recv_buff[i].size(), ret, seq);
-				STATISTICS(ReplSendDataFail()); 
+                STATISTICS(ReplSendDataFail()); 
                 break;
             }
         }
@@ -113,7 +113,7 @@ int ReplicationTransfer::GetEvents(vector<string> *event_list) {
     if (ret) {
         return ret;
     }
-	STATISTICS(GtidEventTransferNum(event_list->size()));
+    STATISTICS(GtidEventTransferNum(event_list->size()));
 
     std::string max_gtid;
     ret = GtidHandler::ParseEventList(event_data, event_list, true, &max_gtid);
@@ -158,7 +158,7 @@ void ReplicationTransfer::CountCheckSum(const vector<string> &event_list, const 
             for (size_t i = 0; i < checksum_for_log.size(); ++i)
                 ColorLogError("%s get check sum %llu", __func__, checksum_for_log[i]);
             checksum_for_log.push_back(checksum_);
-			STATISTICS(ReplCheckSumFail());
+            STATISTICS(ReplCheckSumFail());
             assert(checksum_ == info.checksum());
         }
     }

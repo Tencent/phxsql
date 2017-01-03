@@ -54,7 +54,8 @@ class EventIndex {
     void CloseDB();
     void OpenDB(const std::string &event_path);
 
-    event_index_status GetGTIDIndex(const std::string &gtid, ::google::protobuf::Message *data_info, bool lower_bound);
+    event_index_status GetGTIDIndex(const std::string &gtid, ::google::protobuf::Message *data_info,
+                                    bool lower_bound);
 
  private:
     leveldb::DB *level_db_;
