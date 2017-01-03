@@ -130,7 +130,6 @@ event_index_status EventIndex::IsExist(const string &gtid) {
 }
 
 event_index_status EventIndex::DeleteGTIDIndex(const string &gtid) {
-    LogVerbose("%s delete gtid %s",__func__, gtid.c_str());
     leveldb::Status status = level_db_->Delete(leveldb::WriteOptions(), gtid);
 
     if (status.ok() || status.IsNotFound())
