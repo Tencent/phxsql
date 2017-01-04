@@ -1,5 +1,5 @@
 
-version = 0.8.0
+version = 0.8.5
 
 SRC_BASE_PATH ?= .
 PREFIX?=$(SRC_BASE_PATH)
