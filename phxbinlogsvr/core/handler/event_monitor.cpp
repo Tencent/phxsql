@@ -47,19 +47,12 @@ int EventMonitor::CheckRunningStatus() {
     int ret = OK;
     vector < string > gtid_list;
     if (option_->GetBinLogSvrConfig()->IsForceMakingCheckPoint()) {
-        ret = MasterMonitor::GetMySQLMaxGTIDList(option_, &gtid_list);
+        ret = MasterMonitor::GetMySQLMaxGTIDList(option_, &gtid_list,master_manager_->IsMaster());
     } else {
         vector < string > member_iplist;
         master_manager_->GetMemberIPList(&member_iplist);
 
         ret = MasterMonitor::GetGlobalMySQLMaxGTIDList(option_, member_iplist, &gtid_list);
-    }
-
-    if(master_manager_->IsMaster()) {
-        for (auto &gtid : gtid_list) {
-            gtid = MySqlManager::ReduceGtidByOne(gtid);
-            LogVerbose("%s master get new gtid %s",__func__, gtid.c_str());
-        }
     }
 
     LogVerbose("%s get gtid list ret %d", __func__, ret);
@@ -99,4 +92,3 @@ int EventMonitor::Process() {
 }
 
 }
-

@@ -175,7 +175,7 @@ int MySqlManager::CheckUserGrantExist(const string &username, const string &pwd,
     mysql_option.port = option_->GetMySqlConfig()->GetMySQLPort();
     mysql_option.username = username;
     mysql_option.pwd = pwd;
-    LogVerbose("%s username %s pwd %s", __func__, mysql_option.username.c_str(), mysql_option.pwd.c_str());
+    //LogVerbose("%s username %s pwd %s", __func__, mysql_option.username.c_str(), mysql_option.pwd.c_str());
 
     vector < vector < string >> results;
     int ret = MySQLCommand(&mysql_option).GetQueryResults(grant_string, &results);

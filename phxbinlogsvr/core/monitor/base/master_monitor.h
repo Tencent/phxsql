@@ -7,7 +7,6 @@
 	
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
-
 #pragma once
 
 #include <string>
@@ -21,7 +20,7 @@ class MasterMonitor {
  public:
     static int GetGlobalMySQLMaxGTIDList(const Option *option, const std::vector<std::string> &iplist,
                                          std::vector<std::string> *gtid_list);
-    static int GetMySQLMaxGTIDList(const Option *option, std::vector<std::string> *gtid_list);
+    static int GetMySQLMaxGTIDList(const Option *option, std::vector<std::string> *gtid_list, bool is_master);
 
     static int MasterStart(const Option *option);
 

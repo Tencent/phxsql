@@ -66,16 +66,17 @@ event_index_status EventIndex::SetGTIDIndex(const string &gtid, const ::google::
         return event_index_status::DATA_ERROR;
     }
 
-    LogVerbose("%s gtid %s", __func__, gtid.c_str());
+    //LogVerbose("%s gtid %s", __func__, gtid.c_str());
     leveldb::Status status = level_db_->Put(leveldb::WriteOptions(), gtid, buffer);
     return status.ok() ? event_index_status::OK : event_index_status::DB_ERROR;
 }
 
 event_index_status EventIndex::GetGTID(const string &gtid, ::google::protobuf::Message *data_info) {
-    return GetGTIDIndex(gtid, data_info, false);
+    return GetGTIDIndex(gtid, data_info, false );
 }
 
-event_index_status EventIndex::GetLowerBoundGTID(const string &gtid, ::google::protobuf::Message *data_info) {
+event_index_status EventIndex::GetLowerBoundGTID(const string &gtid, 
+        ::google::protobuf::Message *data_info) {
     return GetGTIDIndex(gtid, data_info, true);
 }
 
@@ -138,4 +139,3 @@ event_index_status EventIndex::DeleteGTIDIndex(const string &gtid) {
 }
 
 }
-

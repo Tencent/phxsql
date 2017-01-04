@@ -8,6 +8,7 @@
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
+
 #include "event_uuid_handler.h"
 
 #include "event_file_manager.h"
@@ -27,7 +28,6 @@ using phxsql::ColorLogError;
 namespace phxbinlog {
 
 bool operator <(const EventDataInfo &info1, const EventDataInfo &info2) {
-    LogVerbose("%s instance id %llu %llu", __func__, info1.instance_id(), info2.instance_id());
     return info1.instance_id() < info2.instance_id();
 }
 
@@ -157,8 +157,8 @@ int EventUUIDHandler::UpdateEventUUIDInfoByGTID(const string &gtid, const EventD
 }
 
 int EventUUIDHandler::UpdateEventUUIDInfoByUUID(const string &uuid, const EventDataInfo &data_info) {
-    LogVerbose("%s update gtid uuid %s-%s instance id %llu", __func__, uuid.c_str(), data_info.gtid().c_str(),
-               data_info.instance_id());
+    //LogVerbose("%s update gtid uuid %s-%s instance id %llu", __func__, uuid.c_str(), data_info.gtid().c_str(),
+     //          data_info.instance_id());
     map_uuid_[uuid] = data_info;
     newest_info_ = data_info;
     return OK;
@@ -251,4 +251,3 @@ int EventUUIDHandler::ParseFromString(const string &buffer) {
 }
 
 }
-
