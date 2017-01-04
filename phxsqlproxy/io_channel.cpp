@@ -190,8 +190,8 @@ int IOChannel::TransMsgDirect(int source_fd, int dest_fd, struct pollfd pf[], in
                 }
 
                 byte_size += written;
-                LOG_DEBUG("last read clientfd %d svrfd %d source %d dest %d ret %d read ret %d",
-                          client_fd_, sqlsvr_fd_, source_fd, dest_fd, read_once, byte_size);
+                //LOG_DEBUG("last read clientfd %d svrfd %d source %d dest %d ret %d read ret %d",
+                //          client_fd_, sqlsvr_fd_, source_fd, dest_fd, read_once, byte_size);
             } else if (pf[i].revents & POLLHUP) {
                 LOG_DEBUG("source %d dest %d read events POLLHUP", source_fd, dest_fd);
             } else if (pf[i].revents & POLLERR) {
@@ -287,10 +287,10 @@ void IOChannel::ByteFromConnectDestSvr(uint32_t byte_size) {
             if (last_received_request_timestamp_) {
                 uint64_t cost = GetTimestampMS() - last_received_request_timestamp_;
                 if (connect_port_ == config_->GetMysqlPort()) {
-                    LOG_DEBUG("recieve mysql resp cost %llu", cost);
+                    //LOG_DEBUG("recieve mysql resp cost %llu", cost);
                     MonitorPluginEntry::GetDefault()->GetMonitorPlugin()->MysqlQueryCost(cost);
                 }
-                LOG_DEBUG("request exec cost %llu", cost);
+                //LOG_DEBUG("request exec cost %llu", cost);
                 MonitorPluginEntry::GetDefault()->GetMonitorPlugin()->RequestExecuteCost(cost);
             }
         }
