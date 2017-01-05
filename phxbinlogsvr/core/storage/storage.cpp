@@ -52,7 +52,6 @@ int Storage::ReOpen(const string &path) {
 
 int Storage::OpenDB(const string &path) {
     string file_path = data_dir_ + path;
-    phxsql::LogVerbose("%s open db %s mode %d", __func__, file_path.c_str(), mode_);
     if (mode_ == MODE::WRITE) {
         fd_ = open(file_path.c_str(), O_WRONLY | O_CREAT, 0666);
     } else if (mode_ == MODE::READ) {
@@ -119,9 +118,7 @@ int Storage::SetFilePos(const string &path, const size_t &offset, const MODE &mo
         stat((data_dir_ + path).c_str(), &sbuf);
         phxsql::LogVerbose("%s set file pos %s offset %u, size after trunc %u", __func__, (data_dir_ + path).c_str(),
                            GetOffSet(), sbuf.st_size);
-    } else {
-        phxsql::LogVerbose("%s set file pos %s offset %u", __func__, path.c_str(), GetOffSet());
-    }
+    } 
     return OK;
 }
 
@@ -230,4 +227,3 @@ void Storage::FSync() {
 }
 
 }
-

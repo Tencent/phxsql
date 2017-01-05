@@ -8,6 +8,7 @@
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
+
 #include "event_index.h"
 
 #include "phxcomm/phx_log.h"
@@ -76,7 +77,7 @@ event_index_status EventIndex::GetGTID(const string &gtid, ::google::protobuf::M
 }
 
 event_index_status EventIndex::GetLowerBoundGTID(const string &gtid, 
-        ::google::protobuf::Message *data_info) {
+		::google::protobuf::Message *data_info) {
     return GetGTIDIndex(gtid, data_info, true);
 }
 
@@ -84,7 +85,7 @@ event_index_status EventIndex::GetGTIDIndex(const string &gtid, ::google::protob
                                             bool lower_bound) {
     string buffer;
 
-    leveldb::ReadOptions rop = leveldb::ReadOptions();
+	leveldb::ReadOptions rop = leveldb::ReadOptions();
     leveldb::Iterator* it = level_db_->NewIterator(rop);
     if (it == NULL) {
         return event_index_status::DB_ERROR;
@@ -93,8 +94,8 @@ event_index_status EventIndex::GetGTIDIndex(const string &gtid, ::google::protob
     event_index_status ret = event_index_status::DATA_NOT_FOUND;
     it->Seek(gtid);
     if (it->Valid()) {
-        LogVerbose("%s find key %s, want key %s", 
-                   __func__, it->key().ToString().c_str(), gtid.c_str());
+    //    LogVerbose("%s find key %s, want key %s", 
+	//			__func__, it->key().ToString().c_str(), gtid.c_str());
 
         if (it->key().ToString() == gtid
                 || (lower_bound && GtidHandler::GetUUIDByGTID(it->key().ToString()) == GtidHandler::GetUUIDByGTID(gtid))) {

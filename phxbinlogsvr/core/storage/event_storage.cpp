@@ -170,10 +170,10 @@ uint64_t EventStorage::GetCurrentInstanceInterval() {
     LockManager lock(&mutex_);
     uint64_t last_instanceid = uuid_handler_->GetLastInstanceID();
     uint64_t oldest_instanceid = event_file_manager_->GetOldestInstanceIDofFile();
-    ColorLogInfo("%s %p get newest instance id %llu oldest instanceid %llu",
-                 __func__, this, last_instanceid, oldest_instanceid); 
-    if(last_instanceid < oldest_instanceid) return 0;
-    return last_instanceid - oldest_instanceid;
+	ColorLogInfo("%s %p get newest instance id %llu oldest instanceid %llu",
+			__func__, this, last_instanceid, oldest_instanceid); 
+	if(last_instanceid < oldest_instanceid) return 0;
+	return last_instanceid - oldest_instanceid;
 }
 
 int EventStorage::AddEvent(const string &gtid, const EventData &event_data, bool switch_file) {
@@ -185,7 +185,7 @@ int EventStorage::AddEvent(const string &gtid, const EventData &event_data, bool
     LogVerbose("%s add event gtid %s instance id %lu, laststanceid %lu", __func__, gtid.c_str(),
                        event_data.instance_id(), last_instanceid);
     if (event_data.instance_id() <= last_instanceid) {
-        STATISTICS(GtidEventExit());
+		STATISTICS(GtidEventExit());
         ColorLogWarning("%s gtid %s exist, last instance id %llu, current instance id %llu", __func__,
                              gtid.c_str(), last_instanceid, event_data.instance_id());
         return EVENT_EXIST;
@@ -219,11 +219,11 @@ int EventStorage::AddEvent(const string &gtid, const EventData &event_data, bool
                 CheckAndSwitchFile();
         }
     } else {
-        STATISTICS(GtidEventAddEventFail());
-    }
+		STATISTICS(GtidEventAddEventFail());
+	}
     ColorLogInfo("%s write data gtid %s instance id %llu checksum %llu ret %d file %s run %u ms", 
-                 __func__, event_data.gtid().c_str(), event_data.instance_id(), event_data.checksum(), ret,
-                 data_info.file_name().c_str(), timer.GetTime()/1000 );
+			__func__, event_data.gtid().c_str(), event_data.instance_id(), event_data.checksum(), ret,
+            data_info.file_name().c_str(), timer.GetTime()/1000 );
     return ret;
 }
 
@@ -236,7 +236,7 @@ int EventStorage::ReSet(const string &gtid) {
         EventDataInfo data_info;
         int ret = RealGetLowerBoundGTIDInfo(gtid, &data_info);
         if (ret == DATA_EMPTY) {
-            STATISTICS(GtidEventResetGtidFilePosFail());
+			STATISTICS(GtidEventResetGtidFilePosFail());
             ColorLogWarning("%s gtid not found", __func__, gtid.c_str());
             return GTID_FAIL;
         } else if (ret == OK) {
@@ -260,7 +260,7 @@ int EventStorage::GetEvent(EventData *data, bool wait) {
             Wait();
         }
         if (ret != OK && ret != DATA_EMPTY)
-            STATISTICS(GtidEventGetEventFail());
+			STATISTICS(GtidEventGetEventFail());
         if (ret == OK && data->gtid().empty()) {
             ColorLogInfo("%s get gtid header skip, ret %d", __func__, ret);
             continue;
@@ -271,14 +271,18 @@ int EventStorage::GetEvent(EventData *data, bool wait) {
 }
 
 int EventStorage::GetGTIDInfo(const string &gtid, EventDataInfo *data_info, bool lower_bound) {
-    LockManager lock(&mutex_);
     if (lower_bound) {
-        int ret = RealGetLowerBoundGTIDInfo(gtid, data_info);
+		int ret = OK;
+		{
+			LockManager lock(&mutex_);
+			ret = RealGetLowerBoundGTIDInfo(gtid, data_info);
+		}
         if (ret == OK) {
             ret = EventStorage::CheckGtidInData(gtid, *data_info);
         }
         return ret;
     } else {
+		LockManager lock(&mutex_);
         return RealGetGTIDInfo(gtid, data_info);
     }
 }
@@ -343,7 +347,7 @@ int EventStorage::DelCheckPointFile(const string &maxfilename, const uint32_t &m
                     }
                 }
             }
-            RemoveFile(*file_name);
+			RemoveFile(*file_name);
         }
     }
     return OK;
@@ -382,8 +386,8 @@ int EventStorage::CheckGtidInData(const string &gtid, const EventDataInfo &data_
         return ret;
     }
 
-    LogVerbose("%s get gtid %s from gtid %s, data size %zu", __func__, gtid.c_str(), event_data.gtid().c_str(),
-                       event_data.data().size());
+    //LogVerbose("%s get gtid %s from gtid %s, data size %zu", __func__, gtid.c_str(), event_data.gtid().c_str(),
+     //                  event_data.data().size());
 
     vector < string > gtid_list;
     string max_gtid;
@@ -431,8 +435,8 @@ int EventStorage::GetLastGtid(const vector<string> &gtid_list, string *gtid) {
             EventDataInfo data_info;
             int find_ret = RealGetLowerBoundGTIDInfo(gtid_list[i], &data_info);
             if (find_ret == OK) {
-                LogVerbose("%s get gtid info %s file_name %s offset %d", __func__, data_info.gtid().c_str(),
-                                   data_info.file_name().c_str(), data_info.offset());
+                //LogVerbose("%s get gtid info %s file_name %s offset %d", __func__, data_info.gtid().c_str(),
+                 //                  data_info.file_name().c_str(), data_info.offset());
                 if (max_data_info < data_info) {
                     int check_ret = CheckGtidInData(gtid_list[i], data_info);
                     if (check_ret == 0) {
@@ -550,7 +554,7 @@ int EventStorage::CheckAndSwitchFile(bool force) {
     EventDataInfo data_info;
     event_file_manager_->GetWriteFileInfo(&data_info);
     if (!force || data_info.offset() > option_->GetBinLogSvrConfig()->GetMaxEventFileSize()) {
-        STATISTICS(GtidEventSwitchDataFile());
+		STATISTICS(GtidEventSwitchDataFile());
         ColorLogInfo("%s file %s size %zu has full, max size %zu, switch", __func__,
                             data_info.file_name().c_str(), data_info.offset(),
                             option_->GetBinLogSvrConfig()->GetMaxEventFileSize());
@@ -571,8 +575,8 @@ void EventStorage::Notify() {
 }
 
 void EventStorage::Wait() {
-    pthread_cond_wait(&cond_, &mutex_);
-    return;
+	pthread_cond_wait(&cond_, &mutex_);
+	return;
 }
 
 uint64_t EventStorage::GetLastestCheckPointInstanceID() {

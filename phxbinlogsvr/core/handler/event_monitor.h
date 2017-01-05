@@ -11,6 +11,8 @@
 #pragma once
 
 #include "phxcomm/thread_base.h"
+#include <vector>
+#include <string>
 
 namespace phxbinlog {
 
@@ -26,6 +28,7 @@ class EventMonitor : public phxsql::ThreadBase {
     int CheckRunningStatus();
 
  private:
+    std::vector<std::string> last_check_gtid_;
     StorageManager *storage_manager_;
     MasterManager *master_manager_;
     const Option *option_;

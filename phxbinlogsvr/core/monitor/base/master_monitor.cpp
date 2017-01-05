@@ -53,15 +53,8 @@ int MasterMonitor::MasterStart(const Option *option) {
     return OK;
 }
 
-int MasterMonitor::GetMySQLMaxGTIDList(const Option *option, vector<string> *gtid_list, bool is_master) {
-    int ret = MonitorComm::GetMySQLMaxGTIDList(option, "gtid_executed", gtid_list);
-    if(ret==0&&is_master) {
-        for (auto &gtid : *gtid_list) {
-           gtid = MySqlManager::ReduceGtidByOne(gtid);
-            LogVerbose("%s master get new gtid %s",__func__, gtid.c_str());
-        }
-    }
-    return ret;
+int MasterMonitor::GetMySQLMaxGTIDList(const Option *option, vector<string> *gtid_list) {
+    return MonitorComm::GetMySQLMaxGTIDList(option, "gtid_executed", gtid_list);
 }
 
 int MasterMonitor::GetGlobalMySQLMaxGTIDList(const Option *option, const vector<string> &iplist,

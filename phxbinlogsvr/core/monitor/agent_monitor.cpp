@@ -8,6 +8,7 @@
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
+
 #include "agent_monitor.h"
 
 #include "event_manager.h"
@@ -263,7 +264,7 @@ int AgentMonitor::CheckMasterInit() {
     if (is_master) {
         // get the current gtid in master binlog
         vector < string > gtid_list;
-        int ret = MasterMonitor::GetMySQLMaxGTIDList(option_, &gtid_list, false);
+        int ret = MasterMonitor::GetMySQLMaxGTIDList(option_, &gtid_list);
         if (ret)
             return false;
 
@@ -306,34 +307,34 @@ int AgentMonitor::CheckMasterInit() {
 }
 
 int AgentMonitor::IsGTIDCompleted(const Option *option, EventManager *event_manager) {
-    vector < string > gtid_list;
-    int ret = MasterMonitor::GetMySQLMaxGTIDList(option, &gtid_list, false);
-    if (ret) {
-        ColorLogWarning("%s get sql info fail, skip", __func__);
-        return SVR_FAIL;
-    }
+	vector < string > gtid_list;
+	int ret = MasterMonitor::GetMySQLMaxGTIDList(option, &gtid_list);
+	if (ret) {
+		ColorLogWarning("%s get sql info fail, skip", __func__);
+		return SVR_FAIL;
+	}
 
-    string last_gtid = event_manager->GetNewestGTID();
-    if (MasterMonitor::IsGTIDCompleted(gtid_list, last_gtid)) {
-    } else {
-        return DATA_EMPTY;
-    }
+	string last_gtid = event_manager->GetNewestGTID();
+	if (MasterMonitor::IsGTIDCompleted(gtid_list, last_gtid)) {
+	} else {
+		return DATA_EMPTY;
+	}
 
-    return OK;
+	return OK;
 }
 
 int AgentMonitor::CheckMasterTimeOut() {
-    bool is_master = master_manager_->CheckMasterBySvrID(option_->GetBinLogSvrConfig()->GetEngineSvrID());
+	bool is_master = master_manager_->CheckMasterBySvrID(option_->GetBinLogSvrConfig()->GetEngineSvrID());
     int ret = OK;
-    if(!is_master) {
-        ret=IsGTIDCompleted(option_, event_manager_);
-        if (ret < 0) {
-            return ret;
-        }
-    }
+	if(!is_master) {
+		ret=IsGTIDCompleted(option_, event_manager_);
+		if (ret < 0) {
+			return ret;
+		}
+	}
     
-    if (!AgentExternalMonitor::IsHealthy()) {
-        ColorLogWarning("%s external monitor not healthy", __func__);
+	if (!AgentExternalMonitor::IsHealthy()) {
+		ColorLogWarning("%s external monitor not healthy", __func__);
         return SVR_FAIL;
     }
 
@@ -362,7 +363,7 @@ int AgentMonitor::CheckSlaveRunningStatus() {
 bool AgentMonitor::IsSlaveReady() {
 
     vector < string > gtid_list;
-    int ret = MasterMonitor::GetMySQLMaxGTIDList(option_, &gtid_list, false);
+    int ret = MasterMonitor::GetMySQLMaxGTIDList(option_, &gtid_list);
     if (ret) {
         ColorLogError("%s get sql info fail", __func__);
         return false;

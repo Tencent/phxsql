@@ -8,6 +8,7 @@
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
+
 #include "storage_file_manager.h"
 
 #include "storage.h"
@@ -60,7 +61,6 @@ int StorageFileManager::Init(const Option *option, const string &data_dir, const
 
     if (read_file_list)
         assert(Init() == 0);
-    LogVerbose("%s init done, data dir %s read file list %d", __func__, data_dir.c_str(), read_file_list);
     return OK;
 }
 
@@ -393,4 +393,3 @@ void StorageFileManager::Flush() {
 }
 
 }
-
