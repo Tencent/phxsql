@@ -163,7 +163,7 @@ int AgentMonitor::CheckRunning() {
     if (read_only == "OFF") {
         if (is_master) {
             MasterInfo master_info;
-            int ret = master_manager_->GetMasterInfo(&master_info);
+            ret = master_manager_->GetMasterInfo(&master_info);
             if (ret == OK) {
                 if (master_info.export_ip().empty()) {
                     //master is running?
