@@ -79,7 +79,7 @@ class EventStorage {
     int RealGetLowerBoundGTIDInfo(const std::string &gtid, EventDataInfo *data_info);
     int RealCheckGTID(const std::string &gtid, EventDataInfo *info);
     void CheckPointDone();
-    int CheckGtidInData(const std::string &gtid, const EventDataInfo &datainfo);
+    static int CheckGtidInData(const std::string &gtid, const EventDataInfo &datainfo, const Option *option);
 
  private:
     EventFileManager *event_file_manager_;

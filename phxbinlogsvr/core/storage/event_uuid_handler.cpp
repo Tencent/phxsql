@@ -8,7 +8,6 @@
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
-
 #include "event_uuid_handler.h"
 
 #include "event_file_manager.h"
@@ -179,13 +178,26 @@ string EventUUIDHandler::GetLastestGTIDByGTID(const string &gtid) {
     return GetLastestGTIDByUUID(uuid);
 }
 
+int EventUUIDHandler::GetLastestGTIDEventByGTID(const string &gtid, EventDataInfo *data_info) {
+    string uuid = GtidHandler::GetUUIDByGTID(gtid);
+    return GetLastestGTIDEventByUUID(uuid, data_info);
+}
+
 string EventUUIDHandler::GetLastestGTIDByUUID(const string &uuid) {
     auto it = map_uuid_.find(uuid);
     if (it == map_uuid_.end())
         return "";
-    LogVerbose("%s find gtid %s by uuid %s", __func__, it->second.gtid().c_str(), uuid.c_str());
     return it->second.gtid();
 }
+
+int EventUUIDHandler::GetLastestGTIDEventByUUID(const string &uuid, EventDataInfo *data_info) {
+    auto it = map_uuid_.find(uuid);
+    if (it == map_uuid_.end())
+        return 1;
+    *data_info=it->second;
+	return OK;
+}
+
 
 string EventUUIDHandler::GetLastestUpdateGTID() {
     return newest_info_.gtid();

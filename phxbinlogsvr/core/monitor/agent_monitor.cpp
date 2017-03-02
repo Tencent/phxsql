@@ -8,7 +8,6 @@
 	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
-
 #include "agent_monitor.h"
 
 #include "event_manager.h"
@@ -143,9 +142,11 @@ int AgentMonitor::Process() {
         MasterMonitor::CheckMySqlUserInfo(option_);
         uint32_t now = time(NULL);
         if (check_master && now - last_check >= option_->GetBinLogSvrConfig()->GetMonitorCheckStatusPeriod()) {
-            CheckMasterTimeOut();
+            int ret = CheckMasterTimeOut();
             CheckCheckPointFiles();
-            last_check = now;
+			if(ret == 0) {
+				last_check = now;
+			}
         }
     }
     return OK;
@@ -266,7 +267,7 @@ int AgentMonitor::CheckMasterInit() {
         vector < string > gtid_list;
         int ret = MasterMonitor::GetMySQLMaxGTIDList(option_, &gtid_list);
         if (ret)
-            return false;
+            return ret;
 
         //get the max gtid in agent
         string last_gtid = event_manager_->GetNewestGTID();
@@ -354,11 +355,7 @@ int AgentMonitor::CheckMasterTimeOut() {
 }
 
 int AgentMonitor::CheckSlaveRunningStatus() {
-    if (IsSlaveReady()) {
-        return SlaveMonitor::CheckSlaveRunningStatus(option_);
-    }
-    return MYSQL_FAIL;
-}
+        return SlaveMonitor::CheckSlaveRunningStatus(option_);}
 
 bool AgentMonitor::IsSlaveReady() {
 

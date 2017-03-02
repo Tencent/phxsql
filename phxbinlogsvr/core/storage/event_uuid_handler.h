@@ -39,6 +39,9 @@ class EventUUIDHandler {
     std::string GetLastestGTIDByUUID(const std::string &uuid);
     uint64_t GetLastInstanceID();
 
+    int GetLastestGTIDEventByGTID(const std::string &gtid, EventDataInfo *data_info);
+    int GetLastestGTIDEventByUUID(const std::string &uuid, EventDataInfo *data_info);
+
     int FlushEventUUIDInfo();
 
     std::string GetLastestUpdateGTID();

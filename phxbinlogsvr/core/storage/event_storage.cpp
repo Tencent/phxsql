@@ -223,7 +223,7 @@ int EventStorage::AddEvent(const string &gtid, const EventData &event_data, bool
 	}
     ColorLogInfo("%s write data gtid %s instance id %llu checksum %llu ret %d file %s run %u ms", 
 			__func__, event_data.gtid().c_str(), event_data.instance_id(), event_data.checksum(), ret,
-            data_info.file_name().c_str(), timer.GetTime()/1000 );
+                        data_info.file_name().c_str(), timer.GetTime()/1000 );
     return ret;
 }
 
@@ -271,6 +271,7 @@ int EventStorage::GetEvent(EventData *data, bool wait) {
 }
 
 int EventStorage::GetGTIDInfo(const string &gtid, EventDataInfo *data_info, bool lower_bound) {
+
     if (lower_bound) {
 		int ret = OK;
 		{
@@ -278,7 +279,7 @@ int EventStorage::GetGTIDInfo(const string &gtid, EventDataInfo *data_info, bool
 			ret = RealGetLowerBoundGTIDInfo(gtid, data_info);
 		}
         if (ret == OK) {
-            ret = EventStorage::CheckGtidInData(gtid, *data_info);
+            ret = EventStorage::CheckGtidInData(gtid, *data_info, option_);
         }
         return ret;
     } else {
@@ -345,6 +346,7 @@ int EventStorage::DelCheckPointFile(const string &maxfilename, const uint32_t &m
                     if (status != event_index_status::OK) {
                         return FILE_FAIL;
                     }
+					usleep(100);
                 }
             }
 			RemoveFile(*file_name);
@@ -353,11 +355,11 @@ int EventStorage::DelCheckPointFile(const string &maxfilename, const uint32_t &m
     return OK;
 }
 
-int EventStorage::CheckGtidInData(const string &gtid, const EventDataInfo &data_info) {
+int EventStorage::CheckGtidInData(const string &gtid, const EventDataInfo &data_info, const Option * option) {
     int ret = OK;
 
     if (gtid == "" || data_info.gtid() == "" || data_info.file_name() == "") {
-        EventFileManager eventfilemanager(option_);
+        EventFileManager eventfilemanager(option);
         ret = eventfilemanager.OpenOldestFile();
         if (ret) {
             return ret;
@@ -373,7 +375,7 @@ int EventStorage::CheckGtidInData(const string &gtid, const EventDataInfo &data_
         return DATA_EMPTY;
     }
 
-    EventFileManager event_file_manager(option_, false);
+    EventFileManager event_file_manager(option, false);
     ret = event_file_manager.SetReadPos(data_info);
     if (ret) {
         return ret;
@@ -413,7 +415,7 @@ int EventStorage::GetLastGtid(const vector<string> &gtid_list, string *gtid) {
     int ret = DATA_EMPTY;
     if (gtid_list.empty()) {
         EventDataInfo data_info;
-        int check_ret = CheckGtidInData("", data_info);
+        int check_ret = EventStorage::CheckGtidInData("", data_info, option_);
         if (check_ret == 0) {
             LogVerbose("%s check empty gtid from file_name %s offset %d", __func__,
                                 data_info.file_name().c_str(), data_info.offset());
@@ -438,7 +440,7 @@ int EventStorage::GetLastGtid(const vector<string> &gtid_list, string *gtid) {
                 //LogVerbose("%s get gtid info %s file_name %s offset %d", __func__, data_info.gtid().c_str(),
                  //                  data_info.file_name().c_str(), data_info.offset());
                 if (max_data_info < data_info) {
-                    int check_ret = CheckGtidInData(gtid_list[i], data_info);
+                    int check_ret = EventStorage::CheckGtidInData(gtid_list[i], data_info, option_);
                     if (check_ret == 0) {
                         max_data_info = data_info;
                         lastest_gtid = gtid_list[i];
@@ -483,6 +485,17 @@ int EventStorage::RealCheckGTID(const string &gtid, EventDataInfo *info) {
 }
 
 int EventStorage::RealGetGTIDInfo(const string &gtid, EventDataInfo *data_info) {
+	
+	int ret = uuid_handler_->GetLastestGTIDEventByGTID(gtid, data_info);
+	if(ret==OK) {
+		if(data_info->gtid()==gtid) {
+			LogVerbose("%s mysql gtid %s, current lastest gtid %s, return competed from uuid, file %s",
+					__func__, gtid.c_str(), data_info->gtid().c_str(), 
+					data_info->file_name().c_str());
+			return OK;
+		}
+	}
+
     event_index_status status = event_index_->GetGTID(gtid, data_info);
     LogVerbose("%s get gtid info %s ret %d, file %s", __func__, gtid.c_str(), status,
                        data_info->file_name().c_str());
@@ -495,6 +508,17 @@ int EventStorage::RealGetGTIDInfo(const string &gtid, EventDataInfo *data_info) 
 }
 
 int EventStorage::RealGetLowerBoundGTIDInfo(const string &gtid, EventDataInfo *data_info) {
+
+	int ret = uuid_handler_->GetLastestGTIDEventByGTID(gtid, data_info);
+	if(ret==OK) {
+		if(data_info->gtid()==gtid) {
+			LogVerbose("%s mysql gtid %s, current lastest gtid %s, return competed from uuid, file %s",
+					__func__, gtid.c_str(), data_info->gtid().c_str(), 
+					data_info->file_name().c_str());
+			return OK;
+		}
+	}
+	
     event_index_status status = event_index_->GetLowerBoundGTID(gtid, data_info);
     LogVerbose("%s get gtid info %s ret %d, file %s", __func__, gtid.c_str(), status,
                        data_info->file_name().c_str());
@@ -562,7 +586,7 @@ int EventStorage::CheckAndSwitchFile(bool force) {
         EventData event_headerdata;
         int ret = GetFileHeader(&event_headerdata, &data_info);
         if (ret == 0) {
-            ret = EventStorage::SwitchNewFile(event_headerdata);
+            ret = SwitchNewFile(event_headerdata);
         }
         return ret;
     }

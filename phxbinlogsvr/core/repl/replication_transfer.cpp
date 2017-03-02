@@ -63,7 +63,7 @@ int ReplicationTransfer::Process() {
 
     int ret = OK;
     //init the gtid to get the data pos
-    while (1) {
+    while (!ctx_->IsClose()) {
         vector < string > recv_buff;
         ret = ReadDataFromDC(&recv_buff);
         if (ret != OK && ret != DATA_EMPTY)
