@@ -86,7 +86,7 @@ int MasterStorage::SetMySqlAdminInfo(const MasterInfo &master_info, const std::s
                       master_info.version());
         return MASTER_VERSION_CONFLICT;
     }
-    ColorLogInfo("%s set new username %s", __func__, username.c_str());
+    ColorLogInfo("%s set new username %s, pwd size %zu", __func__, username.c_str(),pwd.size());
     admin_username_ = username;
     admin_pwd_ = pwd;
     return OK;
@@ -100,7 +100,7 @@ int MasterStorage::SetMySqlReplicaInfo(const MasterInfo &master_info, const std:
                       master_info.version());
         return MASTER_VERSION_CONFLICT;
     }
-    ColorLogInfo("%s set new username %s", __func__, username.c_str());
+    ColorLogInfo("%s set new username %s, pwd size %zu", __func__, username.c_str(),pwd.size());
     replica_username_ = username;
     replica_pwd_ = pwd;
     return OK;
