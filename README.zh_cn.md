@@ -6,7 +6,7 @@
 
 联系我们：phxteam@tencent.com
 
-想了解更多, 以及更详细的编译手册，请进入[中文WIKI](https://github.com/tencent-wechat/phxsql/wiki)，和扫描右侧二维码关注我们的公众号
+想了解更多, 以及更详细的编译手册，请进入[中文WIKI](https://github.com/Tencent/phxsql/wiki)，和扫描右侧二维码关注我们的公众号
 
 方案说明：[微信开源PhxSQL：高可用、强一致的MySQL集群](http://mp.weixin.qq.com/s?__biz=MzI4NDMyNTU2Mw==&mid=2247483783&idx=1&sn=a2d6e589f1f591ded7703eb74aefccbe&scene=0#wechat_redirect)
 
@@ -22,11 +22,11 @@ PhxSQL设计和实现哲学：[上篇](https://zhuanlan.zhihu.com/p/22345242)，
 
 项目中包含PhxSQL源代码，源代码编译时所需要的一些第三方库，及可直接在Linux环境下运行的二进制包。其中代码使用到了微信团队自研的另外三个开源项目（phxpaxos,phxrpc,colib)。若需编译源代码，需额外下载，也可以在clone时通过--recurse-submodule获得代码。
 
-**phxpaxos项目地址：** [http://github.com/tencent-wechat/phxpaxos](http://github.com/tencent-wechat/phxpaxos "http://github.com/tencent-wechat/phxpaxos")
+**phxpaxos项目地址：** [http://github.com/Tencent/phxpaxos](http://github.com/Tencent/phxpaxos "http://github.com/Tencent/phxpaxos")
 
-**phxrpc项目地址：** [http://github.com/tencent-wechat/phxrpc](http://github.com/tencent-wechat/phxrpc "http://github.com/tencent-wechat/phxrpc")
+**phxrpc项目地址：** [http://github.com/Tencent/phxrpc](http://github.com/Tencent/phxrpc "http://github.com/Tencent/phxrpc")
 
-**colib项目地址：** [http://github.com/tencent-wechat/libco](http://github.com/tencent-wechat/libco "http://github.com/tencent-wechat/libco")
+**colib项目地址：** [http://github.com/Tencent/libco](http://github.com/Tencent/libco "http://github.com/Tencent/libco")
 
 
 # PhxSQL编译
@@ -88,7 +88,7 @@ PhxSQL需要用到一些第三方库（glog, leveldb, protobuf, phxpaxos, colib,
 2. 若想打包二进制运行包（集群运行时所需要的所有文件和配置）`make package`
 3. `install`完成后，二进制会生成到`PhxSQL`目录下的`sbin`目录，运行所需要的相关文件和配置会安装到PhxSQL目录下的`install_package`目录。打包二进制运行包会把`install_package`进行tar格式的打包，并生成`phxsql.tar.gz`。若想更改`install`的安装目录，可在`sh autoinstall.sh` 后加入`-prefix=`路径
 
-> 详细的编译步骤请参阅WIKI [中文编译手册](https://github.com/tencent-wechat/phxsql/wiki/%E4%B8%AD%E6%96%87%E8%AF%A6%E7%BB%86%E7%BC%96%E8%AF%91%E6%89%8B%E5%86%8C)
+> 详细的编译步骤请参阅WIKI [中文编译手册](https://github.com/Tencent/phxsql/wiki/%E4%B8%AD%E6%96%87%E8%AF%A6%E7%BB%86%E7%BC%96%E8%AF%91%E6%89%8B%E5%86%8C)
 
 # PhxSQL部署和运行
 

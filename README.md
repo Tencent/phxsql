@@ -1,4 +1,4 @@
-[简体中文README](https://github.com/tencent-wechat/phxsql/blob/master/README.zh_cn.md)
+[简体中文README](https://github.com/Tencent/phxsql/blob/master/README.zh_cn.md)
 
 **PhxSQL is a high-availability and strong-consistency MySQL cluster built on Paxos and Percona.**
 
@@ -6,7 +6,7 @@ Authors: Junchao Chen, Haochuan Cui, Duokai Huang, Ming Chen and Sifan Liu
 
 Contact us: phxteam@tencent.com
 
-[![Build Status](https://travis-ci.org/tencent-wechat/phxsql.svg?branch=master)](https://travis-ci.org/tencent-wechat/phxsql)
+[![Build Status](https://travis-ci.org/Tencent/phxsql.svg?branch=master)](https://travis-ci.org/Tencent/phxsql)
 
 #PhxSQL features:
   - high availability by automatic failovers: the cluster works well when more than half of cluster nodes work and are interconnected.
@@ -21,14 +21,14 @@ This project includes
 * Third party submodules
 * Pre-compiled binaries for Ubuntu 64bit system.
     
-Projects on which this project depends are also published by tencent-wechat( phxpaxos, phxrpc, libco ).
+Projects on which this project depends are also published by Tencent( phxpaxos, phxrpc, libco ).
 You can download or clone them with --recurse-submodule.
 
-**phxpaxos：** [http://github.com/tencent-wechat/phxpaxos](http://github.com/tencent-wechat/phxpaxos "http://github.com/tencent-wechat/phxpaxos")
+**phxpaxos：** [http://github.com/Tencent/phxpaxos](http://github.com/Tencent/phxpaxos "http://github.com/Tencent/phxpaxos")
 
-**phxrpc：** [http://github.com/tencent-wechat/phxrpc](http://github.com/tencent-wechat/phxrpc "http://github.com/tencent-wechat/phxrpc")
+**phxrpc：** [http://github.com/Tencent/phxrpc](http://github.com/Tencent/phxrpc "http://github.com/Tencent/phxrpc")
 
-**libco：** [http://github.com/tencent-wechat/libco](http://github.com/tencent-wechat/libco "http://github.com/tencent-wechat/libco")
+**libco：** [http://github.com/Tencent/libco](http://github.com/Tencent/libco "http://github.com/Tencent/libco")
 
 # Compilation of PhxSQL
 
