@@ -1,5 +1,7 @@
 # PhxSQL
 
+[![Build Status](https://travis-ci.org/Tencent/phxsql.svg?branch=master)](https://travis-ci.org/Tencent/phxsql)
+
 **[README in Chinese (中文 README)](https://github.com/Tencent/phxsql/blob/master/README.zh_cn.md)**
 
 **PhxSQL is a highly-availabile and strongly-consistent MySQL cluster built on Paxos and Percona.**
@@ -7,8 +9,6 @@
 **Authors:** Junchao Chen, Haochuan Cui, Duokai Huang, Ming Chen and Sifan Liu 
 
 **Contact us:** phxteam@tencent.com
-
-[![Build Status](https://travis-ci.org/Tencent/phxsql.svg?branch=master)](https://travis-ci.org/Tencent/phxsql)
 
 
 ## PhxSQL features:
@@ -85,7 +85,6 @@ You can download or clone them with `--recurse-submodule`.
 1. PhxSQL needs 6 third party libs(glog, leveldb, protobuf, phxpaxos, colib, phxrpc). Install them in the `phxsql/third_party` directory or just link them to `third_party`.
 
   **NOTE: Make sure `-fPIC` is added while configuring GLOG and Protobuf and specify `--  prefix=/the/current/absolute/path`.**
-  
   For example: `./configure CXXFLAGS=-fPIC --prefix=/home/root/phxsql/third_party/glog`.
 
 2. **Then download**  [percona-server-5.6.31-77.0.tar.gz](https://www.percona.com/downloads/Percona-Server-5.6/Percona-Server-5.6.31-77.0/source/tarball/percona-server-5.6.31-77.0.tar.gz).
@@ -93,7 +92,6 @@ You can download or clone them with `--recurse-submodule`.
 3. Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as `percona`.
 
   **NOTE: Only `percona-server-5.6\_5.6.31-77.0` is available.**
-
 
 ### Preparation of installation enviroment
 
@@ -202,7 +200,7 @@ PhxSQL cluster needs 1 MySQL admin accounts and 1 synchronization account. The d
 
 ### `phxbinlogsvr_tools -f GetMasterInfoFromGlobal -h <host> -p <port>`
 
-**Function:**Get the current master info from quorum nodes( IP and timeout ).
+**Function:** Get the current master info from quorum nodes (IP and timeout).
 
 **Arguments:**
  
