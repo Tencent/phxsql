@@ -99,9 +99,9 @@ int EventExecuter::SMExecute(const uint64_t &instance_id, const string &paxos_va
         return ret;
     }
 
-    //LogVerbose("%s current gtid %s event gtid %s sm gtid %s old checksum %llu run %u ms", __func__,
-     //          data.current_gtid().c_str(), data.event_gtid().c_str(), newest_gtid.c_str(), old_checksum,
-      //         timer.GetTime() / 1000);
+    LogVerbose("%s current gtid %s event gtid %s sm gtid %s old checksum %llu run %u ms", __func__,
+               data.current_gtid().c_str(), data.event_gtid().c_str(), newest_gtid.c_str(), old_checksum,
+               timer.GetTime() / 1000);
 
     uint64_t new_checksum = Utils::GetCheckSum(old_checksum, data.buffer().c_str(), data.buffer().size());
     if (new_checksum != data.checksum()) {
