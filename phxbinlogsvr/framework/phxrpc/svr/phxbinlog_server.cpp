@@ -107,18 +107,18 @@ PhxBinLogSvrHandler *Server::GetSvrHandler() {
     return svr_handler_;
 }
 
-void Server::Dispatch(const phxrpc::BaseRequest *const request,
-                      phxrpc::BaseResponse *const response,
+void Server::Dispatch(const phxrpc::HttpRequest &req,
+                      phxrpc::HttpResponse *const resp,
                       phxrpc::DispatcherArgs_t *args) {
     ServiceArgs_t *service_args = (ServiceArgs_t *)(args->service_args);
     PhxbinlogServiceImpl service(service_args);
 
     PhxbinlogDispatcher dispatcher(service, args);
-    phxrpc::BaseDispatcher<PhxbinlogDispatcher>
-            base_dispatcher(dispatcher, PhxbinlogDispatcher::GetMqttFuncMap(),
-                            PhxbinlogDispatcher::GetURIFuncMap());
-    if (!base_dispatcher.Dispatch(request, response)) {
-        response->DispatchErr();
+    phxrpc::HttpDispatcher<PhxbinlogDispatcher>
+            base_dispatcher(dispatcher, PhxbinlogDispatcher::GetURIFuncMap());
+    if (!base_dispatcher.Dispatch(req, resp)) {
+        resp->SetStatusCode(404);
+        resp->SetReasonPhrase("Not Found");
     }
 }
 
