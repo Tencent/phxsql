@@ -63,8 +63,8 @@ class Server {
     PhxbinlogServerConfig *GetServerConfig();
     phxbinlogsvr::PhxBinLogSvrHandler *GetSvrHandler();
 
-    static void Dispatch(const phxrpc::BaseRequest *const request,
-                         phxrpc::BaseResponse *const response,
+    static void Dispatch(const phxrpc::HttpRequest &req,
+                         phxrpc::HttpResponse *const resp,
                          phxrpc::DispatcherArgs_t *args);
 
   protected:
