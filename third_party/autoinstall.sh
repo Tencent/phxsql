@@ -16,7 +16,7 @@ function go_back()
     cd $current_path;
 }
 
-function check_dir_exist() 
+function check_dir_exist()
 {
     dir_path=$current_path"/$1";
     if [ ! -d $dir_path ]; then
@@ -25,7 +25,7 @@ function check_dir_exist()
     fi
 }
 
-function check_file_exist() 
+function check_file_exist()
 {
     if [ ! -f $1 ]; then
         return 1;
@@ -145,7 +145,40 @@ function install_glog()
 
     go_back;
     cd $lib_name;
-    ./configure CXXFLAGS=-fPIC --prefix=$(pwd);
+    ./autogen.sh
+    exist_gflags_dir="../gflags";
+    if [ -d $exist_gflags_dir ]; then
+        # use local gflags
+        ./configure CXXFLAGS=-fPIC --prefix=$(pwd) --with-gflags=$(pwd)/gflags;
+    else
+        # use system gflags
+        ./configure CXXFLAGS=-fPIC --prefix=$(pwd);
+    fi
+    make && make install;
+
+    check_lib_exist $lib_name;
+    if [ $? -eq 1 ]; then
+        perror "$lib_name install fail. please check compile error info."
+        exit 1;
+    fi
+    psucc "install $lib_name ok."
+}
+
+function install_gflags()
+{
+    lib_name="gflags";
+    check_dir_exist $lib_name;
+
+    # check if aready install.
+    check_lib_exist $lib_name;
+    if [ $? -eq 0 ]; then
+        psucc "$lib_name already installed."
+        return;
+    fi
+    # end check.
+    go_back;
+    cd $lib_name;
+    cmake . -DCMAKE_INSTALL_PREFIX=$(pwd);
     make && make install;
 
     check_lib_exist $lib_name;
@@ -257,9 +290,10 @@ function install_phxrpc()
     psucc "install $lib_name ok."
 }
 
+install_gflags;
+install_glog;
 install_leveldb;
 install_protobuf;
-install_glog;
 install_colib;
 install_phxpaxos;
 install_phxrpc;
