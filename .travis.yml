@@ -12,3 +12,7 @@ script:
     - docker build -t phxsql/phxsql:latest . && ./test-with-docker.sh
 notifications:
     email: true
+branches:
+  only:
+  - /.*/
+
