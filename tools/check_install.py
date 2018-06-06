@@ -6,7 +6,7 @@ base_dir=""
 lib_dir=""
 bin_dir=""
 
-third_party_list=["PROTOBUF", "LEVELDB", "GLOG", "PHXPAXOS", "PHXPAXOS_PLUGIN", "COLIB"]
+third_party_list=["PROTOBUF", "LEVELDB", "GFLAGS", "GLOG", "PHXPAXOS", "PHXPAXOS_PLUGIN", "COLIB"]
 
 def GetPath(key):
 	makefile_def=open("makefile.mk")
@@ -40,30 +40,30 @@ def GetPathPrefix(key):
 def CheckMySql():
 	if( not os.path.exists( base_dir+"/percona") ):
 		print "percona directory(%s) not found" % (base_dir + "/percona")
-		print "please make sure percona 5.6 has been placed on the source directory and named \"percona\"," 
+		print "please make sure percona 5.6 has been placed on the source directory and named \"percona\","
 		print "you can download percona 5.6 from https://github.com/percona/percona-server.git."
 		exit(1)
-		
+
 
 def CheckBasePath():
 	global lib_dir, sbin_dir
-	lib_dir=GetPath("PHXSQL_LIB_PATH")	
+	lib_dir=GetPath("PHXSQL_LIB_PATH")
 
 	if( not os.path.exists( lib_dir ) ):
 		os.mkdir( lib_dir )
 
-	sbin_dir=GetPath("PHXSQL_SBIN_PATH")	
+	sbin_dir=GetPath("PHXSQL_SBIN_PATH")
 
 	if( not os.path.exists( sbin_dir ) ):
 		os.mkdir( sbin_dir )
 
-	extlib_dir=GetPath("PHXSQL_EXTLIB_PATH")	
+	extlib_dir=GetPath("PHXSQL_EXTLIB_PATH")
 	if( not os.path.exists( extlib_dir ) ):
 		os.mkdir( extlib_dir )
 
 def Check3rdPath():
 	for lib in third_party_list:
-		path_list=GetPathPrefix(lib)	
+		path_list=GetPathPrefix(lib)
 		for path in path_list:
 			if( not os.path.exists( path[1] ) ):
 				print "%s not found" % path[1]
@@ -73,7 +73,7 @@ def Check3rdPath():
 def CheckProtobufVersion():
 	protobuf_bin_path = base_dir + "/third_party/protobuf/bin"
 	if( not os.path.exists( protobuf_bin_path ) ):
-		print "please make sure protobuf 3.0+ has been installed on the third party directory" 
+		print "please make sure protobuf 3.0+ has been installed on the third party directory"
 		print "and %s/protoc can be detected" % protobuf_bin_path
 		exit(1)
 
@@ -83,7 +83,7 @@ def CheckProtobufVersion():
 	cmd_res.close()
 	if( res == '' ):
 		print "protobuf %s has beed found",res
-		print "please make sure protobuf 3.0+ has been installed on the third party directory" 
+		print "please make sure protobuf 3.0+ has been installed on the third party directory"
 		exit(1)
 
 if(__name__ == '__main__'):
