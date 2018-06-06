@@ -1,31 +1,31 @@
-# Copyright (c) 2016 Tencent.  See the AUTHORS file for names 
+# Copyright (c) 2016 Tencent.  See the AUTHORS file for names
 # of contributors.
-# 
+#
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
 # License as published by the Free Software Foundation; either
 # version 2 of the License, or (at your option) any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Library General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Library General Public
 # License along with this library; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-# 
+#
 
-allobject=elibphxglog.a 
+allobject=elibphxglog.a
 
 PHXGLOG_OBJ=phx_glog.o
 
 PHXGLOG_LIB=phxglog include:phxcomm_include
 
-PHXGLOG_SYS_LIB=$(GLOG_LIB_PATH)/libglog.a -lpthread
+PHXGLOG_SYS_LIB=$(GLOG_LIB_PATH)/libglog.a $(GFLAGS_LIB_PATH)/libgflags.a -lpthread
 
-PHXGLOG_INCS=$(SRC_BASE_PATH)/phxcomm/log/phxglog  
+PHXGLOG_INCS=$(SRC_BASE_PATH)/phxcomm/log/phxglog
 
 PHXGLOG_EXTRA_CPPFLAGS=-Wall
 

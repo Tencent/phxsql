@@ -114,7 +114,7 @@ function install_protobuf()
     exist_gmock_dir="../phxpaxos/third_party/gmock";
     if [ -d $exist_gmock_dir ]; then
         if [ ! -d gmock ]; then
-            cp -r $exist_gmock_dir  gmock;
+            cp -r $exist_gmock_dir gmock;
         fi
     fi
 
@@ -149,7 +149,7 @@ function install_glog()
     exist_gflags_dir="../gflags";
     if [ -d $exist_gflags_dir ]; then
         # use local gflags
-        ./configure CXXFLAGS=-fPIC --prefix=$(pwd) --with-gflags=$(pwd)/gflags;
+        ./configure CXXFLAGS=-fPIC --prefix=$(pwd) --with-gflags=$exist_gflags_dir;
     else
         # use system gflags
         ./configure CXXFLAGS=-fPIC --prefix=$(pwd);
@@ -178,7 +178,7 @@ function install_gflags()
     # end check.
     go_back;
     cd $lib_name;
-    cmake . -DCMAKE_INSTALL_PREFIX=$(pwd);
+    CXXFLAGS=-fPIC cmake . -DCMAKE_INSTALL_PREFIX=$(pwd);
     make && make install;
 
     check_lib_exist $lib_name;
@@ -245,7 +245,8 @@ function install_phxpaxos()
     go_back;
     cd $lib_name;
     cd third_party;
-    rm -rf glog leveldb protobuf;
+    rm -rf gflags glog leveldb protobuf;
+    ln -s ../../gflags gflags;
     ln -s ../../glog glog;
     ln -s ../../leveldb leveldb
     ln -s ../../protobuf protobuf;
