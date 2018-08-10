@@ -63,12 +63,12 @@ class Server {
     PhxbinlogServerConfig *GetServerConfig();
     phxbinlogsvr::PhxBinLogSvrHandler *GetSvrHandler();
 
-    static void Dispatch(const phxrpc::HttpRequest &req,
-                         phxrpc::HttpResponse *const resp,
-                         phxrpc::DispatcherArgs_t *args);
+    static void Dispatch(const phxrpc::BaseRequest &req,
+                         phxrpc::BaseResponse *const resp,
+                         phxrpc::DispatcherArgs_t *const args);
 
   protected:
-    typedef void (*OpenLogFunc)(const char *, const int &log_level, const char * log_path,
+    typedef void (*OpenLogFunc)(const char *, const int &log_level, const char *log_path,
                                 const uint32_t &log_file_max_size);
     typedef void (*LogFunc)(int log_level, const char *format, va_list args);
 
