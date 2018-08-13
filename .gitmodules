@@ -13,9 +13,9 @@
 [submodule "third_party/leveldb"]
 	path = third_party/leveldb
 	url = https://github.com/google/leveldb
-[submodule "third_party/phxrpc"]
-	path = third_party/phxrpc
-	url = https://github.com/Tencent/phxrpc
 [submodule "third_party/phxpaxos"]
 	path = third_party/phxpaxos
 	url = https://github.com/Tencent/phxpaxos
+[submodule "third_party/phxrpc"]
+	path = third_party/phxrpc
+	url = https://github.com/Tencent/phxrpc

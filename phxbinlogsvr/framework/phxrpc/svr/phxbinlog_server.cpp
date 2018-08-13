@@ -107,18 +107,17 @@ PhxBinLogSvrHandler *Server::GetSvrHandler() {
     return svr_handler_;
 }
 
-void Server::Dispatch(const phxrpc::HttpRequest &req,
-                      phxrpc::HttpResponse *const resp,
-                      phxrpc::DispatcherArgs_t *args) {
+void Server::Dispatch(const phxrpc::BaseRequest &req,
+                      phxrpc::BaseResponse *const resp,
+                      phxrpc::DispatcherArgs_t *const args) {
     ServiceArgs_t *service_args = (ServiceArgs_t *)(args->service_args);
     PhxbinlogServiceImpl service(service_args);
 
     PhxbinlogDispatcher dispatcher(service, args);
-    phxrpc::HttpDispatcher<PhxbinlogDispatcher>
+    phxrpc::BaseDispatcher<PhxbinlogDispatcher>
             base_dispatcher(dispatcher, PhxbinlogDispatcher::GetURIFuncMap());
     if (!base_dispatcher.Dispatch(req, resp)) {
-        resp->SetStatusCode(404);
-        resp->SetReasonPhrase("Not Found");
+        resp->SetFake(phxrpc::BaseResponse::FakeReason::DISPATCH_ERROR);
     }
 }
 
