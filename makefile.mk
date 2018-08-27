@@ -60,6 +60,7 @@ vpath %.proto $(PROTOS_PATH)
 %.pb.cc: %.proto
 	$(PROTOC) -I$(PROTOBUF_INCLUDE_PATH) -I $(PROTOS_PATH) --cpp_out=. $<
 
+.PHONY: install
 install:
 	make install -C percona
 	@mkdir $(PREFIX)/lib -p;\
