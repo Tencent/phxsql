@@ -1,28 +1,35 @@
-[简体中文README](https://github.com/Tencent/phxsql/blob/master/README.zh_cn.md)
-
-**PhxSQL is a high-availability and strong-consistency MySQL cluster built on Paxos and Percona.**
-
-Authors: Junchao Chen, Haochuan Cui, Duokai Huang, Ming Chen and Sifan Liu 
-
-Contact us: phxteam@tencent.com
+# PhxSQL
 
 [![Build Status](https://travis-ci.org/Tencent/phxsql.svg?branch=master)](https://travis-ci.org/Tencent/phxsql)
 
-#PhxSQL features:
-  - high availability by automatic failovers: the cluster works well when more than half of cluster nodes work and are interconnected.
+**[README in Chinese (中文 README)](https://github.com/Tencent/phxsql/blob/master/README.zh_cn.md)**
+
+**PhxSQL is a highly-availabile and strongly-consistent MySQL cluster built on Paxos and Percona.**
+
+**Authors:** Junchao Chen, Haochuan Cui, Duokai Huang, Ming Chen and Sifan Liu 
+
+**Contact us:** phxteam@tencent.com
+
+
+## PhxSQL features:
+
+  - high availability by automatic failover: the cluster works well when more than half of cluster nodes work and are interconnected.
   - guarantee of data consistency among cluster nodes: replacing loss-less semi-sync between MySQL master and MySQL slaves with Paxos, PhxSQL ensures zero-loss binlogs between master and slaves and supports linearizable consistency, which is as strong as that of Zookeeper.
   - complete compliance with MySQL and MySQL client: PhxSQL supports up to serializable isolation level of transaction.
   - easy deployment and easy maintenance: PhxSQL, powered by in-house implementation of Paxos, has only 4 components including MySQL and doesn't depend on zookeeper or etcd for anything. PhxSql supports automated cluster membership hot reconfiguration.
-  
 
+## What's in this project:
 
-This project includes 
-* Source codes
-* Third party submodules
-* Pre-compiled binaries for Ubuntu 64bit system.
+This project includes:
+
+- Source codes
+- Third party submodules
+- Pre-compiled binaries for Ubuntu 64bit system
     
 Projects on which this project depends are also published by Tencent( phxpaxos, phxrpc, libco ).
-You can download or clone them with --recurse-submodule.
+You can download or clone them with `--recurse-submodule`.
+
+## Dependencies:
 
 **phxpaxos：** [http://github.com/Tencent/phxpaxos](http://github.com/Tencent/phxpaxos "http://github.com/Tencent/phxpaxos")
 
@@ -30,11 +37,12 @@ You can download or clone them with --recurse-submodule.
 
 **libco：** [http://github.com/Tencent/libco](http://github.com/Tencent/libco "http://github.com/Tencent/libco")
 
-# Compilation of PhxSQL
+## Compilation of PhxSQL
 
 >If you prefer pre-compiled binaries, just skip this part.
 
 ### Structure of PhxSQL Directories
+
 * PhxSQL
     * phxsqlproxy
     * phxbinlogsvr
@@ -70,60 +78,63 @@ You can download or clone them with --recurse-submodule.
 | third_party/phxrpc | Phxrpc library
 
 
-### Preparation
+## Preparation
 
-##### Installation of third party libs
+### Installation of third party libs
 
-PhxSQL needs 6 third party libs(glog, leveldb, protobuf, phxpaxos, colib, phxrpc). Please install them in phxsql/third_party directory or just link to third_party.
+1. PhxSQL needs 6 third party libs(glog, leveldb, protobuf, phxpaxos, colib, phxrpc). Install them in the `phxsql/third_party` directory or just link them to `third_party`.
 
-**NOTE: Please make sure -fPIC is added while executing configure in GLOG and Protobuf as well as specifying --prefix=/the/current/absolute/path.**
+  **NOTE: Make sure `-fPIC` is added while configuring GLOG and Protobuf and specify `--  prefix=/the/current/absolute/path`.**
+  For example: `./configure CXXFLAGS=-fPIC --prefix=/home/root/phxsql/third_party/glog`.
 
-For example: `./configure CXXFLAGS=-fPIC --prefix=/home/root/phxsql/third_party/glog`.
+2. **Then download**  [percona-server-5.6.31-77.0.tar.gz](https://www.percona.com/downloads/Percona-Server-5.6/Percona-Server-5.6.31-77.0/source/tarball/percona-server-5.6.31-77.0.tar.gz).
 
-**Then download**  [percona-server-5.6.31-77.0.tar.gz](https://www.percona.com/downloads/Percona-Server-5.6/Percona-Server-5.6.31-77.0/source/tarball/percona-server-5.6.31-77.0.tar.gz)
+3. Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as `percona`.
 
-Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as 'percona'
-**(NOTE: Only percona-server-5.6\_5.6.31-77.0 is available)**
+  **NOTE: Only `percona-server-5.6\_5.6.31-77.0` is available.**
 
+### Preparation of installation enviroment
 
-##### Preparation of installation enviroment
-1. Execute `./autoinstall.sh && make && make install`
-2. Execute 'make package' to generate a tar.gz package so you can transfer to your target hosts.
+1. Run `./autoinstall.sh && make && make install`.
+2. Run `make package` to generate a `tar.gz` package so you can move to your target hosts.
 
-**(NOTE: We put the binaries in install_package/sbin, configuration files in install_package/tools/etc_template, install scripts in install_package/tools. The 'make package' command will pack 'install_package' into 'phxsql-$version.tar.gz'. Please specify -prefix=/the/path/you/want/to/install while executing ./autoinstall.sh)**
+**NOTE: We put the binaries in `install_package/sbin`, configuration files in `install_package/tools/etc_template`, install scripts in `install_package/tools`. The `make package` command packs `install_package` into `phxsql-$version.tar.gz`. Please specify `-prefix=/the/path/you/want/to/install` while executing `./autoinstall.sh`.**
 
-
-# Deployment of PhxSQL
+## Deployment of PhxSQL
 
 ### Host requirements.
 
->PhxSQL needs to run on more than 2 hosts. We suggest N >= 3 and N is an odd number, where N means the number of hosts.
+> PhxSQL needs to run on more than 2 hosts. We suggest N >= 3 and N is an odd number, where N means the number of hosts.
 
 ### Initialization of PhxSQL
 
-1. Transfer phxsql.tar.gz to all of the hosts you want to install. Then do as the following steps:
-    1. Execute `tar -xvf phxsq.tar.gz .`
-    2. Enter phxsql/tools, Execute `python install.py --help` to get the help of installation.
-    
-        (For example:`python2.7 install.py -i"your_inner_ip" -p 54321 -g 6000 -y 11111 -P 17000 -a 8001 -f/tmp/data/`)
-
-2.  After executing 'install.py' on all the hosts, Execute './phxbinlogsvr_tools_phxrpc -f InitBinlogSvrMaster -h"ip1,ip2,ip3" -p 17000' in any one hosts. 17000 should be replaced with the port on which phxbinlogsvr is listening.
-3.  The cluster is active while a message shows master initialization is finished.
-4.  You can execute some SQLs to check the status of cluster through `mysql -uroot -h"your_inner_ip" -P$phxsqlproxy_port` 
+1. Move `phxsql.tar.gz` to all of the hosts you want to install. Then do as the following steps:
+2. Run `tar -xvf phxsq.tar.gz`.
+3. Change your directory to `phxsql/tools` and run `python install.py --help` to get the help of installation.
+  For example:`python2.7 install.py -i"your_inner_ip" -p 54321 -g 6000 -y 11111 -P 17000 -a 8001 -f/tmp/data/`
+4. Run `install.py` on all the hosts.
+5. Run `./phxbinlogsvr_tools_phxrpc -f InitBinlogSvrMaster -h"ip1,ip2,ip3" -p 17000` in any one host. `17000` should be replaced with the port on which `phxbinlogsvr` is listening to.
+6. The cluster is active while a message showing that the master initialization is finished.
+7. You can execute some SQL statements to check the status of cluster through `mysql -uroot -h"your_inner_ip" -P$phxsqlproxy_port` 
 
 ### Simple tests.
 
-1. Enter phxsql/tools/
-2. Execute `test_phxsql.sh phxsqlproxy_port ip1 ip2 ip3`
+1. Change your directory to `phxsql/tools`.
+2. Run `test_phxsql.sh phxsqlproxy_port ip1 ip2 ip3`.
 
 ### Description of Configuration Files
 
 > PhxSQL have 3 configuration files in total.
 
-###### 1. my.cnf： The configuration of MySQL. Please modify it accroding to your own needs.
-**NOTE:Modify `tools/etc_temlate/my.cnf` before installation, Modify `etc/my.cnf` after installation**
+#### `my.cnf`
 
-###### 2. phxbinlogsvr.conf 
+`my.cnf` is the configuration of MySQL. You can edit the file according to your own
+
+**NOTE: Modify `tools/etc_temlate/my.cnf` before the installation, and modify `etc/my.cnf` after the installation.**
+
+#### `phxbinlogsvr.conf` 
+
+In the `phxbinlogsvr.conf` file:
 
 |Section name |Key name |comment|
 |------------ | ---------| ------|
@@ -143,7 +154,9 @@ Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as 'p
 | |  LogFilePath | Directory to store log |
 | | LogLevel | Log level of phxbinlogsvr |
 
-###### 3. phxsqlproxy.conf 
+#### `phxsqlproxy.conf`
+
+In the `phxsqlproxy.conf` file:
 
 | Section name | Key name | comment |
 | ------| ------| ------|
@@ -154,41 +167,40 @@ Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as 'p
 | | MasterEnableReadPort | Enable readonly-port in master node. If set to 0, master will forwarding readonly-port requests to one of slaves. |
 | | TryBestIfBinlogsvrDead | After the local phxbinlogsvr is dead, phxsqlproxy will try to get master information from phxbinlogsvr on other machine, if this option set to 1. |
 
-# PhxSQL Usasge
+## PhxSQL Usasge
 
-> phxsqlproxy is the surrogate of PhxSQL, all requests will be sent to phxsqlproxy and then be forwarded to MySQL.
->
-### phxsqlproxy provides 2 different types of port for user. 
+> `phxsqlproxy` is the surrogate of PhxSQL. All requests will be sent to `phxsqlproxy` and then be forwarded to MySQL.
 
-##### Master Port( also called Read-Write Port )
+### `phxsqlproxy` provides 2 different types of port for users. 
+
+#### Master Port (also called Read-Write Port)
 
 It is the port configured in `phxsqlproxy.conf`.
-Every requests sent to this port will be forwarded to the master node to excute.
+Every request sent to this port will be forwarded to the master node to excute.
 
-##### Slave Port( also called Read-Only Port )
+#### Slave Port (also called Read-Only Port)
 
 It is (MasterPort + 1). You can also specify it by setting `SlavePort = xxxxx` in `phxsqlproxy.conf`.  
 Every requests will be executed on the local MySQL. A master node will make a redirection to another slave nodes if  `MasterEnableReadPort = 0` (this will save the CPU/IO resource for write requests)
 
-
 ### SQL Command Execution
 
-1. Using `mysql -u$user -h$phxsqlproxyip -P$phxsqlproxyport -p$pwd` to connect to phxsqlproxy
+1. Using `mysql -u$user -h$phxsqlproxyip -P$phxsqlproxyport -p$pwd` to connect to `phxsqlproxy`.
 2. Execute SQL command.
 
->`$phxsqlproxyip` can be any one IP of hosts in a clusters and `$phxsqlproxyport` can be `MasterPort` or `SlavePort`.
+> `$phxsqlproxyip` can be any one IP of hosts in a clusters and `$phxsqlproxyport` can be `MasterPort` or `SlavePort`.
 
-# PhxSQL Management
+## PhxSQL Management
 
 PhxSQL provides a tool `phxbinlogsvr_tools_phxrpc` to help the mangerment of PhxSQL.
 
 PhxSQL cluster needs 1 MySQL admin accounts and 1 synchronization account. The default admin account is (`root`, `""` ),  the default synchronization account is ( `replica`, `replica123` ), They can be modified( and only be modifyed ) via `phxbinlogsvr_tools_phxrpc`. **DON'T DO THIS MANUALLY.**
 
-**Following is some commands you may used frequently.**
+## Frequently used commands
 
 ### `phxbinlogsvr_tools -f GetMasterInfoFromGlobal -h <host> -p <port>`
 
-**Function:**Get the current master info from quorum nodes( IP and timeout ).
+**Function:** Get the current master info from quorum nodes (IP and timeout).
 
 **Arguments:**
  
@@ -237,6 +249,7 @@ Execute `phxbinlogsvr_tools_phxrpc -f RemoveMember -h<host> -p<port> -m <ip_of_n
 Once it is succesfully executed, A will not learn binlog after a small period.
 
 ### Member Involvement
+
 1. Execute `phxbinlogsvr_tools -f AddMember -h<host> -p<port> -m <ip_of_nodeA>` to add node A into the membership.
 2. Install PhxSQL on A.
 3. A will begin to learn data after installation is finished.
@@ -245,36 +258,33 @@ Once it is succesfully executed, A will not learn binlog after a small period.
 6. Dump the snapshot into MySQL.
 7. A will begin to work after a while.
 
-# Phxbinlogsvr fault Handling.
+## `Phxbinlogsvr` fault Handling.
 
-###### You can choose to reinstall PhxSQL if PhxSQL meets an unrecovery failure.
+### You can choose to reinstall PhxSQL if PhxSQL fails to recover.
 
 `Phxbinlogsvr` will pull the checkpoint in another node to reboot during reinstallation. It will self-kill after pulling is over(to make sure the consistency). You can reboot `phxbinlogsvr` after a message like `"All sm load state ok, start to exit"` appears. 
 
-###### `phxbinlogsvr` will stop working if a data problem arise in MySQL. We suggest you to check the status of MySQL. 
-###### You can observe logs with red `"err"` to check the abnormaly. 
+**Note:`phxbinlogsvr` will stop working if a data problem arises in MySQL. We suggest you to check the status of MySQL. **
+**Note: You can observe logs with red `"err"` to check the exceptions.**
 
-# Performance Testing
+## Performance Testing
 
 ### Hosts Infomation	
-CPU :	Intel(R) Xeon(R) CPU E5-2420 0 @ 1.90GHz * 24
 
-Memory : 32G
-
-Disk : SSD Raid10 
-
+- CPU :	Intel(R) Xeon(R) CPU E5-2420 0 @ 1.90GHz * 24
+- Memory : 32G
+- Disk : SSD Raid10 
 
 ### Ping Costs
-Master -> Slave : 3 ~ 4ms
 
-Client -> Master : 4ms
-
+- Master -> Slave : 3 ~ 4ms
+- Client -> Master : 4ms
 
 ### Tools and Arguments
-sysbench  --oltp-tables-count=10 --oltp-table-size=1000000 --num-threads=500 --max-requests=100000 --report-interval=1 --max-time=200
+
+`sysbench  --oltp-tables-count=10 --oltp-table-size=1000000 --num-threads=500 --max-requests=100000 --report-interval=1 --max-time=200`
 
 ### Results
-
 
 | Client Threads                                         | Clusters    |                    |             |     Test sets   |           |                 |               |
 |------------------------------------------------------|-------------|------------------------|-------------|----------------------|-----------|---------------------|---------------|
@@ -285,4 +295,4 @@ sysbench  --oltp-tables-count=10 --oltp-table-size=1000000 --num-threads=500 --m
 | 500                                                  | PhxSQL      | 8260               | 60.41/83.14 | 105928           | 4.58/5.81 | 46543           | 192.93/242.85 |
 | 500                                                  | MySQL semi-sync | 7072               | 70.60/91.72 | 121535           | 4.17/5.08 | 33229           | 270.38/345.84 |
 
-**NOTE:The 2 Response times means average and 95% percentile**
+**NOTE:The 2 Response times mean average and 95% percentile**
