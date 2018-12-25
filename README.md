@@ -154,7 +154,7 @@ Move `percona-server-5.6\_5.6.31-77.0` to PhxSQL directory, rename or link as 'p
 | | MasterEnableReadPort | Enable readonly-port in master node. If set to 0, master will forwarding readonly-port requests to one of slaves. |
 | | TryBestIfBinlogsvrDead | After the local phxbinlogsvr is dead, phxsqlproxy will try to get master information from phxbinlogsvr on other machine, if this option set to 1. |
 
-# PhxSQL Usasge
+# PhxSQL Usage
 
 > phxsqlproxy is the surrogate of PhxSQL, all requests will be sent to phxsqlproxy and then be forwarded to MySQL.
 >
