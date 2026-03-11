@@ -5208,6 +5208,9 @@ int digest_password(THD *thd, LEX_USER *user_record)
   */
   if (user_record->plugin.str == sha256_password_plugin_name.str)
   {
+    if (user_record->password.length > SHA256_PASSWORD_MAX_PASSWORD_LENGTH)
+      return 1;
+
     char *buff=  (char *) thd->alloc(CRYPT_MAX_PASSWORD_SIZE+1);
     if (buff == NULL)
       return 1;
@@ -12367,6 +12370,9 @@ http://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Proto
     DBUG_RETURN(CR_ERROR);
 #endif
   } // if(!my_vio_is_encrypter())
+
+  if (pkt_len > SHA256_PASSWORD_MAX_PASSWORD_LENGTH + 1)
+    DBUG_RETURN(CR_ERROR);
 
   /* A password was sent to an account without a password */
   if (info->auth_string_length == 0)
