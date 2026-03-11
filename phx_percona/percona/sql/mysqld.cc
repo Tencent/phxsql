@@ -570,6 +570,7 @@ ulonglong denied_connections= 0;
 
 Error_log_throttle err_log_throttle(Log_throttle::LOG_THROTTLE_WINDOW_SIZE,
                                     sql_print_error,
+char secure_file_real_path[FN_REFLEN];
                                     "Error log throttle: %10lu 'Can't create"
                                     " thread to handle new connection'"
                                     " error(s) suppressed");
@@ -9627,14 +9628,17 @@ bool is_secure_file_path(char *path)
     return FALSE;
 
   /*
-    All paths are secure if opt_secure_file_path is 0
+    All paths are secure if opt_secure_file_priv is 0
   */
-  if (!opt_secure_file_priv)
+  if (!opt_secure_file_priv[0])
     return TRUE;
 
   opt_secure_file_priv_len= strlen(opt_secure_file_priv);
 
   if (strlen(path) >= FN_REFLEN)
+    return FALSE;
+
+  if (!my_strcasecmp(system_charset_info, opt_secure_file_priv, "NULL"))
     return FALSE;
 
   if (my_realpath(buff1, path, 0))
@@ -9703,9 +9707,184 @@ bool is_mysql_datadir_path(const char *path)
 
 }
 
+/**
+  check_secure_file_priv_path : Checks path specified through
+  --secure-file-priv and raises warning in following cases:
+  1. If path is empty string or NULL and mysqld is not running
+     with --bootstrap mode.
+  2. If path can access data directory
+  3. If path points to a directory which is accessible by
+     all OS users (non-Windows build only)
+
+  It throws error in following cases:
+
+  1. If path normalization fails
+  2. If it can not get stats of the directory
+
+  @params NONE
+
+  Assumptions :
+  1. Data directory path has been normalized
+  2. opt_secure_file_priv has been normalized unless it is set
+     to "NULL".
+
+  @returns Status of validation
+    @retval true : Validation is successful with/without warnings
+    @retval false : Validation failed. Error is raised.
+*/
+
+bool check_secure_file_priv_path()
+{
+  char datadir_buffer[FN_REFLEN+1]={0};
+  char plugindir_buffer[FN_REFLEN+1]={0};
+  char whichdir[20]= {0};
+  size_t opt_plugindir_len= 0;
+  size_t opt_datadir_len= 0;
+  size_t opt_secure_file_priv_len= 0;
+  bool warn= false;
+  bool case_insensitive_fs;
+#ifndef _WIN32
+  MY_STAT dir_stat;
+#endif
+
+  if (!opt_secure_file_priv[0])
+  {
+    if (opt_bootstrap)
+    {
+      /*
+        Do not impose --secure-file-priv restriction
+        in --bootstrap mode
+      */
+      sql_print_information("Ignoring --secure-file-priv value as server is "
+                            "running with --bootstrap.");
+    }
+    else
+    {
+      sql_print_warning("Insecure configuration for --secure-file-priv: "
+                        "Current value does not restrict location of generated "
+                        "files. Consider setting it to a valid, "
+                        "non-empty path.");
+    }
+    return true;
+  }
+
+  /*
+    Setting --secure-file-priv to NULL would disable
+    reading/writing from/to file
+  */
+  if(!my_strcasecmp(system_charset_info, opt_secure_file_priv, "NULL"))
+  {
+    sql_print_information("--secure-file-priv is set to NULL. "
+                          "Operations related to importing and exporting "
+                          "data are disabled");
+    return true;
+  }
+
+  /*
+    Check if --secure-file-priv can access data directory
+  */
+  opt_secure_file_priv_len= strlen(opt_secure_file_priv);
+
+  /*
+    Adds dir seperator at the end.
+    This is required in subsequent comparison
+  */
+  convert_dirname(datadir_buffer, mysql_unpacked_real_data_home, NullS);
+  opt_datadir_len= strlen(datadir_buffer);
+
+  case_insensitive_fs=
+    (test_if_case_insensitive(datadir_buffer) == 1);
+
+  if (!case_insensitive_fs)
+  {
+    if (!strncmp(datadir_buffer, opt_secure_file_priv,
+          opt_datadir_len < opt_secure_file_priv_len ?
+          opt_datadir_len : opt_secure_file_priv_len))
+    {
+      warn= true;
+      strcpy(whichdir, "Data directory");
+    }
+  }
+  else
+  {
+    if (!files_charset_info->coll->strnncoll(files_charset_info,
+          (uchar *) datadir_buffer,
+          opt_datadir_len,
+          (uchar *) opt_secure_file_priv,
+          opt_secure_file_priv_len,
+          TRUE))
+    {
+      warn= true;
+      strcpy(whichdir, "Data directory");
+    }
+  }
+
+  /*
+    Don't bother comparing --secure-file-priv with --plugin-dir
+    if we already have a match against --datadir or
+    --plugin-dir is not pointing to a valid directory.
+  */
+  if (!warn && !my_realpath(plugindir_buffer, opt_plugin_dir, 0))
+  {
+    convert_dirname(plugindir_buffer, plugindir_buffer, NullS);
+    opt_plugindir_len= strlen(plugindir_buffer);
+
+    if (!case_insensitive_fs)
+    {
+      if (!strncmp(plugindir_buffer, opt_secure_file_priv,
+          opt_plugindir_len < opt_secure_file_priv_len ?
+          opt_plugindir_len : opt_secure_file_priv_len))
+      {
+        warn= true;
+        strcpy(whichdir, "Plugin directory");
+      }
+    }
+    else
+    {
+      if (!files_charset_info->coll->strnncoll(files_charset_info,
+          (uchar *) plugindir_buffer,
+          opt_plugindir_len,
+          (uchar *) opt_secure_file_priv,
+          opt_secure_file_priv_len,
+          TRUE))
+      {
+        warn= true;
+        strcpy(whichdir, "Plugin directory");
+      }
+    }
+  }
+
+
+  if (warn)
+    sql_print_warning("Insecure configuration for --secure-file-priv: "
+                      "%s is accessible through "
+                      "--secure-file-priv. Consider choosing a different "
+                      "directory.", whichdir);
+
+#ifndef _WIN32
+  /*
+     Check for --secure-file-priv directory's permission
+  */
+  if (!(my_stat(opt_secure_file_priv, &dir_stat, MYF(0))))
+  {
+    sql_print_error("Failed to get stat for directory pointed out "
+                    "by --secure-file-priv");
+    return false;
+  }
+
+  if (dir_stat.st_mode & S_IRWXO)
+    sql_print_warning("Insecure configuration for --secure-file-priv: "
+                      "Location is accessible to all OS users. "
+                      "Consider choosing a different directory.");
+#endif
+  return true;
+}
+
+
 static int fix_paths(void)
 {
   char buff[FN_REFLEN],*pos;
+  bool secure_file_priv_nonempty= false;
   convert_dirname(mysql_home,mysql_home,NullS);
   /* Resolve symlinks to allow 'mysql_home' to be a relative symlink */
   my_realpath(mysql_home,mysql_home,MYF(0));
